@@ -5,7 +5,6 @@ import { Hero } from "@/components/home/hero";
 import { Instagram } from "@/components/home/instagram";
 import { Locations } from "@/components/home/locations";
 import { Reviews } from "@/components/home/reviews";
-import { Story } from "@/components/home/story";
 import { Ticker } from "@/components/home/ticker";
 import { WeeklySpecial } from "@/components/home/weekly-special";
 import { instagramPosts, sampleReviews } from "@/data/social";
@@ -26,7 +25,6 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <WeeklySpecial lang={lang} t={t.special} />
       <Boxes lang={lang} t={t.boxes} />
       <DessertMoment lang={lang} t={t.dessert} />
-      <Story t={t.story} />
       <Reviews reviews={sampleReviews} t={t.reviews} rtl={lang === "ar"} />
       <Instagram posts={instagramPosts} t={t.instagram} />
       <Locations lang={lang} t={t.locations} orderNow={t.common.orderNow} />

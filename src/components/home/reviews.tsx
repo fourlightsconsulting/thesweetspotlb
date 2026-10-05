@@ -66,7 +66,7 @@ export function Reviews({ reviews, t, rtl }: Props) {
       id="reviews"
       aria-roledescription="carousel"
       aria-labelledby="reviews-title"
-      className="overflow-x-clip pt-[140px] desk:pt-[clamp(130px,17cqw,260px)]"
+      className="overflow-x-clip pt-[clamp(80px,9cqw,140px)]"
     >
       <div className="shell flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <h2

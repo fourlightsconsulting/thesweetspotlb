@@ -1,6 +1,7 @@
 const en = {
   meta: {
     title: "The Sweet Spot · Crêpes, waffles & ice cream rolls in Tripoli",
+    titleTemplate: "%s · The Sweet Spot",
     description:
       "Crêpes, waffles, pancakes, ice cream rolls and more, made to order in Tripoli. Ready in 10–15 min for pickup or delivery.",
   },
