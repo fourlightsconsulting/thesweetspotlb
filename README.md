@@ -17,20 +17,19 @@ npm run dev
 
 Open http://localhost:3000.
 
-| Script               | What it does                                          |
-| -------------------- | ----------------------------------------------------- |
-| `npm run dev`        | Next.js dev server                                    |
-| `npm run build`      | Next.js production build                              |
-| `npm run preview`    | Build for Cloudflare and run it locally (workerd)     |
-| `npm run deploy`     | Build and deploy to Cloudflare (needs Wrangler login) |
-| `npm run lint`       | ESLint                                                |
-| `npm run typecheck`  | Generate route types, then `tsc`                      |
-| `npm run format`     | Prettier (write)                                      |
-| `npm run cf-typegen` | Generate types for bindings in `wrangler.jsonc`       |
+| Script               | What it does                                      |
+| -------------------- | ------------------------------------------------- |
+| `npm run dev`        | Next.js dev server                                |
+| `npm run build`      | Next.js production build                          |
+| `npm run preview`    | Build for Cloudflare and run it locally (workerd) |
+| `npm run lint`       | ESLint                                            |
+| `npm run typecheck`  | Generate route types, then `tsc`                  |
+| `npm run format`     | Prettier (write)                                  |
+| `npm run cf-typegen` | Generate types for bindings in `wrangler.jsonc`   |
 
 ## Deployment (Cloudflare Workers Builds)
 
-Connect the GitHub repo to a Worker named `thesweetspotlb` (it must match `name` in `wrangler.jsonc`) and set:
+Deploys happen only through Cloudflare's GitHub integration: every push to `main` builds and deploys. Connect the GitHub repo to a Worker named `thesweetspotlb` (it must match `name` in `wrangler.jsonc`) and set:
 
 - Build command: `npx opennextjs-cloudflare build`
 - Deploy command: `npx opennextjs-cloudflare deploy`
