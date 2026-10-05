@@ -86,9 +86,19 @@ const en = {
   },
   instagram: {
     title: "Fresh from the feed",
+    subtitle: "New drops, weekly specials and life behind the counter.",
     follow: "Follow @thesweetspotlb",
-    reel: "Latest reel",
+    followShort: "Follow",
+    // Draft bio; the live feed will supply the real one.
+    bio: [
+      "Crêpes · Waffles · Ice cream rolls",
+      "Tripoli · Pickup & delivery",
+      "Open till 1 am on weekends",
+    ],
+    reel: "Reel",
     post: "Instagram post",
+    close: "Close",
+    viewOnInstagram: "View on Instagram",
   },
   locations: {
     title: "Come say hi.",

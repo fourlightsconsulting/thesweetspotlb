@@ -84,20 +84,6 @@ export function ArrowSweepRight({ className = "", style }: DoodleProps) {
   );
 }
 
-/** Loopy arrow pointing down. */
-export function ArrowLoop({ className = "", style }: DoodleProps) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 70 80" className={`${base} ${className}`} style={style}>
-      <path
-        pathLength={1}
-        d="M50 4 C 64 22, 40 36, 30 24 C 22 14, 40 8, 44 30 C 47 48, 36 62, 22 72"
-        strokeWidth={2.8}
-      />
-      <path pathLength={1} d="M21 60 L21 73 L34 73" strokeWidth={2.8} />
-    </svg>
-  );
-}
-
 /** Cherry heart at the end of a line. */
 export function Heart({ className = "", style }: DoodleProps) {
   return (

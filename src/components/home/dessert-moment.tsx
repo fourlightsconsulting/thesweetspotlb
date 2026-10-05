@@ -13,7 +13,7 @@ type Props = { lang: Locale; t: Dictionary["dessert"] };
 export function DessertMoment({ lang, t }: Props) {
   return (
     <section className="relative overflow-hidden pt-[120px] pb-[72px] desk:pt-[clamp(150px,13cqw,200px)] desk:pb-[clamp(80px,8cqw,120px)]">
-      <Reveal className="relative mx-auto max-w-[1440px]" threshold={0.3}>
+      <Reveal className="relative mx-auto max-w-[1440px]" threshold={0.3} data-motion="always">
         <h2 className="flex flex-col">
           <span className="-rotate-3 px-[clamp(20px,5cqw,72px)] font-script text-[min(8cqw,44px)] leading-[1.3] font-normal text-blueberry desk:text-[clamp(30px,3.2cqw,46px)]">
             {t.lead}

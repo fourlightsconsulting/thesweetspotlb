@@ -1,25 +1,37 @@
 // Stand-in content until the Instagram feed and curated Google reviews are
 // connected. Every entry is marked as a placeholder on the page.
 import type { StaticImageData } from "next/image";
+import photoBoxLarge from "@/assets/images/photo-box-large.png";
 import photoBox from "@/assets/images/photo-box.png";
 import photoDrinks from "@/assets/images/photo-drinks.png";
 import photoIcecream from "@/assets/images/photo-icecream.png";
 import photoProfiteroles from "@/assets/images/photo-profiteroles.png";
+import photoShop from "@/assets/images/photo-shop.png";
 import photoWaffle from "@/assets/images/photo-waffle.png";
 
+/**
+ * Shaped like what the Instagram API returns, so the live feed can replace
+ * this list: a thumbnail, the post link, and the video file for reels.
+ */
 export type InstagramPost = {
+  id: string;
   image: StaticImageData;
   /** object-position for the crop */
   focus: string;
   isReel?: boolean;
+  /** MP4 for reels; plays in the pop-up. */
+  videoUrl?: string;
+  permalink?: string;
 };
 
 export const instagramPosts: InstagramPost[] = [
-  { image: photoIcecream, focus: "55% 50%", isReel: true },
-  { image: photoDrinks, focus: "62% 40%" },
-  { image: photoBox, focus: "30% 50%" },
-  { image: photoWaffle, focus: "70% 30%" },
-  { image: photoProfiteroles, focus: "40% 60%" },
+  { id: "stand-in-1", image: photoIcecream, focus: "55% 50%", isReel: true },
+  { id: "stand-in-2", image: photoWaffle, focus: "70% 30%" },
+  { id: "stand-in-3", image: photoBoxLarge, focus: "45% 55%", isReel: true },
+  { id: "stand-in-4", image: photoDrinks, focus: "62% 40%" },
+  { id: "stand-in-5", image: photoProfiteroles, focus: "40% 60%", isReel: true },
+  { id: "stand-in-6", image: photoShop, focus: "78% 50%" },
+  { id: "stand-in-7", image: photoBox, focus: "30% 50%" },
 ];
 
 export type Review = {

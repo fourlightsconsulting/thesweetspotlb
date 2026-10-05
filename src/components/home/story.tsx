@@ -31,11 +31,11 @@ export function Story({ t }: Props) {
           </p>
         </div>
 
-        {/* Phones: the collage keeps its 375×330 proportions and caps at 520px wide,
-            hugging the end edge so the shop photo can bleed off-screen. */}
-        <div className="relative ms-auto mt-11 aspect-[375/330] w-full max-w-[520px] overflow-x-clip desk:ms-0 desk:mt-0 desk:aspect-auto desk:h-[clamp(440px,37cqw,540px)] desk:max-w-none desk:overflow-x-visible">
+        {/* Phones: the collage keeps its 375×330 proportions, caps at 520px wide and
+            stays fully on screen. */}
+        <div className="relative mx-auto mt-11 aspect-[375/330] w-full max-w-[520px] desk:mx-0 desk:mt-0 desk:aspect-auto desk:h-[clamp(440px,37cqw,540px)] desk:max-w-none">
           <figure
-            className={`${polaroid} -end-[8%] top-0 z-1 w-[80%] -rotate-3 p-2.5 pb-9 desk:end-0 desk:-rotate-[2.5deg] desk:p-3 desk:pb-[46px]`}
+            className={`${polaroid} end-[4%] top-0 z-1 w-[74%] -rotate-3 p-2.5 pb-9 desk:end-0 desk:-rotate-[2.5deg] desk:p-3 desk:pb-[46px]`}
           >
             <Image
               src={photoShop}

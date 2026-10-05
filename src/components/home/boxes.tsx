@@ -28,15 +28,18 @@ export function Boxes({ lang, t }: Props) {
       id="boxes"
       className="relative mx-auto mt-[clamp(110px,11cqw,180px)] grid max-w-[1440px] items-center gap-[clamp(32px,6cqw,96px)] desk:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
     >
-      {/* Desktop: bleeds to the start edge. Mobile: 4:5 crop hugging the end edge. */}
+      {/* Desktop: bleeds to the start edge. Phones: full-width square. */}
       <Image
         src={photoBoxLarge}
         alt={t.photoAlt}
-        sizes="(min-width: 820px) 56vw, min(84vw, 520px)"
-        className="ms-auto aspect-[4/5] w-[84%] max-w-[520px] object-cover object-[42%_55%] desk:ms-0 desk:aspect-[6/5] desk:w-full desk:max-w-none desk:object-[50%_60%]"
+        sizes="(min-width: 820px) 56vw, 100vw"
+        className="aspect-square max-h-[600px] w-full object-cover object-[45%_55%] desk:aspect-[6/5] desk:max-h-none desk:object-[50%_60%]"
       />
 
-      <Reveal className="flex flex-col items-start gap-[18px] px-5 desk:ps-0 desk:pe-[clamp(20px,5cqw,72px)]">
+      <Reveal
+        className="flex flex-col items-start gap-[18px] px-5 desk:ps-0 desk:pe-[clamp(20px,5cqw,72px)]"
+        data-motion="always"
+      >
         <span className="eyebrow text-blueberry">{t.tag}</span>
         <h2 className="font-display text-[clamp(46px,5.6cqw,84px)] leading-[0.95] font-black tracking-[-0.035em] text-balance">
           {t.title}

@@ -86,9 +86,14 @@ const ar: Dictionary = {
   },
   instagram: {
     title: "طازة من إنستغرام",
+    subtitle: "جديدنا، عروض الأسبوع، وشو عم يصير ورا الكاونتر.",
     follow: "تابعنا @thesweetspotlb",
-    reel: "آخر ريل",
+    followShort: "تابعنا",
+    bio: ["كريب · وافل · آيس كريم رولز", "طرابلس · استلام وتوصيل", "مفتوحين لـ 1 فجراً بالويكند"],
+    reel: "ريل",
     post: "منشور على إنستغرام",
+    close: "إغلاق",
+    viewOnInstagram: "شوفها على إنستغرام",
   },
   locations: {
     title: "مرّ سلّم علينا.",

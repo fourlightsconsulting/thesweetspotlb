@@ -384,6 +384,24 @@ html[lang="ar"] {
   stroke-dasharray: 1;
 }
 
+/* Sections marked data-motion="always" keep their small entrance touches on
+   phones too: the dessert full stop rolling in and the boxes heart drawing.
+   Plain CSS, run once on scroll. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="always"] .doodle path {
+    transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0.2s);
+  }
+  .js [data-motion="always"]:not([data-inview]) .doodle path {
+    stroke-dashoffset: 1;
+  }
+  .js [data-motion="always"]:not([data-inview]) .roll-in {
+    opacity: 0;
+  }
+  [data-motion="always"][data-inview] .roll-in {
+    animation: tss-roll-in 1.1s var(--ease-soft) 0.15s backwards;
+  }
+}
+
 @media (width >= 51.25rem) and (prefers-reduced-motion: no-preference) {
   .reel img {
     opacity: 0;
@@ -434,4 +452,9 @@ html[lang="ar"] {
   .marquee {
     animation: none;
   }
+}
+
+/* No page scroll behind an open pop-up (Instagram posts). */
+html:has(dialog[open]) {
+  overflow: hidden;
 }
