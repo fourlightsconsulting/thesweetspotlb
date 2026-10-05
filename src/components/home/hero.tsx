@@ -74,7 +74,7 @@ export function Hero({ lang, t, orderNow }: Props) {
         <div aria-hidden="true" className="absolute inset-x-0 top-0 z-3 awning" />
       </div>
 
-      <div className="absolute inset-0 z-2 mx-auto flex max-w-[1440px] flex-col items-center justify-end px-5 pb-11 text-vanilla desk:items-start desk:gap-[clamp(16px,1.8cqw,26px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[72px] desk:pb-[clamp(24px,5cqw,88px)]">
+      <div className="absolute inset-0 z-2 mx-auto flex max-w-[1440px] flex-col items-center justify-end px-5 pb-8 text-vanilla desk:items-start desk:gap-[clamp(16px,1.8cqw,26px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[72px] desk:pb-[clamp(24px,5cqw,88px)]">
         <h1 className="rise sr-only font-display font-black tracking-[-0.03em] desk:not-sr-only desk:text-[clamp(54px,7.6cqw,124px)] desk:leading-[0.92] desk:text-shadow-[0_2px_28px_rgba(20,40,55,.35)]">
           <span className="block">{t.line1}</span> <span className="block">{t.line2}</span>{" "}
           <span className="block text-strawberry-cream">{t.line3}</span>
@@ -84,10 +84,7 @@ export function Hero({ lang, t, orderNow }: Props) {
         </p>
 
         {/* Phones: just the button, sitting above the ticker's scallops */}
-        <Link
-          href={routes(lang).order}
-          className="btn btn-light btn-lg w-full max-w-[460px] desk:hidden"
-        >
+        <Link href={routes(lang).order} className="btn btn-light px-7 desk:hidden">
           {orderNow} <span aria-hidden="true">{forwardArrow(lang)}</span>
         </Link>
 

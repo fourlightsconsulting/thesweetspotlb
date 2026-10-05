@@ -233,21 +233,24 @@ html[lang="ar"] {
 }
 
 @utility scallop-top {
-  /* bumps rising from the top edge, in the element's --scallop colour */
+  /* bumps rising from the top edge, in the element's --scallop colour.
+     Optional sizing: --scallop-r (bump radius), --scallop-w (spacing),
+     --scallop-h (height); defaults match the footer. */
   &::before {
     content: "";
     position: absolute;
     inset-inline: 0;
-    top: -22px;
-    height: 24px;
+    top: calc(2px - var(--scallop-h, 24px));
+    height: var(--scallop-h, 24px);
     pointer-events: none;
     background: radial-gradient(
-        circle at 18px 24px,
-        var(--scallop) 0 18.5px,
-        var(--color-chocolate) 19px 21px,
-        transparent 21.5px
+        circle at calc(var(--scallop-w, 36px) / 2) var(--scallop-h, 24px),
+        var(--scallop) 0 var(--scallop-r, 18.5px),
+        var(--color-chocolate) calc(var(--scallop-r, 18.5px) + 0.5px)
+          calc(var(--scallop-r, 18.5px) + 2.5px),
+        transparent calc(var(--scallop-r, 18.5px) + 3px)
       )
-      0 0 / 36px 24px repeat-x;
+      0 0 / var(--scallop-w, 36px) var(--scallop-h, 24px) repeat-x;
   }
 }
 
