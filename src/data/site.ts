@@ -22,3 +22,10 @@ export const tripoliHours: [number, number][] = [
   [12 * 60, 25 * 60], // Fri 12 pm – 1 am
   [12 * 60, 25 * 60], // Sat
 ];
+
+/**
+ * Hero video, served from /public (e.g. "/video/hero-desktop.mp4"). Leave null
+ * until the clips arrive; the hero shows stills meanwhile. Aim for 6–10 s,
+ * silent H.264 MP4: ~2 MB landscape for desktop, under 1 MB portrait for phones.
+ */
+export const heroVideo: { desktop: string; mobile: string } | null = null;

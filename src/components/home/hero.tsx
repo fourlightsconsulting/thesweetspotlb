@@ -1,46 +1,74 @@
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import photoIcecream from "@/assets/images/photo-icecream.png";
 import photoProfiteroles from "@/assets/images/photo-profiteroles.png";
 import photoWaffle from "@/assets/images/photo-waffle.png";
 import { ArrowDownLeft, ArrowToButton } from "@/components/doodles";
+import { HeroVideo } from "@/components/home/hero-video";
 import { Reveal } from "@/components/reveal";
+import { heroVideo } from "@/data/site";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 
-// Crossfading stills (18s loop, slow zoom) until the real hero video arrives.
+// Until the video arrives: crossfading stills on desktop (18s loop, slow zoom),
+// the first still alone on phones. With a video, the first still is its poster.
 const reel = [
   { src: photoWaffle, origin: "35% 60%" },
   { src: photoIcecream, origin: "65% 40%" },
   { src: photoProfiteroles, origin: "50% 55%" },
 ];
+const stills = heroVideo ? reel.slice(0, 1) : reel;
+
+// Phones get a 1px blank in place of the extra stills, so they are never fetched.
+const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 type Props = { lang: Locale; t: Dictionary["hero"]; orderNow: string };
 
 export function Hero({ lang, t, orderNow }: Props) {
   return (
-    <section className="relative h-[calc(100svh-150px)] min-h-[520px] overflow-hidden bg-blueberry text-vanilla desk:h-[min(calc(100svh-110px),820px)]">
-      <div className="reel absolute inset-0">
-        {reel.map((photo, i) => (
-          <Image
-            key={photo.origin}
-            src={photo.src}
-            alt=""
-            fill
-            loading={i === 0 ? "eager" : "lazy"}
-            fetchPriority={i === 0 ? "high" : "auto"}
-            sizes="100vw"
-            className="object-cover"
-            style={{ transformOrigin: photo.origin, animationDelay: `${i * 6 - 1}s` }}
-          />
-        ))}
+    <section className="relative h-[calc(100svh-130px)] min-h-[460px] overflow-hidden bg-blueberry text-vanilla desk:h-[min(calc(100svh-110px),820px)] desk:min-h-[520px]">
+      <div className={`absolute inset-0 ${heroVideo ? "" : "reel"}`}>
+        {stills.map((photo, i) => {
+          const style = { transformOrigin: photo.origin, animationDelay: `${i * 6 - 1}s` };
+          if (i === 0) {
+            return (
+              <Image
+                key={photo.origin}
+                src={photo.src}
+                alt=""
+                fill
+                loading="eager"
+                fetchPriority="high"
+                sizes="100vw"
+                className="object-cover"
+                style={style}
+              />
+            );
+          }
+          const {
+            props: { srcSet, ...props },
+          } = getImageProps({ src: photo.src, alt: "", fill: true, sizes: "100vw" });
+          return (
+            <picture key={photo.origin}>
+              <source media="(width >= 51.25rem)" srcSet={srcSet} />
+              <img
+                {...props}
+                src={BLANK}
+                alt=""
+                className="object-cover"
+                style={{ ...props.style, ...style }}
+              />
+            </picture>
+          );
+        })}
+        {heroVideo && <HeroVideo desktop={heroVideo.desktop} mobile={heroVideo.mobile} />}
       </div>
       <div className="absolute inset-0 hero-scrim" />
       <div aria-hidden="true" className="absolute inset-x-0 top-0 z-3 awning" />
 
-      <div className="relative z-2 mx-auto flex h-full max-w-[1440px] flex-col items-start justify-end gap-[clamp(16px,1.8cqw,26px)] px-[clamp(20px,5cqw,72px)] pt-[72px] pb-[clamp(28px,5cqw,88px)]">
-        <h1 className="rise flex flex-col font-display text-[clamp(54px,7.6cqw,124px)] leading-[0.92] font-black tracking-[-0.03em] text-shadow-[0_2px_28px_rgba(20,40,55,.35)]">
+      <div className="relative z-2 mx-auto flex h-full max-w-[1440px] flex-col items-start justify-end gap-[clamp(16px,1.8cqw,26px)] px-[clamp(20px,5cqw,72px)] pt-[72px] pb-[clamp(24px,5cqw,88px)]">
+        <h1 className="rise flex flex-col font-display text-[clamp(46px,14.4cqw,84px)] leading-[0.92] font-black tracking-[-0.03em] text-shadow-[0_2px_28px_rgba(20,40,55,.35)] desk:text-[clamp(54px,7.6cqw,124px)]">
           <span>{t.line1}</span>
           <span>{t.line2}</span>
           <span className="text-strawberry-cream">{t.line3}</span>
@@ -50,7 +78,7 @@ export function Hero({ lang, t, orderNow }: Props) {
         </p>
 
         {/* Mobile: note above a full-width button */}
-        <Reveal className="w-full [--draw-delay:.7s] desk:hidden">
+        <div className="w-full max-w-[460px] desk:hidden">
           <div className="flex items-end justify-end text-vanilla" aria-hidden="true">
             <ArrowDownLeft className="mb-1 h-[38px] w-10 stroke-current rtl:-scale-x-100" />
             <span className="mb-[22px] -rotate-4 font-script text-[19px] leading-[1.2] whitespace-nowrap">
@@ -60,7 +88,7 @@ export function Hero({ lang, t, orderNow }: Props) {
           <Link href={routes(lang).order} className="btn btn-light btn-lg w-full">
             {orderNow} <span aria-hidden="true">{forwardArrow(lang)}</span>
           </Link>
-        </Reveal>
+        </div>
 
         {/* Desktop: button with a hand-written note pointing back at it */}
         <Reveal className="mt-1 hidden items-center gap-1 [--draw-delay:.7s] desk:flex">

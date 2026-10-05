@@ -32,8 +32,8 @@ export function Boxes({ lang, t }: Props) {
       <Image
         src={photoBoxLarge}
         alt={t.photoAlt}
-        sizes="(min-width: 820px) 56vw, 84vw"
-        className="ms-[16%] aspect-[4/5] w-[84%] object-cover object-[42%_55%] desk:ms-0 desk:aspect-[6/5] desk:w-full desk:object-[50%_60%]"
+        sizes="(min-width: 820px) 56vw, min(84vw, 520px)"
+        className="ms-auto aspect-[4/5] w-[84%] max-w-[520px] object-cover object-[42%_55%] desk:ms-0 desk:aspect-[6/5] desk:w-full desk:max-w-none desk:object-[50%_60%]"
       />
 
       <Reveal className="flex flex-col items-start gap-[18px] px-5 desk:ps-0 desk:pe-[clamp(20px,5cqw,72px)]">

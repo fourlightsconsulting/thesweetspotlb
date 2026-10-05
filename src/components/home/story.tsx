@@ -31,7 +31,9 @@ export function Story({ t }: Props) {
           </p>
         </div>
 
-        <div className="relative mt-11 h-[330px] overflow-x-clip desk:mt-0 desk:h-[clamp(440px,37cqw,540px)] desk:overflow-x-visible">
+        {/* Phones: the collage keeps its 375×330 proportions and caps at 520px wide,
+            hugging the end edge so the shop photo can bleed off-screen. */}
+        <div className="relative ms-auto mt-11 aspect-[375/330] w-full max-w-[520px] overflow-x-clip desk:ms-0 desk:mt-0 desk:aspect-auto desk:h-[clamp(440px,37cqw,540px)] desk:max-w-none desk:overflow-x-visible">
           <figure
             className={`${polaroid} -end-[8%] top-0 z-1 w-[80%] -rotate-3 p-2.5 pb-9 desk:end-0 desk:-rotate-[2.5deg] desk:p-3 desk:pb-[46px]`}
           >
@@ -49,7 +51,7 @@ export function Story({ t }: Props) {
 
           <div
             aria-hidden="true"
-            className="absolute start-4 top-[22px] z-3 flex flex-col items-start text-blueberry desk:-start-[2%] desk:top-[2%]"
+            className="absolute start-[4%] top-[7%] z-3 flex flex-col items-start text-blueberry desk:-start-[2%] desk:top-[2%]"
           >
             <span className="-rotate-8 font-script text-2xl leading-[1.2] desk:text-[clamp(28px,2.4cqw,36px)]">
               {t.place}
@@ -58,7 +60,7 @@ export function Story({ t }: Props) {
           </div>
 
           <figure
-            className={`${polaroid} start-5 -bottom-[86px] z-2 w-[48%] rotate-4 p-2 pb-[30px] desk:start-[2%] desk:-bottom-[150px] desk:w-[42%] desk:p-2.5 desk:pb-10`}
+            className={`${polaroid} start-[5%] -bottom-[26%] z-2 w-[48%] rotate-4 p-2 pb-[30px] desk:start-[2%] desk:-bottom-[150px] desk:w-[42%] desk:p-2.5 desk:pb-10`}
           >
             <div className={`${placeholder} aspect-[4/5]`}>Real photo · waffle iron mid-pour</div>
             <span

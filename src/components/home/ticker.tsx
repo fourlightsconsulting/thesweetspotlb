@@ -26,7 +26,7 @@ function Half({ words }: { words: string[] }) {
 
 export function Ticker({ words }: { words: string[] }) {
   return (
-    <div className="scallop-top relative z-2 border-b-[3px] border-chocolate bg-ticker py-[clamp(14px,1.4cqw,20px)] font-ui text-[clamp(22px,2.4cqw,36px)] leading-[1.1] font-black text-vanilla uppercase [font-stretch:125%] [--scallop:var(--color-ticker)] [font-variation-settings:'ROND'_100]">
+    <div className="scallop-top relative z-2 border-b-[3px] border-chocolate bg-ticker py-[clamp(14px,1.4cqw,20px)] font-ui text-[clamp(22px,2.4cqw,36px)] leading-[1.1] font-black text-vanilla uppercase [font-stretch:125%] [--scallop:var(--color-ticker)]">
       <p className="sr-only">{words.join(" · ")}</p>
       <div aria-hidden="true" className="overflow-hidden">
         <div className="marquee flex w-max">

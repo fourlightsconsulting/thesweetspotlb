@@ -11,8 +11,10 @@ import { routes } from "@/i18n/routes";
 type Props = { lang: Locale; t: Dictionary["special"] };
 
 /**
- * Cotton Candy band with a cut-out cup that breaks ~120px above the band into
- * the pink category section. The category section's bottom padding leaves room.
+ * Cotton Candy band with a cut-out cup that breaks above the band into the pink
+ * category section (~120px desktop, 26cqw up to 112px on phones). The category
+ * section's bottom padding leaves room. On phones the cup box is sized in cqw
+ * and capped, so the layout holds from 320px phones to 819px tablets.
  */
 export function WeeklySpecial({ lang, t }: Props) {
   const href = routes(lang).item(WEEKLY_SPECIAL_ID);
@@ -23,24 +25,27 @@ export function WeeklySpecial({ lang, t }: Props) {
       <Reveal className="mx-auto grid max-w-[1440px] desk:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] desk:items-center desk:px-[clamp(20px,5cqw,72px)] desk:py-[clamp(72px,6.4cqw,104px)]">
         <div className="relative z-3 flex flex-col items-start gap-3.5 px-5 pb-16 desk:gap-[clamp(18px,1.8cqw,26px)] desk:p-0">
           <span className="eyebrow">{t.tag}</span>
-          <h2 className="font-display text-[16.5cqw] leading-[0.88] font-black tracking-[-0.04em] text-balance desk:text-[clamp(64px,9cqw,136px)]">
+          <h2 className="font-display text-[min(16.5cqw,96px)] leading-[0.88] font-black tracking-[-0.04em] text-balance desk:text-[clamp(64px,9cqw,136px)]">
             {t.title}
           </h2>
-          <p className="mt-1 font-body text-[17px] leading-normal font-medium text-pretty desk:mt-2 desk:max-w-[30ch] desk:text-[clamp(17px,1.35cqw,20px)]">
+          <p className="mt-1 max-w-[36ch] font-body text-[17px] leading-normal font-medium text-pretty desk:mt-2 desk:max-w-[30ch] desk:text-[clamp(17px,1.35cqw,20px)]">
             {t.description}
           </p>
-          <Link href={href} className="btn btn-primary btn-lg mt-1.5 w-full desk:w-auto">
+          <Link
+            href={href}
+            className="btn btn-primary btn-lg mt-1.5 w-full max-w-[460px] desk:w-auto desk:max-w-none"
+          >
             {t.cta} <span aria-hidden="true">{forwardArrow(lang)}</span>
           </Link>
         </div>
 
-        <div className="relative order-first h-[200px] desk:order-none desk:h-auto desk:min-h-[380px] desk:self-stretch">
-          <div className="absolute end-[-9%] -top-[110px] z-2 aspect-[459/515] w-[74%] desk:end-[2%] desk:top-[calc(-1*(clamp(72px,6.4cqw,104px)+clamp(96px,8.5cqw,128px)))] desk:w-[min(100%,36cqw)]">
+        <div className="relative order-first h-[min(57cqw,247px)] desk:order-none desk:h-auto desk:min-h-[380px] desk:self-stretch">
+          <div className="absolute -end-[min(9cqw,32px)] -top-[min(26cqw,112px)] z-2 aspect-[459/515] w-[min(74cqw,320px)] desk:end-[2%] desk:top-[calc(-1*(clamp(72px,6.4cqw,104px)+clamp(96px,8.5cqw,128px)))] desk:w-[min(100%,36cqw)]">
             <div className="float size-full">
               <Image
                 src={cup}
                 alt={t.cupAlt}
-                sizes="(min-width: 820px) 36vw, 74vw"
+                sizes="(min-width: 820px) 36vw, 320px"
                 className="size-full rotate-6 drop-shadow-[0_28px_22px_rgba(36,91,120,.5)] desk:rotate-5 desk:drop-shadow-[0_40px_34px_rgba(36,91,120,.5)]"
               />
             </div>

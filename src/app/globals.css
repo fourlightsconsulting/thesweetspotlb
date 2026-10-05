@@ -24,8 +24,18 @@
   --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-@theme inline {
-  /* Arabic faces only cover Arabic code points, so Latin falls through. */
+@theme {
+  --font-display: var(--font-fraunces), serif;
+  --font-body: var(--font-fraunces), serif;
+  --font-ui: var(--font-google-sans), system-ui, sans-serif;
+  --font-script: var(--font-pacifico), cursive;
+}
+
+/* Arabic pages put the Arabic faces first. They only cover Arabic code points,
+   so Latin (prices, brand names) falls through to the English fonts. English
+   pages never reference them, so the lone "عربي" switch uses the system font
+   instead of downloading one. */
+html[lang="ar"] {
   --font-display: var(--font-ar-display), var(--font-fraunces), serif;
   --font-body: var(--font-ar-text), var(--font-fraunces), serif;
   --font-ui: var(--font-ar-text), var(--font-google-sans), system-ui, sans-serif;
@@ -354,11 +364,9 @@
   --scrim-angle: 270deg;
 }
 
-.reel > img {
-  opacity: 0;
-  animation: tss-reel 18s linear infinite;
-}
-
+/* Motion runs on desktop only. Phones render everything still: no animation
+   work, and nothing waits on JS to appear. The ticker is the exception: a
+   compositor-only transform that costs nothing per frame. */
 .marquee {
   animation: tss-marquee 40s linear infinite;
 }
@@ -366,26 +374,42 @@
   animation-name: tss-marquee-rtl;
 }
 
-.rise {
-  animation: tss-rise 0.8s var(--ease-soft) both;
-}
-
-.float {
-  animation: tss-float 6s ease-in-out infinite;
-}
-
-.slow-zoom {
-  animation: tss-slow-zoom 14s ease-in-out infinite alternate;
+/* Hero placeholder stills: only the first is shown (and fetched) on phones. */
+.reel > :not(:first-child) {
+  display: none;
 }
 
 /* Hand-drawn strokes: every path uses pathLength="1" so it can draw itself in. */
 .doodle path {
   stroke-dasharray: 1;
-  transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0.2s);
 }
 
-/* Scroll reveals only hide content once JS has marked <html class="js">. */
-@media (prefers-reduced-motion: no-preference) {
+@media (width >= 51.25rem) and (prefers-reduced-motion: no-preference) {
+  .reel img {
+    opacity: 0;
+    animation: tss-reel 18s linear infinite;
+  }
+  .reel > :not(:first-child) {
+    display: block;
+  }
+
+  .rise {
+    animation: tss-rise 0.8s var(--ease-soft) both;
+  }
+
+  .float {
+    animation: tss-float 6s ease-in-out infinite;
+  }
+
+  .slow-zoom {
+    animation: tss-slow-zoom 14s ease-in-out infinite alternate;
+  }
+
+  .doodle path {
+    transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0.2s);
+  }
+
+  /* Scroll reveals only hide content once JS has marked <html class="js">. */
   .js [data-reveal]:not([data-inview]) .doodle path {
     stroke-dashoffset: 1;
   }
@@ -407,19 +431,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .reel > img {
+  .marquee {
     animation: none;
-  }
-  .reel > img:first-child {
-    opacity: 1;
-  }
-  .marquee,
-  .rise,
-  .float,
-  .slow-zoom {
-    animation: none;
-  }
-  .doodle path {
-    transition: none;
   }
 }

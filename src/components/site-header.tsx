@@ -55,7 +55,7 @@ export function SiteHeader({ lang, nav, cartCount = 0 }: Props) {
             alt="The Sweet Spot"
             loading="eager"
             sizes="96px"
-            className="h-auto w-24 transition-[width] duration-300 ease-soft group-data-scrolled/header:w-[72px]"
+            className="h-auto w-[72px] transition-[width] duration-300 ease-soft desk:w-24 desk:group-data-scrolled/header:w-[72px]"
           />
         </Link>
 

@@ -1,20 +1,21 @@
-import { Fraunces, Google_Sans_Flex, Pacifico } from "next/font/google";
+import { Fraunces, Pacifico } from "next/font/google";
 import localFont from "next/font/local";
 
+// Latin only: every character on the site (incl. ê, –, ·) is in that subset.
 export const fraunces = Fraunces({
-  subsets: ["latin", "latin-ext"],
+  subsets: ["latin"],
   axes: ["opsz"],
   variable: "--font-fraunces",
 });
 
-// wdth + ROND drive the wide, rounded ticker lettering.
-export const googleSans = Google_Sans_Flex({
-  subsets: ["latin", "latin-ext"],
-  axes: ["wdth", "ROND"],
+// Self-hosted Google Sans Flex, clipped to the axis ranges we use (wdth 100–125
+// for the ticker, wght 400–900): 65 KB instead of 173 KB for the full font.
+// Source: fonts.googleapis.com/css2?family=Google+Sans+Flex:wdth,wght@100..125,400..900
+export const googleSans = localFont({
+  src: "../fonts/google-sans-flex-latin.woff2",
+  weight: "400 900",
   variable: "--font-google-sans",
-  // next/font has no fallback metrics for this family yet
-  adjustFontFallback: false,
-  fallback: ["system-ui", "sans-serif"],
+  declarations: [{ prop: "font-stretch", value: "100% 125%" }],
 });
 
 export const pacifico = Pacifico({

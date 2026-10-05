@@ -116,7 +116,7 @@ export function Reviews({ reviews, t, rtl }: Props) {
               aria-hidden={!isActive}
               inert={!isActive}
               style={{ "--offset": offset } as CSSProperties}
-              className={`m-0 flex w-[74%] [translate:calc(var(--offset)*var(--dir,1)*(100%-8px))_0] flex-col gap-4 transition-[translate,scale,opacity] duration-700 ease-soft [grid-area:1/1] desk:w-[31%] desk:[translate:calc(var(--offset)*var(--dir,1)*(100%+48px))_0] ${
+              className={`m-0 flex w-[min(74%,420px)] [translate:calc(var(--offset)*var(--dir,1)*(100%-8px))_0] flex-col gap-4 transition-[translate,scale,opacity] duration-700 ease-soft [grid-area:1/1] desk:w-[31%] desk:[translate:calc(var(--offset)*var(--dir,1)*(100%+48px))_0] ${
                 isActive
                   ? "scale-100 opacity-100"
                   : distance === 1

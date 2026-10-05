@@ -23,13 +23,15 @@ type Props = {
   from: string;
 };
 
+// Bottom padding leaves room for the weekly special cup, which rises into this
+// section (see weekly-special.tsx; the two min()/clamp() values must agree).
 export function Categories({ lang, t, from }: Props) {
   const r = routes(lang);
 
   return (
     <section
       id="menu"
-      className="bg-strawberry-cream pt-[clamp(64px,6.4cqw,104px)] pb-[clamp(124px,11cqw,160px)]"
+      className="bg-strawberry-cream pt-[clamp(56px,6.4cqw,104px)] pb-[calc(min(26cqw,112px)+28px)] desk:pb-[clamp(124px,11cqw,160px)]"
     >
       <Reveal className="shell" threshold={0.1}>
         <h2 className="mb-[clamp(24px,3cqw,44px)] font-display text-[clamp(38px,4.6cqw,68px)] leading-[1.02] font-black tracking-[-0.025em] text-balance">
@@ -40,7 +42,7 @@ export function Categories({ lang, t, from }: Props) {
           </span>
         </h2>
 
-        <div className="drop-in -mx-[clamp(20px,5cqw,72px)] grid snap-x snap-mandatory scroll-px-[clamp(20px,5cqw,72px)] [scrollbar-width:none] auto-cols-[64%] grid-flow-col gap-x-[clamp(14px,1.8cqw,26px)] gap-y-[clamp(18px,2.2cqw,32px)] overflow-x-auto px-[clamp(20px,5cqw,72px)] pt-2 pb-[22px] desk:mx-0 desk:grid-flow-row desk:grid-cols-4 desk:overflow-visible desk:p-0">
+        <div className="drop-in -mx-[clamp(20px,5cqw,72px)] grid snap-x snap-mandatory scroll-px-[clamp(20px,5cqw,72px)] [scrollbar-width:none] auto-cols-[min(64%,260px)] grid-flow-col gap-x-[clamp(14px,1.8cqw,26px)] gap-y-[clamp(18px,2.2cqw,32px)] overflow-x-auto px-[clamp(20px,5cqw,72px)] pt-2 pb-[22px] desk:mx-0 desk:grid-flow-row desk:grid-cols-4 desk:overflow-visible desk:p-0">
           {categories.map((category, i) => (
             <Link
               key={category.id}
@@ -51,7 +53,7 @@ export function Categories({ lang, t, from }: Props) {
               <Image
                 src={category.image}
                 alt=""
-                sizes="(min-width: 820px) 22vw, 60vw"
+                sizes="(min-width: 820px) 22vw, 260px"
                 className="aspect-square w-full rounded-[clamp(10px,1cqw,14px)] bg-strawberry-milk object-cover"
               />
               <span className="flex flex-col gap-1.5 px-1">

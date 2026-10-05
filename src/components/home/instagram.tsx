@@ -32,7 +32,7 @@ export function Instagram({ posts, t }: Props) {
           </div>
         </div>
 
-        <div className="mt-[clamp(24px,3cqw,44px)] grid grid-cols-2 gap-2 desk:grid-cols-4 desk:gap-[clamp(8px,0.9cqw,14px)]">
+        <div className="mt-[clamp(24px,3cqw,44px)] grid grid-cols-2 gap-2 sm:grid-cols-4 desk:gap-[clamp(8px,0.9cqw,14px)]">
           {posts.map((post, i) => (
             <a
               key={post.image.src}
@@ -41,7 +41,9 @@ export function Instagram({ posts, t }: Props) {
               rel="noreferrer"
               aria-label={post.isReel ? t.reel : `${t.post} ${i}`}
               className={`group relative block overflow-hidden rounded-[4px] bg-strawberry-milk ${
-                post.isReel ? "col-span-2 row-span-2 aspect-square" : "aspect-square"
+                post.isReel
+                  ? "col-span-2 aspect-[4/3] sm:row-span-2 sm:aspect-square"
+                  : "aspect-square"
               }`}
             >
               <Image
@@ -49,7 +51,7 @@ export function Instagram({ posts, t }: Props) {
                 alt=""
                 fill
                 sizes={
-                  post.isReel ? "(min-width: 820px) 50vw, 100vw" : "(min-width: 820px) 25vw, 50vw"
+                  post.isReel ? "(min-width: 640px) 50vw, 100vw" : "(min-width: 640px) 25vw, 50vw"
                 }
                 className={`object-cover transition-transform duration-500 ease-soft group-hover:scale-105 ${post.isReel ? "slow-zoom" : ""}`}
                 style={{ objectPosition: post.focus }}
