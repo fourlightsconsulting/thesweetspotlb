@@ -24,9 +24,17 @@ export const tripoliHours: [number, number][] = [
 ];
 
 /**
- * Hero video, served from /public (e.g. "/video/hero-desktop.mp4"). Leave null
- * until the clips arrive; the hero shows stills meanwhile. Aim for 6–10 s,
- * silent H.264 MP4: ~2 MB 16:9 for desktop, under 1 MB 4:5 (e.g. 1080×1350) for
- * phones. A 9:16 Reel also works on phones; it is centre-cropped to 4:5.
+ * Hero video, served from /public. Each screen size is optional: without a
+ * clip, that size keeps the photo stills. Aim for short, silent H.264 MP4s:
+ * ~2 MB 16:9 for desktop, ~1–2 MB portrait for phones (shown as a 4:5 crop,
+ * trimmed equally top and bottom).
+ *
+ * The phone poster (src/assets/images/hero-mobile-poster.jpg) is the frame at
+ * `startAt` seconds, so playback picks up exactly where the still leaves off.
  */
-export const heroVideo: { desktop: string; mobile: string } | null = null;
+export type HeroVideo = { mobile?: string; desktop?: string; startAt?: number };
+
+export const heroVideo: HeroVideo | null = {
+  mobile: "/video/hero-mobile.mp4",
+  startAt: 4,
+};

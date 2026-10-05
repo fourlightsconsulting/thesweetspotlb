@@ -53,3 +53,7 @@ next-env.d.ts
 # design references (local only, not part of the build)
 /design_handoff_sweet_spot_site/
 /mockups/
+
+# raw source media dropped in the root (processed copies live in public/)
+/*.mp4
+/*.mov
