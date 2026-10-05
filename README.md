@@ -4,7 +4,9 @@ Bilingual (EN / AR, RTL) marketing site and online ordering for The Sweet Spot, 
 
 ## Stack
 
-Next.js (App Router, TypeScript, React Compiler) · Tailwind CSS v4 · ESLint + Prettier · Supabase (orders and tracking, coming later)
+Next.js 16 (App Router, TypeScript, React Compiler) · Tailwind CSS v4 · ESLint + Prettier · Cloudflare Workers via [OpenNext](https://opennext.js.org/cloudflare) · Supabase (orders, menu, tracking — coming later)
+
+Routes are locale-prefixed: `/en/...` and `/ar/...`; `/` redirects to `/en`.
 
 ## Getting started
 
@@ -15,17 +17,24 @@ npm run dev
 
 Open http://localhost:3000.
 
-| Script              | What it does     |
-| ------------------- | ---------------- |
-| `npm run dev`       | Dev server       |
-| `npm run build`     | Production build |
-| `npm run lint`      | ESLint           |
-| `npm run typecheck` | TypeScript check |
-| `npm run format`    | Prettier (write) |
+| Script               | What it does                                          |
+| -------------------- | ----------------------------------------------------- |
+| `npm run dev`        | Next.js dev server                                    |
+| `npm run build`      | Next.js production build                              |
+| `npm run preview`    | Build for Cloudflare and run it locally (workerd)     |
+| `npm run deploy`     | Build and deploy to Cloudflare (needs Wrangler login) |
+| `npm run lint`       | ESLint                                                |
+| `npm run typecheck`  | Generate route types, then `tsc`                      |
+| `npm run format`     | Prettier (write)                                      |
+| `npm run cf-typegen` | Generate types for bindings in `wrangler.jsonc`       |
+
+## Deployment (Cloudflare Workers Builds)
+
+Connect the GitHub repo to a Worker named `thesweetspotlb` (it must match `name` in `wrangler.jsonc`) and set:
+
+- Build command: `npx opennextjs-cloudflare build`
+- Deploy command: `npx opennextjs-cloudflare deploy`
 
 ## Design references
 
-- `design_handoff_sweet_spot_site/` — HTML prototypes (home directions 3a and 2a, order, checkout, done), menu data and EN/AR strings in `tss-data.js`, brand notes. See its `README.md` for tokens and specs.
-- `mockups/` — earlier landing and order page mockups.
-
-These are references only; they are not part of the app build.
+The design prototypes (`design_handoff_sweet_spot_site/`, `mockups/`) are kept locally and are not in git. Assets the site needs are copied into `public/`.
