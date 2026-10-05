@@ -4,7 +4,7 @@ import heroMobilePoster from "@/assets/images/hero-mobile-poster.jpg";
 import photoIcecream from "@/assets/images/photo-icecream.png";
 import photoProfiteroles from "@/assets/images/photo-profiteroles.png";
 import photoWaffle from "@/assets/images/photo-waffle.png";
-import { ArrowDownLeft, ArrowToButton } from "@/components/doodles";
+import { ArrowToButton } from "@/components/doodles";
 import { HeroVideo } from "@/components/home/hero-video";
 import { Reveal } from "@/components/reveal";
 import { heroVideo } from "@/data/site";
@@ -36,8 +36,10 @@ const imageProps = (src: typeof photoWaffle, priority = false) =>
 type Props = { lang: Locale; t: Dictionary["hero"]; orderNow: string };
 
 /**
- * Phones: a 4:5 video box with nothing on it, then the headline and order
- * button below on cream. Desktop: full-height stills with everything overlaid.
+ * Phones: a 4:5 video box with only the order button on it; the ticker below
+ * overlaps its bottom edge with its scallops. The H1 is kept for search and
+ * screen readers but hidden visually. Desktop: full-height stills with the
+ * headline and button overlaid.
  */
 export function Hero({ lang, t, orderNow }: Props) {
   const poster = imageProps(heroMobilePoster, true);
@@ -72,29 +74,22 @@ export function Hero({ lang, t, orderNow }: Props) {
         <div aria-hidden="true" className="absolute inset-x-0 top-0 z-3 awning" />
       </div>
 
-      {/* Phones: below the video on cream. Desktop: overlaid on the stills. */}
-      <div className="mx-auto flex max-w-[500px] flex-col gap-4 px-5 pt-5 pb-7 desk:absolute desk:inset-0 desk:z-2 desk:max-w-[1440px] desk:items-start desk:justify-end desk:gap-[clamp(16px,1.8cqw,26px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[72px] desk:pb-[clamp(24px,5cqw,88px)] desk:text-vanilla">
-        <h1 className="rise font-display text-[clamp(28px,8.8cqw,44px)] leading-[1.02] font-black tracking-[-0.03em] desk:text-[clamp(54px,7.6cqw,124px)] desk:leading-[0.92] desk:text-shadow-[0_2px_28px_rgba(20,40,55,.35)]">
-          <span className="desk:block">{t.line1}</span>{" "}
-          <span className="desk:block">{t.line2}</span>{" "}
-          <span className="block text-blueberry desk:text-strawberry-cream">{t.line3}</span>
+      <div className="absolute inset-0 z-2 mx-auto flex max-w-[1440px] flex-col items-center justify-end px-5 pb-11 text-vanilla desk:items-start desk:gap-[clamp(16px,1.8cqw,26px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[72px] desk:pb-[clamp(24px,5cqw,88px)]">
+        <h1 className="rise sr-only font-display font-black tracking-[-0.03em] desk:not-sr-only desk:text-[clamp(54px,7.6cqw,124px)] desk:leading-[0.92] desk:text-shadow-[0_2px_28px_rgba(20,40,55,.35)]">
+          <span className="block">{t.line1}</span> <span className="block">{t.line2}</span>{" "}
+          <span className="block text-strawberry-cream">{t.line3}</span>
         </h1>
         <p className="rise hidden max-w-[32ch] font-body text-[clamp(18px,1.6cqw,22px)] leading-[1.45] font-medium text-pretty [animation-delay:120ms] desk:block">
           {t.lead}
         </p>
 
-        {/* Mobile: note above a full-width button */}
-        <div className="-mt-2 desk:hidden">
-          <div className="flex items-end justify-end text-blueberry" aria-hidden="true">
-            <ArrowDownLeft className="mb-1 h-[38px] w-10 stroke-current rtl:-scale-x-100" />
-            <span className="mb-[22px] -rotate-4 font-script text-[19px] leading-[1.2] whitespace-nowrap">
-              {t.note}
-            </span>
-          </div>
-          <Link href={routes(lang).order} className="btn btn-primary btn-lg w-full">
-            {orderNow} <span aria-hidden="true">{forwardArrow(lang)}</span>
-          </Link>
-        </div>
+        {/* Phones: just the button, sitting above the ticker's scallops */}
+        <Link
+          href={routes(lang).order}
+          className="btn btn-light btn-lg w-full max-w-[460px] desk:hidden"
+        >
+          {orderNow} <span aria-hidden="true">{forwardArrow(lang)}</span>
+        </Link>
 
         {/* Desktop: button with a hand-written note pointing back at it */}
         <Reveal className="mt-1 hidden items-center gap-1 [--draw-delay:.7s] desk:flex">

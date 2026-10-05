@@ -33,16 +33,6 @@ export function ArrowToButton({ className = "", style }: DoodleProps) {
   );
 }
 
-/** Short curved arrow pointing down-left (mobile hero note). */
-export function ArrowDownLeft({ className = "", style }: DoodleProps) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 48 44" className={`${base} ${className}`} style={style}>
-      <path pathLength={1} d="M46 8 C 24 2, 8 14, 9 38" strokeWidth={2.6} />
-      <path pathLength={1} d="M2 30 L9 40 L17 31" strokeWidth={2.6} />
-    </svg>
-  );
-}
-
 /** Three short rays pointing at a product. */
 export function Rays({ className = "", style }: DoodleProps) {
   return (
