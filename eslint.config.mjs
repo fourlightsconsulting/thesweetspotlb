@@ -14,6 +14,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Cloudflare build output:
+    ".open-next/**",
+    ".wrangler/**",
     // Design references (prototype HTML/JS, not app code):
     "design_handoff_sweet_spot_site/**",
     "mockups/**",

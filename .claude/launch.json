@@ -6,6 +6,16 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "design-refs",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "const h=require('http'),f=require('fs'),p=require('path');const r=process.cwd();const t={'.html':'text/html; charset=utf-8','.js':'text/javascript','.css':'text/css','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ttf':'font/ttf','.md':'text/plain; charset=utf-8'};h.createServer((q,s)=>{const fp=p.join(r,p.normalize(decodeURIComponent(q.url.split('?')[0])));if(!fp.startsWith(r))return s.writeHead(403).end();f.readFile(fp,(e,d)=>{if(e)return s.writeHead(404).end();s.writeHead(200,{'Content-Type':t[p.extname(fp)]||'application/octet-stream'});s.end(d)})}).listen(4100)"
+      ],
+      "port": 4100,
+      "url": "http://localhost:4100"
     }
   ]
 }

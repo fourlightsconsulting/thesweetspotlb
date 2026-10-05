@@ -8,3 +8,6 @@ export const hasLocale = (value: string): value is Locale =>
   (locales as readonly string[]).includes(value);
 
 export const localeDir = (locale: Locale) => (locale === "ar" ? "rtl" : "ltr");
+
+/** Inline arrow glyph that points "forward" in the reading direction. */
+export const forwardArrow = (locale: Locale) => (locale === "ar" ? "←" : "→");

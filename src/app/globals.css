@@ -1,6 +1,425 @@
 @import "tailwindcss";
 
-body {
-  background: #fff8ee;
-  color: #352522;
+/* ── Design tokens ─────────────────────────────────────────────
+   Brand palette (guidelines v1.3). Change a colour here and it updates everywhere. */
+@theme {
+  --color-vanilla: #fff8ee; /* page background */
+  --color-strawberry-cream: #f0cfd5; /* story band, category band, hover fills */
+  --color-strawberry-milk: #f9e9e9; /* placeholder fills */
+  --color-cotton-candy: #53b3d6; /* weekly special band */
+  --color-cotton-candy-light: #68bedd;
+  --color-blueberry: #245b78; /* action colour: buttons, links, footer */
+  --color-blueberry-hover: oklch(0.37 0.07 236);
+  --color-chocolate: #352522; /* text, outlines, hard shadows */
+  --color-cacao: #5a3a32; /* secondary text */
+  --color-caramel: #c9874a; /* hand-drawn underline/circle, link underline */
+  --color-toffee: #d9a15f; /* price sticker */
+  --color-cherry: #d94a47; /* promo only (≤2%), hand-drawn heart */
+  --color-whipped: #ffffff; /* Polaroid paper, cards */
+  --color-ticker: oklch(0.53 0.17 2);
+  --color-ticker-star: #f2d48a;
+
+  --breakpoint-desk: 51.25rem; /* 820px: mobile below, desktop above */
+
+  --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@theme inline {
+  /* Arabic faces only cover Arabic code points, so Latin falls through. */
+  --font-display: var(--font-ar-display), var(--font-fraunces), serif;
+  --font-body: var(--font-ar-text), var(--font-fraunces), serif;
+  --font-ui: var(--font-ar-text), var(--font-google-sans), system-ui, sans-serif;
+  --font-script: var(--font-ar-display), var(--font-pacifico), cursive;
+}
+
+/* ── Base ─────────────────────────────────────────────────────── */
+@layer base {
+  html {
+    background: var(--color-vanilla);
+    scroll-padding-top: 96px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-vanilla);
+    color: var(--color-chocolate);
+    font-family: var(--font-ui);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  [lang="ar"],
+  [lang="ar"] * {
+    letter-spacing: 0 !important;
+  }
+
+  [lang="ar"] :is(h1, h2, h3) {
+    line-height: 1.3 !important;
+  }
+}
+
+/* ── Layout helpers ───────────────────────────────────────────── */
+@utility page {
+  /* cqw units throughout the design are relative to the page width */
+  container-type: inline-size;
+}
+
+@utility shell {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: clamp(20px, 5cqw, 72px);
+}
+
+@utility eyebrow {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  @variant desk {
+    font-size: 13px;
+    line-height: 18px;
+  }
+}
+
+@utility text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  color: var(--color-blueberry);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 17px;
+  text-decoration: underline;
+  text-decoration-color: var(--color-caramel);
+  text-decoration-thickness: 2.5px;
+  text-underline-offset: 8px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: var(--color-chocolate);
+  }
+}
+
+/* ── Sticker buttons: chocolate outline + hard offset shadow ──── */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 0 22px;
+    border: 2.5px solid var(--color-chocolate);
+    border-radius: 14px;
+    box-shadow: 4px 5px 0 var(--color-chocolate);
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      transform 0.18s var(--ease-soft),
+      box-shadow 0.18s var(--ease-soft),
+      background-color 0.2s;
+  }
+  .btn:hover {
+    transform: translate(-1px, -2px);
+    box-shadow: 5px 7px 0 var(--color-chocolate);
+  }
+  .btn:active {
+    transform: translate(3px, 4px);
+    box-shadow: 1px 1px 0 var(--color-chocolate);
+  }
+  .btn:focus-visible {
+    outline: 3px solid var(--color-caramel);
+    outline-offset: 4px;
+  }
+
+  .btn-primary {
+    background: var(--color-blueberry);
+    color: var(--color-vanilla);
+  }
+  .btn-primary:hover {
+    background: var(--color-blueberry-hover);
+  }
+  .btn-secondary {
+    background: var(--color-whipped);
+    color: var(--color-chocolate);
+  }
+  .btn-secondary:hover {
+    background: var(--color-strawberry-cream);
+  }
+  .btn-light {
+    background: var(--color-vanilla);
+    color: var(--color-blueberry);
+  }
+  .btn-light:hover {
+    background: var(--color-strawberry-cream);
+  }
+
+  .btn-sm {
+    min-height: 44px;
+    padding: 0 16px;
+    border-width: 2px;
+    border-radius: 12px;
+    box-shadow: 3px 4px 0 var(--color-chocolate);
+  }
+  .btn-lg {
+    min-height: 58px;
+    padding: 0 30px;
+    font-size: 17px;
+  }
+  .btn-xl {
+    min-height: 64px;
+    padding: 0 36px;
+    font-size: 19px;
+    border-radius: 16px;
+    box-shadow: 5px 6px 0 var(--color-chocolate);
+  }
+}
+
+/* ── Scalloped edges (2a) ─────────────────────────────────────── */
+@utility awning {
+  /* candy-striped awning with a scalloped hem, along the top of the hero */
+  &::before {
+    content: "";
+    display: block;
+    height: 14px;
+    border-top: 2px solid var(--color-chocolate);
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-strawberry-cream) 0 32px,
+      var(--color-vanilla) 32px 64px
+    );
+  }
+  &::after {
+    content: "";
+    display: block;
+    height: 18px;
+    background:
+      radial-gradient(
+          circle at 16px 0,
+          var(--color-strawberry-cream) 0 14.5px,
+          var(--color-chocolate) 15px 17px,
+          transparent 17.5px
+        )
+        0 0 / 64px 18px repeat-x,
+      radial-gradient(
+          circle at 48px 0,
+          var(--color-vanilla) 0 14.5px,
+          var(--color-chocolate) 15px 17px,
+          transparent 17.5px
+        )
+        0 0 / 64px 18px repeat-x;
+  }
+}
+
+@utility scallop-top {
+  /* bumps rising from the top edge, in the element's --scallop colour */
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: -22px;
+    height: 24px;
+    pointer-events: none;
+    background: radial-gradient(
+        circle at 18px 24px,
+        var(--scallop) 0 18.5px,
+        var(--color-chocolate) 19px 21px,
+        transparent 21.5px
+      )
+      0 0 / 36px 24px repeat-x;
+  }
+}
+
+/* ── Section backgrounds ──────────────────────────────────────── */
+@utility hero-scrim {
+  /* blueberry wash so the headline reads over any photo */
+  background: linear-gradient(
+    0deg,
+    rgb(36 91 120 / 0.94) 0%,
+    rgb(36 91 120 / 0.7) 40%,
+    rgb(36 91 120 / 0) 74%
+  );
+
+  @variant desk {
+    background:
+      linear-gradient(
+        var(--scrim-angle, 90deg),
+        rgb(36 91 120 / 0.86) 0%,
+        rgb(36 91 120 / 0.5) 42%,
+        rgb(36 91 120 / 0) 72%
+      ),
+      linear-gradient(0deg, rgb(36 91 120 / 0.55) 0%, rgb(36 91 120 / 0) 45%);
+  }
+}
+
+@utility candy-stripes {
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--color-cotton-candy) 0 14px,
+    var(--color-cotton-candy-light) 14px 28px
+  );
+}
+
+/* ── Motion ───────────────────────────────────────────────────── */
+@keyframes tss-reel {
+  0% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  5% {
+    opacity: 1;
+  }
+  33% {
+    opacity: 1;
+  }
+  39% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes tss-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes tss-marquee-rtl {
+  to {
+    transform: translateX(50%);
+  }
+}
+
+@keyframes tss-rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes tss-float {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes tss-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-36px) rotate(calc(var(--rot, 0deg) - 7deg)) scale(1.08);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+
+@keyframes tss-roll-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(-140% * var(--dir, 1))) rotate(calc(-320deg * var(--dir, 1)));
+  }
+}
+
+@keyframes tss-progress {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes tss-slow-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+[dir="rtl"] {
+  --dir: -1;
+  --scrim-angle: 270deg;
+}
+
+.reel > img {
+  opacity: 0;
+  animation: tss-reel 18s linear infinite;
+}
+
+.marquee {
+  animation: tss-marquee 40s linear infinite;
+}
+[dir="rtl"] .marquee {
+  animation-name: tss-marquee-rtl;
+}
+
+.rise {
+  animation: tss-rise 0.8s var(--ease-soft) both;
+}
+
+.float {
+  animation: tss-float 6s ease-in-out infinite;
+}
+
+.slow-zoom {
+  animation: tss-slow-zoom 14s ease-in-out infinite alternate;
+}
+
+/* Hand-drawn strokes: every path uses pathLength="1" so it can draw itself in. */
+.doodle path {
+  stroke-dasharray: 1;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0.2s);
+}
+
+/* Scroll reveals only hide content once JS has marked <html class="js">. */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal]:not([data-inview]) .doodle path {
+    stroke-dashoffset: 1;
+  }
+
+  .js [data-reveal]:not([data-inview]) .drop-in > * {
+    opacity: 0;
+  }
+  [data-inview] .drop-in > * {
+    animation: tss-drop 0.7s cubic-bezier(0.3, 1.3, 0.5, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 80ms);
+  }
+
+  .js [data-reveal]:not([data-inview]) .roll-in {
+    opacity: 0;
+  }
+  [data-inview] .roll-in {
+    animation: tss-roll-in 1.1s var(--ease-soft) 0.15s backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel > img {
+    animation: none;
+  }
+  .reel > img:first-child {
+    opacity: 1;
+  }
+  .marquee,
+  .rise,
+  .float,
+  .slow-zoom {
+    animation: none;
+  }
+  .doodle path {
+    transition: none;
+  }
 }
