@@ -4,10 +4,11 @@ import type { CSSProperties } from "react";
 import { Underline } from "@/components/doodles";
 import { MenuIcon } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
-import { categories, formatPrice, lowestPrice } from "@/data/menu";
+import { categories, lowestPrice } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
+import { formatPrice } from "@/lib/money";
 
 // Each sticker card sits slightly crooked; it straightens up on hover.
 const tilt = ["-1.6deg", "1.8deg", "-1deg", "2.2deg", "1.4deg", "-2deg", "1.2deg", "-1.4deg"];
@@ -69,23 +70,24 @@ export function Categories({ lang, t, from }: Props) {
                   {category.description[lang]}
                 </span>
                 <span className="mt-0.5 font-ui text-[13px] leading-4 font-semibold text-blueberry">
-                  {from} {formatPrice(lowestPrice(category.id))}
+                  {from} {formatPrice(lowestPrice(category.id), lang)}
                 </span>
               </span>
             </Link>
           ))}
 
+          {/* The full menu: the last card of the phone rail, a full-width bar under the grid on desktop. */}
           <Link
             href={r.order}
-            className={`${card} bg-blueberry text-vanilla`}
-            style={{ "--rot": tilt[7], "--i": 7 } as CSSProperties}
+            className={`${card} bg-blueberry text-vanilla [--rot:-1.4deg] desk:col-span-4 desk:flex-row desk:items-center desk:gap-[clamp(18px,2cqw,28px)] desk:pb-[clamp(8px,0.8cqw,12px)] desk:[--rot:0.5deg]`}
+            style={{ "--i": categories.length } as CSSProperties}
           >
-            <span className="flex aspect-square w-full items-center justify-center rounded-[clamp(10px,1cqw,14px)] bg-cotton-candy">
-              <span className="flex aspect-square w-[44%] items-center justify-center rounded-full border-[2.5px] border-chocolate bg-vanilla font-ui text-[clamp(28px,3.2cqw,52px)] leading-none font-bold text-blueberry">
+            <span className="flex aspect-square w-full items-center justify-center rounded-[clamp(10px,1cqw,14px)] bg-cotton-candy desk:w-[clamp(76px,7cqw,100px)] desk:flex-none">
+              <span className="flex aspect-square w-[44%] items-center justify-center rounded-full border-[2.5px] border-chocolate bg-vanilla font-ui text-[clamp(28px,3.2cqw,52px)] leading-none font-bold text-blueberry desk:w-[62%] desk:text-[clamp(22px,2cqw,30px)]">
                 {forwardArrow(lang)}
               </span>
             </span>
-            <span className="flex flex-col gap-1.5 px-1">
+            <span className="flex flex-col gap-1.5 px-1 desk:flex-1">
               <span className={cardName}>{t.allTitle}</span>
               <span className="font-ui text-[clamp(14px,1.15cqw,16px)] leading-[1.4] text-pretty">
                 {t.allSub}

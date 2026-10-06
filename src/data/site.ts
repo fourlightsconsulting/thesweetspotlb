@@ -4,8 +4,8 @@ export const site = {
   // The live address: link previews (WhatsApp, Instagram) need absolute URLs.
   // Placeholder until the new domain is chosen.
   url: "http://localhost:3000",
-  instagramHandle: "thesweetspotlb",
-  instagramUrl: "https://www.instagram.com/thesweetspotlb/",
+  instagramHandle: "thesweetspot_lb",
+  instagramUrl: "https://www.instagram.com/thesweetspot_lb/",
   tripoliDirectionsUrl:
     "https://www.google.com/maps/search/?api=1&query=The+Sweet+Spot+Tripoli+Lebanon",
   totersUrl: "https://www.totersapp.com/",

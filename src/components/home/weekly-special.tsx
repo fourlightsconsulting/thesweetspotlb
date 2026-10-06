@@ -3,10 +3,11 @@ import Link from "next/link";
 import cup from "@/assets/images/cutout-icecream-cup.png";
 import { ArrowUpLeft, Rays } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
-import { formatPrice, getItem, WEEKLY_SPECIAL_ID } from "@/data/menu";
+import { getItem, WEEKLY_SPECIAL_ID } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
+import { formatPrice } from "@/lib/money";
 
 type Props = { lang: Locale; t: Dictionary["special"] };
 
@@ -18,7 +19,7 @@ type Props = { lang: Locale; t: Dictionary["special"] };
  */
 export function WeeklySpecial({ lang, t }: Props) {
   const href = routes(lang).item(WEEKLY_SPECIAL_ID);
-  const price = formatPrice(getItem(WEEKLY_SPECIAL_ID).price);
+  const price = formatPrice(getItem(WEEKLY_SPECIAL_ID).price, lang);
 
   return (
     <section id="special" className="relative overflow-x-clip bg-cotton-candy text-chocolate">

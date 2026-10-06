@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import photoProfiteroles from "@/assets/images/photo-profiteroles.png";
+import photoProfiteroles from "@/assets/images/menu/creamy-profiteroles.webp";
 import { ArrowUpRight } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
 import { forwardArrow, type Locale } from "@/i18n/config";
@@ -30,7 +30,7 @@ export function DessertMoment({ lang, t }: Props) {
               src={photoProfiteroles}
               alt={t.photoAlt}
               sizes="(min-width: 820px) 22vw, 22vw"
-              className="roll-in ms-[0.08em] inline-block size-[1.05em] rotate-8 rounded-full border-[0.035em] border-vanilla object-cover object-[56%_50%] align-baseline shadow-[0_0.12em_0.24em_-0.1em_rgba(53,37,34,.5)] rtl:size-[0.8em]"
+              className="roll-in ms-[0.08em] inline-block size-[1.05em] rotate-8 rounded-full border-[0.035em] border-vanilla object-cover align-baseline shadow-[0_0.12em_0.24em_-0.1em_rgba(53,37,34,.5)] rtl:size-[0.8em]"
             />
           </span>
         </h2>
@@ -42,7 +42,7 @@ export function DessertMoment({ lang, t }: Props) {
             </span>
             <ArrowUpRight className="h-10 w-[52px] stroke-current rtl:-scale-x-100" />
           </div>
-          <Link href={routes(lang).category("bakes")} className="text-link">
+          <Link href={routes(lang).category("profiteroles")} className="text-link">
             {t.link} <span aria-hidden="true">{forwardArrow(lang)}</span>
           </Link>
         </div>

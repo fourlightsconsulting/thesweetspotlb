@@ -7,6 +7,9 @@ export const routes = (lang: Locale) => ({
   category: (id: string) => `/${lang}/order#${id}`,
   item: (id: string, options?: Record<string, string>) =>
     `/${lang}/order?${new URLSearchParams({ item: id, ...options })}`,
+  checkout: `/${lang}/checkout`,
+  /** The confirmation and status page for a placed order. */
+  orderStatus: (ref: string) => `/${lang}/orders/${ref}`,
   about: `/${lang}/about`,
   contact: `/${lang}/contact`,
   privacy: `/${lang}/privacy`,

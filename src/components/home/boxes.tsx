@@ -3,25 +3,27 @@ import Link from "next/link";
 import boxCutout from "@/assets/images/box-blue-cutout.png";
 import { Heart } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
-import { formatPriceShort, getItem, PARTY_BOX_EXTRA } from "@/data/menu";
+import { items } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
+import { formatPriceShort } from "@/lib/money";
 
 type Props = { lang: Locale; t: Dictionary["boxes"] };
 
 export function Boxes({ lang, t }: Props) {
   const r = routes(lang);
-  const box = getItem("box");
-  const rows = [
-    { name: t.regular, serves: t.regularServes, price: box.price, href: r.item("box") },
-    {
-      name: t.party,
-      serves: t.partyServes,
-      price: box.price + PARTY_BOX_EXTRA,
-      href: r.item("box", { boxsize: "party" }),
-    },
-  ];
+  // Every box on the menu, biggest first, so new ones appear here too.
+  const rows = items
+    .filter((item) => item.category === "boxes")
+    .sort((a, b) => b.price - a.price)
+    .map((item) => ({
+      id: item.id,
+      name: item.name[lang],
+      note: item.description[lang],
+      price: item.price,
+      href: r.item(item.id),
+    }));
 
   return (
     <section
@@ -50,19 +52,21 @@ export function Boxes({ lang, t }: Props) {
         <div className="mt-2.5 w-full max-w-[520px] border-t-[1.5px] border-chocolate">
           {rows.map((row) => (
             <Link
-              key={row.name}
+              key={row.id}
               href={row.href}
               className="flex w-full items-center justify-between gap-4 border-b-[1.5px] border-chocolate py-5 transition-colors duration-200 hover:text-blueberry"
             >
-              <span className="flex flex-col gap-0.5">
+              <span className="flex min-w-0 flex-col gap-0.5">
                 <span className="font-display text-[clamp(22px,1.9cqw,28px)] leading-[1.15] font-black">
                   {row.name}
                 </span>
-                <span className="font-ui text-sm leading-[18px] text-cacao">{row.serves}</span>
+                <span className="line-clamp-1 font-ui text-sm leading-[18px] text-cacao">
+                  {row.note}
+                </span>
               </span>
               <span className="flex items-center gap-3.5">
                 <span className="font-display text-[clamp(22px,1.9cqw,28px)] leading-none font-black">
-                  {formatPriceShort(row.price)}
+                  {formatPriceShort(row.price, lang)}
                 </span>
                 <span aria-hidden="true" className="font-ui text-xl font-bold text-blueberry">
                   {forwardArrow(lang)}

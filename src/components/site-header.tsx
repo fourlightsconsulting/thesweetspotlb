@@ -3,12 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import logo from "@/assets/images/logo-blueberry.png";
 import { site } from "@/data/site";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
+import { itemCount, useCart } from "@/lib/cart";
 
 const subscribeToScroll = (onChange: () => void) => {
   window.addEventListener("scroll", onChange, { passive: true });
@@ -29,13 +30,27 @@ type Props = {
   lang: Locale;
   nav: Dictionary["nav"];
   menu: MenuExtras;
-  cartCount?: number;
 };
 
-export function SiteHeader({ lang, nav, menu, cartCount = 0 }: Props) {
+export function SiteHeader({ lang, nav, menu }: Props) {
   const pathname = usePathname();
+  const headerRef = useRef<HTMLElement>(null);
   const drawerRef = useRef<HTMLDialogElement>(null);
   const scrolled = useSyncExternalStore(subscribeToScroll, isScrolled, isScrolledOnServer);
+  const cartCount = itemCount(useCart());
+
+  // Publishes the header's height (it shrinks on scroll) as --header-h, so
+  // sticky bars below it, like the order page's category tabs, sit flush.
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const root = document.documentElement;
+    const observer = new ResizeObserver(([entry]) => {
+      root.style.setProperty("--header-h", `${entry.borderBoxSize[0].blockSize}px`);
+    });
+    observer.observe(header);
+    return () => observer.disconnect();
+  }, []);
 
   const r = routes(lang);
   const otherLang: Locale = lang === "en" ? "ar" : "en";
@@ -63,6 +78,7 @@ export function SiteHeader({ lang, nav, menu, cartCount = 0 }: Props) {
 
   return (
     <header
+      ref={headerRef}
       data-scrolled={scrolled || undefined}
       className="group/header sticky top-0 z-40 border-b border-chocolate/8 bg-vanilla transition-shadow duration-300 data-scrolled:shadow-[0_10px_24px_-20px_rgba(53,37,34,.6)]"
     >
@@ -99,7 +115,7 @@ export function SiteHeader({ lang, nav, menu, cartCount = 0 }: Props) {
         {langSwitch}
 
         <Link
-          href={r.order}
+          href={`${r.order}#your-order`}
           aria-label={`${nav.cart} (${cartCount})`}
           className="btn btn-primary btn-sm gap-2"
         >

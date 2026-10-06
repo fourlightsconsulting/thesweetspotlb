@@ -61,7 +61,9 @@ html[lang="ar"] {
 @layer base {
   html {
     background: var(--color-vanilla);
-    scroll-padding-top: 96px;
+    /* Anchor jumps clear the sticky header, plus any sticky bar under it
+       (the order page's category tabs set --sticky-extra). */
+    scroll-padding-top: calc(var(--header-h, 84px) + var(--sticky-extra, 0px) + 12px);
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -532,6 +534,80 @@ html:has(dialog[open]) {
 @media (prefers-reduced-motion: reduce) {
   .drawer,
   .drawer::backdrop {
+    transition: none;
+  }
+}
+
+/* Item customiser and the phone cart (modal <dialog>s): a bottom sheet on
+   phones, a side panel from the inline end on desktop. */
+.sheet {
+  position: fixed;
+  inset: 48px 0 0;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 24px 24px 0 0;
+  background: var(--color-vanilla);
+  color: var(--color-chocolate);
+  overflow: hidden;
+  translate: 0 100%;
+  transition:
+    translate 0.38s var(--ease-soft),
+    overlay 0.38s allow-discrete,
+    display 0.38s allow-discrete;
+}
+.sheet[open] {
+  display: flex;
+  flex-direction: column;
+  translate: 0 0;
+}
+.sheet::backdrop {
+  background: rgb(26 86 167 / 0.3);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition:
+    opacity 0.38s,
+    overlay 0.38s allow-discrete,
+    display 0.38s allow-discrete;
+}
+.sheet[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .sheet[open] {
+    translate: 0 100%;
+  }
+  .sheet[open]::backdrop {
+    opacity: 0;
+  }
+}
+@media (width >= 51.25rem) {
+  .sheet {
+    inset: 0 auto 0 auto;
+    inset-inline-end: 0;
+    width: min(500px, 92vw);
+    border-radius: 0;
+    border-start-start-radius: 28px;
+    border-end-start-radius: 28px;
+    box-shadow: calc(-18px * var(--dir, 1)) 0 40px -24px rgb(53 37 34 / 0.45);
+    translate: calc(100% * var(--dir, 1)) 0;
+  }
+  .sheet[open] {
+    translate: 0 0;
+  }
+  @starting-style {
+    .sheet[open] {
+      translate: calc(100% * var(--dir, 1)) 0;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .sheet::backdrop {
     transition: none;
   }
 }

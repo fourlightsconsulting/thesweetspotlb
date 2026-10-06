@@ -2,27 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 import { Circle } from "@/components/doodles";
-import { site, tripoliHours } from "@/data/site";
+import { storeStatus } from "@/lib/hours";
 
-const beirutClock = new Intl.DateTimeFormat("en-US", {
-  timeZone: site.timeZone,
-  weekday: "short",
-  hour: "numeric",
-  minute: "numeric",
-  hourCycle: "h23",
-});
-const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-function isOpenNow() {
-  const parts = Object.fromEntries(
-    beirutClock.formatToParts(new Date()).map((p) => [p.type, p.value]),
-  );
-  const day = weekdays.indexOf(parts.weekday);
-  const minutes = Number(parts.hour) * 60 + Number(parts.minute);
-  const [open, close] = tripoliHours[day];
-  const [, closeYesterday] = tripoliHours[(day + 6) % 7];
-  return (minutes >= open && minutes < close) || minutes < closeYesterday - 24 * 60;
-}
+const isOpenNow = () => storeStatus().open;
 
 const subscribeToMinute = (onChange: () => void) => {
   const timer = setInterval(onChange, 60_000);
