@@ -58,7 +58,7 @@ export function Categories({ lang, t, from }: Props) {
               />
               <span className="flex flex-col gap-1.5 px-1">
                 <span className={cardName}>{category.name[lang]}</span>
-                <span className="font-ui text-[clamp(13px,1.05cqw,15px)] leading-[1.4] text-pretty text-cacao">
+                <span className="font-ui text-[clamp(14px,1.15cqw,16px)] leading-[1.4] text-pretty text-cacao">
                   {category.description[lang]}
                 </span>
                 <span className="mt-0.5 font-ui text-[13px] leading-4 font-semibold text-blueberry">
@@ -80,7 +80,7 @@ export function Categories({ lang, t, from }: Props) {
             </span>
             <span className="flex flex-col gap-1.5 px-1">
               <span className={cardName}>{t.allTitle}</span>
-              <span className="font-ui text-[clamp(13px,1.05cqw,15px)] leading-[1.4] text-pretty">
+              <span className="font-ui text-[clamp(14px,1.15cqw,16px)] leading-[1.4] text-pretty">
                 {t.allSub}
               </span>
             </span>
