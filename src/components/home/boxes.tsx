@@ -26,7 +26,7 @@ export function Boxes({ lang, t }: Props) {
   return (
     <section
       id="boxes"
-      className="relative mx-auto grid max-w-[1440px] items-center gap-[clamp(28px,5cqw,80px)] pt-[clamp(48px,6cqw,96px)] pb-[clamp(64px,7cqw,112px)] desk:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] desk:px-[clamp(20px,5cqw,72px)]"
+      className="relative mx-auto grid max-w-[1440px] items-center gap-[clamp(28px,5cqw,80px)] pt-section-sm pb-section desk:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] desk:px-[clamp(20px,5cqw,72px)]"
     >
       {/* The cut-out box, slightly tilted, with a soft shadow. */}
       <div className="relative mx-auto aspect-square w-[min(84%,440px)] desk:w-[min(100%,580px)]">
@@ -40,7 +40,7 @@ export function Boxes({ lang, t }: Props) {
 
       <Reveal className="flex flex-col items-start gap-[18px] px-5 desk:px-0" data-motion="always">
         <span className="eyebrow text-blueberry">{t.tag}</span>
-        <h2 className="font-display text-[clamp(46px,5.6cqw,84px)] leading-[0.95] font-black tracking-[-0.035em] text-balance">
+        <h2 className="title-section">
           {t.title}
           <Heart className="ms-[0.12em] inline-block size-[0.5em] rotate-12 align-[0.06em]" />
         </h2>

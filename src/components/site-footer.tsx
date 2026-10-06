@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import logoPink from "@/assets/images/logo-pink.png";
+import { MenuIcon, menuIconNames } from "@/components/icons";
 import { site } from "@/data/site";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -20,11 +21,16 @@ export function SiteFooter({ lang, dict }: Props) {
 
   return (
     <footer className="scallop-top relative bg-blueberry text-vanilla [--scallop:var(--color-blueberry)]">
-      <div className="mx-auto grid max-w-[1440px] grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] items-start gap-9 px-[clamp(20px,5cqw,72px)] pt-[clamp(48px,5cqw,80px)] pb-8">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] items-start gap-9 px-[clamp(20px,5cqw,72px)] pt-section-sm pb-8">
         <div className="flex flex-col items-start gap-4">
           <Image src={logoPink} alt="The Sweet Spot" sizes="150px" className="h-auto w-[150px]" />
           <span className="font-script text-[28px] leading-[1.35] text-strawberry-cream">
             {footer.tagline}
+          </span>
+          <span className="flex flex-wrap gap-2.5">
+            {menuIconNames.map((name) => (
+              <MenuIcon key={name} name={name} className="size-7 stroke-strawberry-cream" />
+            ))}
           </span>
         </div>
 

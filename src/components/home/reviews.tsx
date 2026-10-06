@@ -67,17 +67,14 @@ export function Reviews({ reviews, t, rtl }: Props) {
       id="reviews"
       aria-roledescription="carousel"
       aria-labelledby="reviews-title"
-      className="overflow-x-clip py-[clamp(72px,8cqw,128px)]"
+      className="overflow-x-clip py-section"
       onMouseEnter={() => setHolding(true)}
       onMouseLeave={() => setHolding(false)}
       onFocus={() => setHolding(true)}
       onBlur={() => setHolding(false)}
     >
       <div className="shell flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
-        <h2
-          id="reviews-title"
-          className="font-display text-[clamp(36px,4cqw,60px)] leading-none font-black tracking-[-0.03em]"
-        >
+        <h2 id="reviews-title" className="title-section">
           {t.title}
         </h2>
         <p className="font-mono text-[11px] leading-normal text-cacao [direction:ltr]">
@@ -131,7 +128,11 @@ export function Reviews({ reviews, t, rtl }: Props) {
               >
                 “
               </span>
-              <blockquote className="m-0 font-body text-[clamp(20px,2cqw,28px)] leading-[1.35] font-medium text-pretty">
+              {/* Reviews come in either language: let each one set its own direction. */}
+              <blockquote
+                dir="auto"
+                className="m-0 font-body text-[clamp(20px,2cqw,28px)] leading-[1.35] font-medium text-pretty"
+              >
                 {review.quote}
               </blockquote>
               <figcaption className="flex flex-wrap items-center gap-x-3 gap-y-1 font-ui text-sm">

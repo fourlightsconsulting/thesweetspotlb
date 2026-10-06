@@ -22,8 +22,8 @@ export function WeeklySpecial({ lang, t }: Props) {
 
   return (
     <section id="special" className="relative overflow-x-clip bg-cotton-candy text-chocolate">
-      <Reveal className="mx-auto grid max-w-[1440px] desk:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] desk:items-center desk:px-[clamp(20px,5cqw,72px)] desk:py-[clamp(72px,6.4cqw,104px)]">
-        <div className="relative z-3 flex flex-col items-start gap-3.5 px-5 pb-16 desk:gap-[clamp(18px,1.8cqw,26px)] desk:p-0">
+      <Reveal className="mx-auto grid max-w-[1440px] desk:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] desk:items-center desk:px-[clamp(20px,5cqw,72px)] desk:py-section">
+        <div className="relative z-3 flex flex-col items-start gap-3.5 px-5 pb-section desk:gap-[clamp(18px,1.8cqw,26px)] desk:p-0">
           <span className="eyebrow">{t.tag}</span>
           <h2 className="font-display text-[min(16.5cqw,96px)] leading-[0.88] font-black tracking-[-0.04em] text-balance desk:text-[clamp(64px,9cqw,136px)]">
             {t.title}
@@ -40,7 +40,7 @@ export function WeeklySpecial({ lang, t }: Props) {
         </div>
 
         <div className="relative order-first h-[min(57cqw,247px)] desk:order-none desk:h-auto desk:min-h-[380px] desk:self-stretch">
-          <div className="absolute -end-[min(9cqw,32px)] -top-[min(26cqw,112px)] z-2 aspect-[459/515] w-[min(74cqw,320px)] desk:end-[2%] desk:top-[calc(-1*(clamp(72px,6.4cqw,104px)+clamp(96px,8.5cqw,128px)))] desk:w-[min(100%,36cqw)]">
+          <div className="absolute -end-[min(9cqw,32px)] -top-[min(26cqw,112px)] z-2 aspect-[459/515] w-[min(74cqw,320px)] desk:end-[2%] desk:top-[calc(-1*(var(--spacing-section)+clamp(96px,8.5cqw,128px)))] desk:w-[min(100%,36cqw)]">
             <div className="float size-full">
               <Image
                 src={cup}

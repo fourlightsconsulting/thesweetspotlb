@@ -16,7 +16,7 @@ type Props = { lang: Locale; t: Dictionary["dessert"] };
  */
 export function DessertMoment({ lang, t }: Props) {
   return (
-    <section className="relative overflow-hidden bg-blueberry px-5 pt-[72px] pb-16 text-vanilla [--link-hover:var(--color-strawberry-cream)] [--link:var(--color-vanilla)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[clamp(96px,9cqw,140px)] desk:pb-[clamp(80px,8cqw,120px)]">
+    <section className="relative overflow-hidden bg-blueberry px-5 pt-section pb-section text-vanilla [--link-hover:var(--color-strawberry-cream)] [--link:var(--color-vanilla)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-section-lg">
       <Reveal className="mx-auto w-fit max-w-full" threshold={0.3} data-motion="always">
         <h2 className="flex flex-col">
           <span className="origin-bottom-left -rotate-3 font-script text-[min(7cqw,40px)] leading-[1.3] font-normal text-strawberry-cream desk:text-[clamp(30px,3.2cqw,46px)] rtl:origin-bottom-right">

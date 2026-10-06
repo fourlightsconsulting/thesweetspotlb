@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Underline } from "@/components/doodles";
+import { MenuIcon } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
 import { categories, formatPrice, lowestPrice } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
@@ -31,10 +32,10 @@ export function Categories({ lang, t, from }: Props) {
   return (
     <section
       id="menu"
-      className="bg-strawberry-cream pt-[clamp(56px,6.4cqw,104px)] pb-[calc(min(26cqw,112px)+28px)] desk:pb-[clamp(124px,11cqw,160px)]"
+      className="bg-strawberry-cream pt-section pb-[calc(min(26cqw,112px)+28px)] desk:pb-[clamp(124px,11cqw,160px)]"
     >
       <Reveal className="shell" threshold={0.1}>
-        <h2 className="mb-[clamp(24px,3cqw,44px)] font-display text-[clamp(38px,4.6cqw,68px)] leading-[1.02] font-black tracking-[-0.025em] text-balance">
+        <h2 className="mb-[clamp(24px,3cqw,44px)] title-section">
           {t.titleStart}{" "}
           <span className="relative inline-block whitespace-nowrap">
             {t.titleEnd}
@@ -50,12 +51,18 @@ export function Categories({ lang, t, from }: Props) {
               className={`${card} bg-vanilla text-chocolate`}
               style={{ "--rot": tilt[i], "--i": i } as CSSProperties}
             >
-              <Image
-                src={category.image}
-                alt=""
-                sizes="(min-width: 820px) 22vw, 260px"
-                className="aspect-square w-full rounded-[clamp(10px,1cqw,14px)] bg-strawberry-milk object-cover"
-              />
+              <span className="relative">
+                <Image
+                  src={category.image}
+                  alt=""
+                  sizes="(min-width: 820px) 22vw, 260px"
+                  className="aspect-square w-full rounded-[clamp(10px,1cqw,14px)] bg-strawberry-milk object-cover"
+                />
+                {/* The category's icon, stuck on like a sticker */}
+                <span className="absolute end-[clamp(10px,1cqw,14px)] -bottom-3 flex size-[clamp(40px,3.4cqw,50px)] -rotate-8 items-center justify-center rounded-full border-2 border-chocolate bg-vanilla shadow-[2px_2px_0_var(--color-chocolate)]">
+                  <MenuIcon name={category.id} className="size-[62%] stroke-blueberry" />
+                </span>
+              </span>
               <span className="flex flex-col gap-1.5 px-1">
                 <span className={cardName}>{category.name[lang]}</span>
                 <span className="font-ui text-[clamp(14px,1.15cqw,16px)] leading-[1.4] text-pretty text-cacao">

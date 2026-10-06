@@ -20,12 +20,10 @@ type Props = { t: Dictionary["story"] };
 export function Story({ t }: Props) {
   return (
     <section id="story" className="relative z-1 bg-strawberry-cream">
-      <Reveal className="mx-auto grid max-w-[1440px] items-start desk:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] desk:gap-[clamp(40px,5cqw,80px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[clamp(88px,8cqw,128px)] desk:pb-[clamp(64px,6cqw,96px)]">
-        <div className="flex flex-col items-start gap-[clamp(14px,1.4cqw,20px)] px-5 pt-[72px] desk:px-0 desk:pt-6">
+      <Reveal className="mx-auto grid max-w-[1440px] items-start desk:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] desk:gap-[clamp(40px,5cqw,80px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-section desk:pb-section-sm">
+        <div className="flex flex-col items-start gap-[clamp(14px,1.4cqw,20px)] px-5 pt-section desk:px-0 desk:pt-6">
           <span className="eyebrow text-blueberry">{t.tag}</span>
-          <h1 className="font-display text-[clamp(36px,4.4cqw,68px)] leading-[1.02] font-black tracking-[-0.025em] text-balance">
-            {t.title}
-          </h1>
+          <h1 className="title-section">{t.title}</h1>
           <p className="max-w-[40ch] font-body text-[clamp(16px,1.3cqw,18px)] leading-[1.6] text-pretty">
             {t.body}
           </p>

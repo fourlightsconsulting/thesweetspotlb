@@ -26,7 +26,13 @@
   --color-blueberry-hover: color-mix(in oklab, var(--color-blueberry), black 18%);
   --color-ticker: var(--color-raspberry);
   --color-ticker-ink: var(--color-whipped);
-  --color-ticker-star: var(--color-strawberry-cream);
+  --color-ticker-icon: var(--color-strawberry-cream);
+
+  /* Section padding: every band uses one of these three (pt-section,
+     py-section-lg, …), plus any room an overlapping cut-out needs. */
+  --spacing-section-sm: clamp(56px, 6cqw, 88px);
+  --spacing-section: clamp(72px, 8cqw, 120px);
+  --spacing-section-lg: clamp(88px, 10cqw, 152px);
 
   --breakpoint-desk: 51.25rem; /* 820px: mobile below, desktop above */
 
@@ -104,6 +110,17 @@ html[lang="ar"] {
     font-size: 13px;
     line-height: 18px;
   }
+}
+
+/* One size for every section heading and page title. The weekly special title
+   and the giant "dessert" word are the two deliberate exceptions. */
+@utility title-section {
+  font-family: var(--font-display);
+  font-size: clamp(42px, 5cqw, 76px);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
 @utility text-link {

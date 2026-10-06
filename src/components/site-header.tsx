@@ -55,7 +55,7 @@ export function SiteHeader({ lang, nav, menu, cartCount = 0 }: Props) {
       lang={otherLang}
       hrefLang={otherLang}
       onClick={closeDrawer}
-      className="inline-flex min-h-10 items-center rounded-full border-[1.5px] border-chocolate/20 px-3.5 font-ui text-sm font-semibold transition-colors duration-200 hover:border-strawberry-cream hover:bg-strawberry-cream"
+      className="inline-flex min-h-11 items-center rounded-full border-[1.5px] border-chocolate/20 px-3.5 font-ui text-sm font-semibold transition-colors duration-200 hover:border-strawberry-cream hover:bg-strawberry-cream"
     >
       {nav.langSwitch}
     </Link>
@@ -77,7 +77,7 @@ export function SiteHeader({ lang, nav, menu, cartCount = 0 }: Props) {
             alt="The Sweet Spot"
             loading="eager"
             sizes="96px"
-            className="h-auto w-[72px] transition-[width] duration-300 ease-soft desk:w-24 desk:group-data-scrolled/header:w-[72px]"
+            className="h-auto w-[72px] transition-[width] duration-300 ease-soft group-data-scrolled/header:w-14 desk:w-24 desk:group-data-scrolled/header:w-[72px]"
           />
         </Link>
 

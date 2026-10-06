@@ -1,11 +1,16 @@
-import { Fraunces, Pacifico } from "next/font/google";
+import { Pacifico } from "next/font/google";
 import localFont from "next/font/local";
 
-// Latin only: every character on the site (incl. ê, –, ·) is in that subset.
-export const fraunces = Fraunces({
-  subsets: ["latin"],
-  axes: ["opsz"],
+// Self-hosted Fraunces with its "soft" axis fixed at 100: rounder terminals that
+// suit a dessert brand, and 62 KB instead of 67 KB for the default sharp cut.
+// Optical size and weight stay variable. Latin only: every character on the
+// site (incl. ê, –, ·) is in that subset.
+// Source: fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,100..900,100
+export const fraunces = localFont({
+  src: "../fonts/fraunces-soft-latin.woff2",
+  weight: "100 900",
   variable: "--font-fraunces",
+  adjustFontFallback: "Times New Roman",
 });
 
 // Self-hosted Google Sans Flex, clipped to the weights the UI uses (400–700):

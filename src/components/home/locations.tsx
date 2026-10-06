@@ -13,11 +13,9 @@ type Props = { lang: Locale; t: Dictionary["locations"]; orderNow: string };
 
 export function Locations({ lang, t, orderNow }: Props) {
   return (
-    <section id="locations" className="pt-[clamp(72px,8cqw,128px)] pb-[clamp(100px,10cqw,150px)]">
+    <section id="locations" className="pt-section pb-section-lg">
       <Reveal className="shell grid items-start gap-[clamp(36px,4cqw,64px)] desk:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-        <h2 className="font-display text-[clamp(46px,5.4cqw,80px)] leading-[0.95] font-black tracking-[-0.035em] text-balance">
-          {t.title}
-        </h2>
+        <h2 className="title-section">{t.title}</h2>
 
         {/* The two branches: stacked with a divider on phones, side by side with a
             thin vertical rule from 640px. */}
