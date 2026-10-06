@@ -278,7 +278,7 @@ function ModeToggle({ mode, t }: { mode: Fulfilment; t: Dictionary["order"] }) {
       {(["pickup", "delivery"] as const).map((value) => (
         <label
           key={value}
-          className="flex min-h-11 cursor-pointer items-center rounded-[12px] px-5 font-ui text-[15px] font-semibold transition-colors duration-200 has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel"
+          className="relative flex min-h-11 cursor-pointer items-center rounded-[12px] px-5 font-ui text-[15px] font-semibold transition-colors duration-200 has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel"
         >
           <input
             type="radio"

@@ -16,7 +16,9 @@ import { describeSelections, orderTotals, priceLines } from "@/lib/pricing";
 import { checkPromo } from "./promotions";
 
 // The request is untrusted: only ids, quantities, choices and contact details
-// come from the browser. Prices, fees and discounts are worked out here.
+// come from the browser. Prices, fees and discounts are worked out here. If
+// they differ from what the customer saw (prices changed mid-checkout), the
+// order still goes through: staff check every order before starting it.
 const text = (max: number) => z.string().max(max);
 const inputSchema = z.object({
   idempotencyKey: z.uuid(),
@@ -42,7 +44,7 @@ const inputSchema = z.object({
     )
     .min(1)
     .max(ordering.maxLines),
-  expectedTotal: z.int().min(0),
+  quotedTotal: z.int().min(0),
 });
 
 /** Whether orders have somewhere to go yet (Supabase for storage, WhatsApp for the alert). */
@@ -86,7 +88,6 @@ export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult
 
   const delivery = input.mode === "delivery" && zone ? zone : null;
   const totals = orderTotals(subtotal, delivery?.fee ?? 0, promo);
-  if (totals.total !== input.expectedTotal) return { ok: false, code: "price_changed", totals };
 
   if (!backendReady() && process.env.NODE_ENV === "production") {
     return { ok: false, code: "unavailable" };
@@ -123,7 +124,8 @@ export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult
     demo: !backendReady(),
   };
 
-  // TODO(supabase): insert the order (idempotency key unique), redeem the promo
-  // (first-order codes check the phone's history) and queue the WhatsApp alert.
+  // TODO(supabase): check the code again with check_discount_code (with the
+  // phone, for first-order codes), then save the order, quotedTotal included,
+  // with create_order (supabase/migrations/), which also queues the WhatsApp alert.
   return { ok: true, order };
 }

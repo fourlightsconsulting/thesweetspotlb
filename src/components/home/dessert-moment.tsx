@@ -22,16 +22,19 @@ export function DessertMoment({ lang, t }: Props) {
           <span className="origin-bottom-left -rotate-3 font-script text-[min(7cqw,40px)] leading-[1.3] font-normal text-strawberry-cream desk:text-[clamp(30px,3.2cqw,46px)] rtl:origin-bottom-right">
             {t.lead}
           </span>
-          {/* English: a smaller word with a full stop just taller than its letters, sitting
-              on the baseline. Arabic keeps the larger word (it is much shorter). */}
+          {/* English: a smaller word whose full stop stands taller than its letters, sitting
+              on the baseline. Arabic keeps the larger word (it is much shorter). The photo
+              is zoomed in on the profiteroles. */}
           <span className="pt-[0.14em] font-display text-[19cqw] leading-[0.82] font-black tracking-[-0.06em] whitespace-nowrap desk:text-[18cqw] rtl:pb-[0.12em] rtl:text-[25cqw] rtl:leading-[1.05] desk:rtl:text-[27cqw]">
             {t.word}
-            <Image
-              src={photoProfiteroles}
-              alt={t.photoAlt}
-              sizes="(min-width: 820px) 22vw, 22vw"
-              className="roll-in ms-[0.08em] inline-block size-[1.05em] rotate-8 rounded-full border-[0.035em] border-vanilla object-cover align-baseline shadow-[0_0.12em_0.24em_-0.1em_rgba(53,37,34,.5)] rtl:size-[0.8em]"
-            />
+            <span className="roll-in ms-[0.08em] inline-block size-[1.25em] rotate-8 overflow-hidden rounded-full border-[0.035em] border-vanilla align-baseline shadow-[0_0.12em_0.24em_-0.1em_rgba(53,37,34,.5)] rtl:size-[0.95em]">
+              <Image
+                src={photoProfiteroles}
+                alt={t.photoAlt}
+                sizes="40vw"
+                className="size-full origin-[47%_68%] scale-150 object-cover"
+              />
+            </span>
           </span>
         </h2>
         {/* w-0 + min-w-full: matches the word's width without widening the block */}

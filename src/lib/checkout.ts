@@ -24,8 +24,11 @@ export type PlaceOrderInput = {
   fields: CheckoutFields;
   promoCode: string | null;
   lines: { itemId: string; qty: number; selections: Selections; note: string }[];
-  /** The total the customer saw; a mismatch stops the order instead of charging a surprise. */
-  expectedTotal: number;
+  /**
+   * The total the customer saw. Saved with the order so staff can spot a
+   * difference (prices changed mid-checkout); it never blocks the order.
+   */
+  quotedTotal: number;
 };
 
 export type PlacedOrder = {
@@ -52,7 +55,6 @@ export type PlaceOrderResult =
   | { ok: false; code: "invalid"; fields: Partial<Record<keyof CheckoutFields, FieldError>> }
   | { ok: false; code: "closed"; opensAt: number; opensTomorrow: boolean }
   | { ok: false; code: "items" }
-  | { ok: false; code: "price_changed"; totals: Totals }
   | { ok: false; code: "promo"; error: PromoError }
   | { ok: false; code: "unavailable" };
 

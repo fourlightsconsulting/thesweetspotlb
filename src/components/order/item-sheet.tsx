@@ -315,7 +315,7 @@ function OptionFieldset({ group, chosen, missing, onToggle, lang, t }: FieldsetP
           return (
             <label
               key={option.id}
-              className="group/opt flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-chocolate/12 bg-whipped px-4 py-2.5 transition-colors has-checked:border-blueberry has-checked:bg-strawberry-milk has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel has-disabled:cursor-not-allowed has-disabled:opacity-45"
+              className="group/opt relative flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-chocolate/12 bg-whipped px-4 py-2.5 transition-colors has-checked:border-blueberry has-checked:bg-strawberry-milk has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel has-disabled:cursor-not-allowed has-disabled:opacity-45"
             >
               <input
                 type={single && required ? "radio" : "checkbox"}

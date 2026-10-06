@@ -24,7 +24,6 @@ const en = {
   common: {
     orderNow: "Order now",
     from: "From",
-    readyIn: "Ready in 10–15 min · Pickup or delivery",
   },
   hero: {
     line1: "Chocolate.",
@@ -221,7 +220,6 @@ const en = {
       unavailable: "Online ordering isn’t open yet. Please call or visit us.",
       items:
         "Something in your order is no longer available. We’ve updated it, so please check it again.",
-      priceChanged: "Prices changed since you added these items. Please check your new total.",
       invalid: "Something in your order needs another look.",
       generic: "Something went wrong. Please try again.",
       network: "We couldn’t reach the shop. Check your connection and try again.",

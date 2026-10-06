@@ -5,7 +5,7 @@ import { useEffect, useRef, type ComponentProps } from "react";
 /**
  * Marks itself `data-inview` the first time it scrolls into view. The CSS in
  * globals.css keys entrance animations (doodles drawing in, cards dropping in)
- * off that attribute, and only hides content once JS is running.
+ * off that attribute, and only hides content where scripts run.
  */
 export function Reveal({
   threshold = 0.2,

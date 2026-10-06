@@ -408,17 +408,19 @@ html[lang="ar"] {
   stroke-dasharray: 1;
 }
 
-/* Sections marked data-motion="always" keep their small entrance touches on
+/* Scroll reveals only hide content where scripts run (Reveal then marks it
+   data-inview), so the page still reads in full without JS.
+   Sections marked data-motion="always" keep their small entrance touches on
    phones too: the dessert full stop rolling in and the boxes heart drawing.
    Plain CSS, run once on scroll. */
-@media (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
   [data-motion="always"] .doodle path {
     transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0.2s);
   }
-  .js [data-motion="always"]:not([data-inview]) .doodle path {
+  [data-motion="always"]:not([data-inview]) .doodle path {
     stroke-dashoffset: 1;
   }
-  .js [data-motion="always"]:not([data-inview]) .roll-in {
+  [data-motion="always"]:not([data-inview]) .roll-in {
     opacity: 0;
   }
   [data-motion="always"][data-inview] .roll-in {
@@ -450,13 +452,14 @@ html[lang="ar"] {
   .doodle path {
     transition: stroke-dashoffset 0.9s cubic-bezier(0.6, 0.1, 0.3, 1) var(--draw-delay, 0.2s);
   }
+}
 
-  /* Scroll reveals only hide content once JS has marked <html class="js">. */
-  .js [data-reveal]:not([data-inview]) .doodle path {
+@media (width >= 51.25rem) and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+  [data-reveal]:not([data-inview]) .doodle path {
     stroke-dashoffset: 1;
   }
 
-  .js [data-reveal]:not([data-inview]) .drop-in > * {
+  [data-reveal]:not([data-inview]) .drop-in > * {
     opacity: 0;
   }
   [data-inview] .drop-in > * {
@@ -464,7 +467,7 @@ html[lang="ar"] {
     animation-delay: calc(var(--i, 0) * 80ms);
   }
 
-  .js [data-reveal]:not([data-inview]) .roll-in {
+  [data-reveal]:not([data-inview]) .roll-in {
     opacity: 0;
   }
   [data-inview] .roll-in {
@@ -553,7 +556,8 @@ html:has(dialog[open]) {
   border-radius: 24px 24px 0 0;
   background: var(--color-vanilla);
   color: var(--color-chocolate);
-  overflow: hidden;
+  /* clip, not hidden: a focused control must never scroll the sheet itself */
+  overflow: clip;
   translate: 0 100%;
   transition:
     translate 0.38s var(--ease-soft),

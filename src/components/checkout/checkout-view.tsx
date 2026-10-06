@@ -212,7 +212,7 @@ function CheckoutForm({
             selections: line.selections,
             note: line.note,
           })),
-          expectedTotal: totals.total,
+          quotedTotal: totals.total,
         });
         if (result.ok) {
           finish(result.order);
@@ -236,9 +236,6 @@ function CheckoutForm({
             break;
           case "items":
             showBanner({ tone: "error", text: t.serverErrors.items });
-            break;
-          case "price_changed":
-            showBanner({ tone: "error", text: t.serverErrors.priceChanged });
             break;
           case "promo":
             setPromo(null);
@@ -456,7 +453,7 @@ function CheckoutForm({
                     {deliveryZones.map((z) => (
                       <label
                         key={z.id}
-                        className={`flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel ${errors.zone ? "border-caramel" : "border-chocolate/15 hover:border-chocolate/40"}`}
+                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel ${errors.zone ? "border-caramel" : "border-chocolate/15 hover:border-chocolate/40"}`}
                       >
                         <input
                           type="radio"
@@ -688,7 +685,7 @@ type ChoiceProps = {
 
 function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-[18px] border-2 border-chocolate/15 bg-vanilla p-4 transition-[border-color,box-shadow,background-color] duration-200 has-checked:border-chocolate has-checked:bg-strawberry-milk has-checked:shadow-[4px_5px_0_var(--color-chocolate)] has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel">
+    <label className="relative flex cursor-pointer items-start gap-3 rounded-[18px] border-2 border-chocolate/15 bg-vanilla p-4 transition-[border-color,box-shadow,background-color] duration-200 has-checked:border-chocolate has-checked:bg-strawberry-milk has-checked:shadow-[4px_5px_0_var(--color-chocolate)] has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel">
       <input
         type="radio"
         name={name}

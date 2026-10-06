@@ -11,7 +11,7 @@ type Props = { lang: Locale; dict: Dictionary };
 
 export function SiteFooter({ lang, dict }: Props) {
   const r = routes(lang);
-  const { nav, locations: loc, footer, common, instagram } = dict;
+  const { nav, locations: loc, footer, instagram } = dict;
   const links = [
     { href: r.order, label: nav.menu },
     { href: r.category("boxes"), label: nav.boxes },
@@ -67,7 +67,6 @@ export function SiteFooter({ lang, dict }: Props) {
 
       <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-3 border-t border-vanilla/16 px-[clamp(20px,5cqw,72px)] pt-[18px] pb-7 font-ui text-[13px] text-vanilla/82">
         <span>{footer.rights}</span>
-        <span>{common.readyIn}</span>
       </div>
     </footer>
   );

@@ -26,7 +26,7 @@ const base = (): PlaceOrderInput => ({
       note: "",
     },
   ],
-  expectedTotal: 2400,
+  quotedTotal: 2400,
 });
 
 beforeEach(() => {
@@ -55,9 +55,10 @@ describe("placeOrder", () => {
     expect(result.order.demo).toBe(true);
   });
 
-  it("refuses a total the customer didn't see", async () => {
-    const result = await placeOrder({ ...base(), expectedTotal: 100 });
-    expect(result).toMatchObject({ ok: false, code: "price_changed", totals: { total: 2400 } });
+  it("takes the order even if the customer saw a different total", async () => {
+    const result = await placeOrder({ ...base(), quotedTotal: 2200 });
+    expect(result.ok).toBe(true);
+    expect(result.ok && result.order.totals.total).toBe(2400);
   });
 
   it("refuses unknown items and missing required choices", async () => {
@@ -89,7 +90,7 @@ describe("placeOrder", () => {
       mode: "delivery",
       fields: { ...base().fields, zone: "mina", street: "Port Said Street" },
       promoCode: "sweet20",
-      expectedTotal: 2400 - 480 + 200,
+      quotedTotal: 2400 - 480 + 200,
     });
     expect(result.ok && result.order.totals).toEqual({
       subtotal: 2400,

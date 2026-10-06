@@ -8,7 +8,7 @@ type Promotion = PromoRule & {
   active: boolean;
   startsAt?: string;
   endsAt?: string;
-  /** Enforced once orders are stored: the phone number must have no earlier order. */
+  /** Checked once orders are stored (check_discount_code looks up the phone's earlier orders). */
   firstOrderOnly?: boolean;
 };
 

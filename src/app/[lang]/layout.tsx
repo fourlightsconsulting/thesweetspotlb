@@ -47,12 +47,6 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       className={`${fontVariables} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        {/* Lets CSS hide scroll-reveal content only when JS will reveal it. */}
-        <script
-          dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }}
-        />
-      </head>
       <body className="min-h-full">
         <div className="page flex min-h-full flex-col overflow-x-clip">
           <SiteHeader

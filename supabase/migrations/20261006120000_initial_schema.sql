@@ -433,6 +433,9 @@ create table public.orders (
   discount_cents public.cents not null default 0,
   delivery_fee_cents public.cents not null default 0,
   total_cents integer generated always as (subtotal_cents - discount_cents + delivery_fee_cents) stored,
+  -- The total the customer was shown at checkout. It differs from total_cents
+  -- only if prices changed while they ordered; staff settle that with them.
+  quoted_total_cents public.cents,
   discount_code_id uuid references public.discount_codes (id),
   discount_code text,
   eta_min_minutes smallint not null,
@@ -448,8 +451,8 @@ create table public.orders (
   check (discount_cents <= subtotal_cents),
   check (eta_min_minutes <= eta_max_minutes),
   check ((fulfilment = 'delivery') = (payment_method = 'cash_on_delivery')),
-  check (fulfilment = 'pickup' or (delivery_zone_id is not null and address_street is not null)),
-  check ((discount_code_id is null) = (discount_cents = 0))
+  check (fulfilment = 'pickup' or (delivery_zone_name_en is not null and address_street is not null)),
+  check ((discount_code is null) = (discount_cents = 0))
 );
 
 create index orders_branch_status_idx on public.orders (branch_id, status, placed_at desc);
@@ -597,18 +600,79 @@ create index notifications_pending_idx on public.notifications (created_at)
 -- ─── Placing an order ─────────────────────────────────────────────────────
 
 /**
- * Creates an order in one transaction. Called by the website's server with
- * the secret key, after it has priced the order; this re-prices it from the
- * tables and refuses anything that doesn't match, so the database is the
- * final word on what an order costs.
+ * Checks a discount code for the website: when the customer applies it, and
+ * again with their phone number just before the order is sent. Returns the
+ * rule to price with, { ok: true, code, kind, value, min_subtotal_cents,
+ * max_discount_cents }, or { ok: false, error } where error is invalid,
+ * expired, minimum (with short_by_cents), first_order or used_up. Without a
+ * phone number the first-order and per-customer limits aren't checked yet.
+ */
+create function public.check_discount_code(p_code text, p_subtotal_cents integer, p_phone text default null)
+returns jsonb
+language plpgsql stable security definer set search_path = '' as $$
+declare
+  v_code public.discount_codes;
+  v_customer uuid;
+begin
+  select * into v_code from public.discount_codes d
+  where d.code = upper(trim(p_code)) and d.is_active;
+  if not found or (v_code.starts_at is not null and now() < v_code.starts_at) then
+    return jsonb_build_object('ok', false, 'error', 'invalid');
+  end if;
+  if v_code.ends_at is not null and now() > v_code.ends_at then
+    return jsonb_build_object('ok', false, 'error', 'expired');
+  end if;
+  if p_subtotal_cents < v_code.min_subtotal_cents then
+    return jsonb_build_object('ok', false, 'error', 'minimum',
+      'short_by_cents', v_code.min_subtotal_cents - p_subtotal_cents);
+  end if;
+  -- Cancelled orders give their use back.
+  if v_code.usage_limit is not null and (
+    select count(*) from public.discount_redemptions r
+    join public.orders o on o.id = r.order_id
+    where r.discount_code_id = v_code.id and o.status <> 'cancelled'
+  ) >= v_code.usage_limit then
+    return jsonb_build_object('ok', false, 'error', 'used_up');
+  end if;
+
+  select c.id into v_customer from public.customers c where c.phone = p_phone;
+  if v_customer is not null then
+    if v_code.first_order_only and exists (
+      select 1 from public.orders o where o.customer_id = v_customer and o.status <> 'cancelled'
+    ) then
+      return jsonb_build_object('ok', false, 'error', 'first_order');
+    end if;
+    if v_code.usage_limit_per_customer is not null and (
+      select count(*) from public.discount_redemptions r
+      join public.orders o on o.id = r.order_id
+      where r.discount_code_id = v_code.id and r.customer_id = v_customer and o.status <> 'cancelled'
+    ) >= v_code.usage_limit_per_customer then
+      return jsonb_build_object('ok', false, 'error', 'used_up');
+    end if;
+  end if;
+
+  return jsonb_build_object('ok', true, 'code', v_code.code, 'kind', v_code.kind, 'value', v_code.value,
+    'min_subtotal_cents', v_code.min_subtotal_cents, 'max_discount_cents', v_code.max_discount_cents);
+end;
+$$;
+
+/**
+ * Saves an order exactly as the website priced it, in one transaction.
+ *
+ * The website's server calls this with the secret key once it has checked
+ * the order (opening hours with branch_is_open, items and choices, the code
+ * with check_discount_code). Nothing here re-prices or refuses the order:
+ * staff check every order before starting it, so if the website and the
+ * database ever disagree, the order still arrives and staff talk it through
+ * with the customer. Products, options, the delivery area and the code are
+ * linked when they exist here; names and prices are always the snapshot the
+ * customer saw, and quoted_total_cents is the total they were shown.
  *
  * payload: { idempotency_key, branch, locale, fulfilment, name, phone,
- *   zone?, street?, floor?, delivery_note?, discount_code?, expected_total_cents,
- *   lines: [{ product, quantity, note, options: { <group key>: [<option key>, …] } }] }
- *
- * Errors (message): closed, zone_invalid, below_minimum, item_unavailable,
- * option_unavailable, choice_invalid, code_invalid, code_expired, code_minimum,
- * code_first_order, code_used_up, price_changed (detail: the real total).
+ *   zone?: { slug, name_en, name_ar }, street?, floor?, delivery_note?,
+ *   discount_code?, discount_cents, delivery_fee_cents, quoted_total_cents,
+ *   lines: [{ product, name_en, name_ar, base_price_cents, quantity, note?,
+ *     options: [{ group, group_name_en, group_name_ar, option, name_en, name_ar, price_cents }] }] }
  */
 create function public.create_order(payload jsonb)
 returns table (order_id uuid, order_number bigint, public_token uuid, total_cents integer, already_placed boolean)
@@ -616,25 +680,16 @@ language plpgsql security definer set search_path = '' as $$
 declare
   v_key uuid := (payload ->> 'idempotency_key')::uuid;
   v_fulfilment public.fulfilment := (payload ->> 'fulfilment')::public.fulfilment;
+  v_delivery boolean := (payload ->> 'fulfilment') = 'delivery';
   v_branch public.branches;
-  v_zone public.delivery_zones;
-  v_code public.discount_codes;
+  v_code_id uuid;
   v_customer uuid;
   v_order uuid;
   v_item uuid;
   v_line jsonb;
-  v_product public.products;
-  v_group record;
-  v_option record;
-  v_chosen jsonb;
-  v_count int;
-  v_unit int;
-  v_subtotal int := 0;
-  v_discount int := 0;
-  v_fee int := 0;
+  v_subtotal int;
+  v_discount int;
   v_position int := 0;
-  v_lines jsonb := '[]';
-  v_line_options jsonb;
 begin
   -- A retry of an order that already went through.
   return query
@@ -645,95 +700,22 @@ begin
   end if;
 
   select * into v_branch from public.branches where slug = payload ->> 'branch';
-  if not found or not public.branch_is_open(v_branch.id) then
-    raise exception 'closed';
+  if not found then
+    raise exception 'unknown branch "%"', payload ->> 'branch';
+  end if;
+  if jsonb_typeof(payload -> 'lines') is distinct from 'array' or jsonb_array_length(payload -> 'lines') = 0 then
+    raise exception 'an order needs at least one line';
   end if;
 
-  if jsonb_typeof(payload -> 'lines') <> 'array' or jsonb_array_length(payload -> 'lines') = 0 then
-    raise exception 'item_unavailable';
-  end if;
-
-  -- Price every line from the menu tables.
-  for v_line in select * from jsonb_array_elements(payload -> 'lines') loop
-    select * into v_product from public.products p
-    where p.slug = v_line ->> 'product' and p.is_active and p.is_available and p.orderable_online;
-    if not found then
-      raise exception 'item_unavailable' using detail = coalesce(v_line ->> 'product', '');
-    end if;
-
-    v_chosen := coalesce(v_line -> 'options', '{}');
-    -- Every chosen group must belong to the product.
-    if exists (
-      select 1 from jsonb_object_keys(v_chosen) k
-      where not exists (
-        select 1 from public.product_option_groups pog
-        join public.option_groups g on g.id = pog.group_id
-        where pog.product_id = v_product.id and g.key = k
-      )
-    ) then
-      raise exception 'choice_invalid' using detail = v_product.slug;
-    end if;
-
-    v_unit := v_product.price_cents;
-    v_line_options := '[]';
-    for v_group in
-      select g.* from public.product_option_groups pog
-      join public.option_groups g on g.id = pog.group_id
-      where pog.product_id = v_product.id
-      order by pog.sort_order
-    loop
-      v_count := 0;
-      if v_chosen ? v_group.key and jsonb_typeof(v_chosen -> v_group.key) <> 'array' then
-        raise exception 'choice_invalid' using detail = v_group.key;
-      end if;
-      if jsonb_typeof(v_chosen -> v_group.key) = 'array' then
-        for v_option in
-          select o.* from jsonb_array_elements_text(v_chosen -> v_group.key) as picked (key)
-          left join public.options o on o.group_id = v_group.id and o.key = picked.key
-        loop
-          if v_option.id is null or not v_option.is_available then
-            raise exception 'option_unavailable' using detail = v_group.key;
-          end if;
-          v_count := v_count + 1;
-          v_unit := v_unit + v_option.price_cents;
-          v_line_options := v_line_options || jsonb_build_object(
-            'option_id', v_option.id, 'group_key', v_group.key, 'option_key', v_option.key,
-            'group_name_en', v_group.name_en, 'group_name_ar', v_group.name_ar,
-            'option_name_en', v_option.name_en, 'option_name_ar', v_option.name_ar,
-            'price_cents', v_option.price_cents
-          );
-        end loop;
-        -- The same option twice?
-        if (select count(distinct x) from jsonb_array_elements_text(v_chosen -> v_group.key) x) <> v_count then
-          raise exception 'choice_invalid' using detail = v_group.key;
-        end if;
-      end if;
-      if v_count < v_group.min_select or v_count > v_group.max_select then
-        raise exception 'choice_invalid' using detail = v_group.key;
-      end if;
-    end loop;
-
-    if coalesce((v_line ->> 'quantity')::int, 0) not between 1 and 50 then
-      raise exception 'choice_invalid' using detail = 'quantity';
-    end if;
-    v_subtotal := v_subtotal + v_unit * (v_line ->> 'quantity')::int;
-    v_lines := v_lines || jsonb_build_object(
-      'product', to_jsonb(v_product), 'unit', v_unit, 'quantity', (v_line ->> 'quantity')::int,
-      'note', left(coalesce(v_line ->> 'note', ''), 140), 'options', v_line_options
-    );
-  end loop;
-
-  if v_fulfilment = 'delivery' then
-    select * into v_zone from public.delivery_zones z
-    where z.branch_id = v_branch.id and z.slug = payload ->> 'zone' and z.is_active;
-    if not found then
-      raise exception 'zone_invalid';
-    end if;
-    if v_subtotal < v_zone.min_order_cents then
-      raise exception 'below_minimum' using detail = v_zone.min_order_cents::text;
-    end if;
-    v_fee := v_zone.fee_cents;
-  end if;
+  -- Each line costs its base price plus its options, as sent.
+  select coalesce(sum((
+      (l ->> 'base_price_cents')::int + coalesce((
+        select sum((x ->> 'price_cents')::int) from jsonb_array_elements(coalesce(l -> 'options', '[]')) x
+      ), 0)
+    ) * (l ->> 'quantity')::int), 0)
+  into v_subtotal
+  from jsonb_array_elements(payload -> 'lines') l;
+  v_discount := least(greatest(coalesce((payload ->> 'discount_cents')::int, 0), 0), v_subtotal);
 
   insert into public.customers as c (phone, name, preferred_locale)
   values (payload ->> 'phone', payload ->> 'name', (payload ->> 'locale')::public.locale)
@@ -741,48 +723,8 @@ begin
     set name = excluded.name, preferred_locale = excluded.preferred_locale
   returning c.id into v_customer;
 
-  if nullif(payload ->> 'discount_code', '') is not null then
-    -- Locked, so two orders can't both take the last use of a code.
-    select * into v_code from public.discount_codes d
-    where d.code = upper(payload ->> 'discount_code') and d.is_active
-    for update;
-    if not found or (v_code.starts_at is not null and now() < v_code.starts_at) then
-      raise exception 'code_invalid';
-    end if;
-    if v_code.ends_at is not null and now() > v_code.ends_at then
-      raise exception 'code_expired';
-    end if;
-    if v_subtotal < v_code.min_subtotal_cents then
-      raise exception 'code_minimum' using detail = (v_code.min_subtotal_cents - v_subtotal)::text;
-    end if;
-    if v_code.first_order_only and exists (
-      select 1 from public.orders o where o.customer_id = v_customer and o.status <> 'cancelled'
-    ) then
-      raise exception 'code_first_order';
-    end if;
-    if v_code.usage_limit is not null and (
-      select count(*) from public.discount_redemptions r
-      join public.orders o on o.id = r.order_id
-      where r.discount_code_id = v_code.id and o.status <> 'cancelled'
-    ) >= v_code.usage_limit then
-      raise exception 'code_used_up';
-    end if;
-    if v_code.usage_limit_per_customer is not null and (
-      select count(*) from public.discount_redemptions r
-      join public.orders o on o.id = r.order_id
-      where r.discount_code_id = v_code.id and r.customer_id = v_customer and o.status <> 'cancelled'
-    ) >= v_code.usage_limit_per_customer then
-      raise exception 'code_used_up';
-    end if;
-    v_discount := least(
-      case v_code.kind when 'percent' then round(v_subtotal * v_code.value / 100.0)::int else v_code.value end,
-      coalesce(v_code.max_discount_cents, v_subtotal),
-      v_subtotal
-    );
-  end if;
-
-  if v_subtotal - v_discount + v_fee is distinct from (payload ->> 'expected_total_cents')::int then
-    raise exception 'price_changed' using detail = (v_subtotal - v_discount + v_fee)::text;
+  if v_discount > 0 then
+    select d.id into v_code_id from public.discount_codes d where d.code = upper(payload ->> 'discount_code');
   end if;
 
   insert into public.orders as o (
@@ -791,35 +733,47 @@ begin
     delivery_zone_id, delivery_zone_name_en, delivery_zone_name_ar,
     address_street, address_floor, delivery_note,
     subtotal_cents, discount_cents, delivery_fee_cents, discount_code_id, discount_code,
-    eta_min_minutes, eta_max_minutes
+    quoted_total_cents, eta_min_minutes, eta_max_minutes
   ) values (
     v_key, v_branch.id, v_customer, v_fulfilment,
-    case v_fulfilment when 'delivery' then 'cash_on_delivery'::public.payment_method
+    case when v_delivery then 'cash_on_delivery'::public.payment_method
       else 'pay_at_pickup'::public.payment_method end,
     (payload ->> 'locale')::public.locale,
     payload ->> 'name', payload ->> 'phone',
-    v_zone.id, v_zone.name_en, v_zone.name_ar,
-    case when v_fulfilment = 'delivery' then payload ->> 'street' end,
-    case when v_fulfilment = 'delivery' then coalesce(payload ->> 'floor', '') end,
-    case when v_fulfilment = 'delivery' then coalesce(payload ->> 'delivery_note', '') end,
-    v_subtotal, v_discount, v_fee,
-    case when v_discount > 0 then v_code.id end,
-    case when v_discount > 0 then v_code.code end,
-    case v_fulfilment when 'delivery' then v_branch.delivery_eta_min else v_branch.pickup_eta_min end,
-    case v_fulfilment when 'delivery' then v_branch.delivery_eta_max else v_branch.pickup_eta_max end
+    case when v_delivery then (
+      select z.id from public.delivery_zones z
+      where z.branch_id = v_branch.id and z.slug = payload #>> '{zone,slug}'
+    ) end,
+    case when v_delivery then payload #>> '{zone,name_en}' end,
+    case when v_delivery then payload #>> '{zone,name_ar}' end,
+    case when v_delivery then payload ->> 'street' end,
+    case when v_delivery then coalesce(payload ->> 'floor', '') end,
+    case when v_delivery then coalesce(payload ->> 'delivery_note', '') end,
+    v_subtotal, v_discount,
+    case when v_delivery then coalesce((payload ->> 'delivery_fee_cents')::int, 0) else 0 end,
+    v_code_id,
+    case when v_discount > 0 then upper(payload ->> 'discount_code') end,
+    (payload ->> 'quoted_total_cents')::int,
+    case when v_delivery then v_branch.delivery_eta_min else v_branch.pickup_eta_min end,
+    case when v_delivery then v_branch.delivery_eta_max else v_branch.pickup_eta_max end
   )
   returning o.id into v_order;
 
-  for v_line in select * from jsonb_array_elements(v_lines) loop
+  for v_line in select * from jsonb_array_elements(payload -> 'lines') loop
     v_position := v_position + 1;
     insert into public.order_items as i (
       order_id, position, product_id, product_slug, name_en, name_ar,
       base_price_cents, unit_price_cents, quantity, note
     ) values (
-      v_order, v_position, (v_line #>> '{product,id}')::uuid, v_line #>> '{product,slug}',
-      v_line #>> '{product,name_en}', v_line #>> '{product,name_ar}',
-      (v_line #>> '{product,price_cents}')::int, (v_line ->> 'unit')::int,
-      (v_line ->> 'quantity')::int, v_line ->> 'note'
+      v_order, v_position,
+      (select p.id from public.products p where p.slug = v_line ->> 'product'),
+      v_line ->> 'product', v_line ->> 'name_en', v_line ->> 'name_ar',
+      (v_line ->> 'base_price_cents')::int,
+      (v_line ->> 'base_price_cents')::int + coalesce((
+        select sum((x ->> 'price_cents')::int) from jsonb_array_elements(coalesce(v_line -> 'options', '[]')) x
+      ), 0),
+      (v_line ->> 'quantity')::int,
+      left(coalesce(v_line ->> 'note', ''), 140)
     )
     returning i.id into v_item;
 
@@ -827,15 +781,17 @@ begin
       order_item_id, option_id, group_key, option_key, group_name_en, group_name_ar,
       option_name_en, option_name_ar, price_cents
     )
-    select v_item, (x ->> 'option_id')::uuid, x ->> 'group_key', x ->> 'option_key',
-      x ->> 'group_name_en', x ->> 'group_name_ar', x ->> 'option_name_en', x ->> 'option_name_ar',
-      (x ->> 'price_cents')::int
-    from jsonb_array_elements(v_line -> 'options') x;
+    select v_item,
+      (select o.id from public.options o join public.option_groups g on g.id = o.group_id
+       where g.key = x ->> 'group' and o.key = x ->> 'option'),
+      x ->> 'group', x ->> 'option', x ->> 'group_name_en', x ->> 'group_name_ar',
+      x ->> 'name_en', x ->> 'name_ar', (x ->> 'price_cents')::int
+    from jsonb_array_elements(coalesce(v_line -> 'options', '[]')) x;
   end loop;
 
-  if v_discount > 0 then
+  if v_code_id is not null then
     insert into public.discount_redemptions (discount_code_id, order_id, customer_id, amount_cents)
-    values (v_code.id, v_order, v_customer, v_discount);
+    values (v_code_id, v_order, v_customer, v_discount);
   end if;
 
   if v_branch.alert_phone is not null then
@@ -885,7 +841,7 @@ $$;
 
 -- ─── Access ───────────────────────────────────────────────────────────────
 -- Row level security on every table. The website's server uses the secret
--- key (bypasses RLS) only through create_order; browsers use the publishable
+-- key (bypasses RLS) only through create_order and check_discount_code; browsers use the publishable
 -- key and see the menu, their own orders and profile, and nothing else.
 
 alter table public.staff enable row level security;
@@ -1010,9 +966,13 @@ revoke insert, delete on public.orders, public.order_items, public.order_item_op
   public.order_status_events, public.discount_redemptions, public.notifications
   from anon, authenticated;
 
--- Functions: only the server places orders; anyone with a status link can read it.
+-- Functions: only the server places orders and checks codes (a code's answer
+-- can reveal whether a phone number has ordered before); anyone with a status
+-- link can read it.
 revoke execute on function public.create_order(jsonb) from public, anon, authenticated;
 grant execute on function public.create_order(jsonb) to service_role;
+revoke execute on function public.check_discount_code(text, integer, text) from public, anon, authenticated;
+grant execute on function public.check_discount_code(text, integer, text) to service_role;
 revoke execute on function public.get_order_status(uuid) from public;
 grant execute on function public.get_order_status(uuid) to anon, authenticated, service_role;
 revoke execute on function public.link_customer_to_user() from public, anon, authenticated;
