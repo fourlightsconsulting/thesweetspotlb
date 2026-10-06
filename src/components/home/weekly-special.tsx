@@ -46,7 +46,7 @@ export function WeeklySpecial({ lang, t }: Props) {
                 src={cup}
                 alt={t.cupAlt}
                 sizes="(min-width: 820px) 36vw, 320px"
-                className="size-full rotate-6 drop-shadow-[0_28px_22px_rgba(36,91,120,.5)] desk:rotate-5 desk:drop-shadow-[0_40px_34px_rgba(36,91,120,.5)]"
+                className="size-full rotate-6 drop-shadow-[0_28px_22px_rgba(26,86,167,.4)] desk:rotate-5 desk:drop-shadow-[0_40px_34px_rgba(26,86,167,.4)]"
               />
             </div>
 

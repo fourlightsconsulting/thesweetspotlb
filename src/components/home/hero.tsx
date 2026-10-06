@@ -75,7 +75,7 @@ export function Hero({ lang, t, orderNow }: Props) {
       </div>
 
       <div className="absolute inset-0 z-2 mx-auto flex max-w-[1440px] flex-col items-center justify-end px-5 pb-8 text-vanilla desk:items-start desk:gap-[clamp(16px,1.8cqw,26px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[72px] desk:pb-[clamp(24px,5cqw,88px)]">
-        <h1 className="rise sr-only font-display font-black tracking-[-0.03em] desk:not-sr-only desk:text-[clamp(54px,7.6cqw,124px)] desk:leading-[0.92] desk:text-shadow-[0_2px_28px_rgba(20,40,55,.35)]">
+        <h1 className="rise sr-only font-display font-black tracking-[-0.03em] desk:not-sr-only desk:text-[clamp(54px,7.6cqw,124px)] desk:leading-[0.92] desk:text-shadow-[0_2px_28px_rgba(53,37,34,.35)]">
           <span className="block">{t.line1}</span> <span className="block">{t.line2}</span>{" "}
           <span className="block text-strawberry-cream">{t.line3}</span>
         </h1>
@@ -96,7 +96,7 @@ export function Hero({ lang, t, orderNow }: Props) {
           <ArrowToButton className="ms-3 -mt-10 h-11 w-[72px] stroke-vanilla rtl:-scale-x-100" />
           <span
             aria-hidden="true"
-            className="-mt-16 -rotate-5 font-script text-2xl leading-[1.2] whitespace-nowrap text-shadow-[0_1px_14px_rgba(20,40,55,.5)]"
+            className="-mt-16 -rotate-5 font-script text-2xl leading-[1.2] whitespace-nowrap text-shadow-[0_1px_14px_rgba(53,37,34,.5)]"
           >
             {t.note}
           </span>

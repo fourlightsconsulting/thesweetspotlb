@@ -30,7 +30,7 @@ export function DessertMoment({ lang, t }: Props) {
               src={photoProfiteroles}
               alt={t.photoAlt}
               sizes="(min-width: 820px) 22vw, 22vw"
-              className="roll-in ms-[0.08em] inline-block size-[1.05em] rotate-8 rounded-full border-[0.035em] border-vanilla object-cover object-[56%_50%] align-baseline shadow-[0_0.12em_0.24em_-0.1em_rgba(20,40,55,.55)] rtl:size-[0.8em]"
+              className="roll-in ms-[0.08em] inline-block size-[1.05em] rotate-8 rounded-full border-[0.035em] border-vanilla object-cover object-[56%_50%] align-baseline shadow-[0_0.12em_0.24em_-0.1em_rgba(53,37,34,.5)] rtl:size-[0.8em]"
             />
           </span>
         </h2>

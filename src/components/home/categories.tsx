@@ -73,7 +73,7 @@ export function Categories({ lang, t, from }: Props) {
             className={`${card} bg-blueberry text-vanilla`}
             style={{ "--rot": tilt[7], "--i": 7 } as CSSProperties}
           >
-            <span className="flex aspect-square w-full items-center justify-center rounded-[clamp(10px,1cqw,14px)] candy-stripes">
+            <span className="flex aspect-square w-full items-center justify-center rounded-[clamp(10px,1cqw,14px)] bg-cotton-candy">
               <span className="flex aspect-square w-[44%] items-center justify-center rounded-full border-[2.5px] border-chocolate bg-vanilla font-ui text-[clamp(28px,3.2cqw,52px)] leading-none font-bold text-blueberry">
                 {forwardArrow(lang)}
               </span>

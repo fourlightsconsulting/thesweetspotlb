@@ -150,7 +150,7 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
 function Avatar({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex shrink-0 rounded-full bg-[conic-gradient(from_200deg,var(--color-cherry),var(--color-toffee),var(--color-strawberry-cream),var(--color-cherry))] p-[3px] ${className}`}
+      className={`inline-flex shrink-0 rounded-full bg-[conic-gradient(from_200deg,var(--color-raspberry),var(--color-toffee),var(--color-strawberry-cream),var(--color-raspberry))] p-[3px] ${className}`}
     >
       <span className="flex size-full items-center justify-center rounded-full border-2 border-whipped bg-vanilla">
         <Image src={logo} alt="" sizes="96px" className="h-auto w-[74%]" />

@@ -1,23 +1,32 @@
 @import "tailwindcss";
 
 /* ── Design tokens ─────────────────────────────────────────────
-   Brand palette (guidelines v1.3). Change a colour here and it updates everywhere. */
+   The twelve official brand colours (Brand Guidelines, 03 Color). Change a
+   colour here and it updates everywhere. */
 @theme {
+  /* Primary */
+  --color-strawberry-cream: #f2cfd4; /* the store pink: brand sections, hover fills */
+  --color-cotton-candy: #8fc7dd; /* the store blue: weekly special band, accents */
+  /* Dark */
+  --color-chocolate: #352522; /* text, outlines, hard shadows, dark backgrounds */
+  --color-cacao: #5a3a32; /* supporting warm dark: secondary text */
+  /* Neutral */
   --color-vanilla: #fff8ee; /* page background */
-  --color-strawberry-cream: #f0cfd5; /* story band, category band, hover fills */
-  --color-strawberry-milk: #f9e9e9; /* placeholder fills */
-  --color-cotton-candy: #53b3d6; /* weekly special band */
-  --color-cotton-candy-light: #68bedd;
-  --color-blueberry: #245b78; /* action colour: buttons, links, footer */
-  --color-blueberry-hover: oklch(0.37 0.07 236);
-  --color-chocolate: #352522; /* text, outlines, hard shadows */
-  --color-cacao: #5a3a32; /* secondary text */
-  --color-caramel: #c9874a; /* hand-drawn underline/circle, link underline */
-  --color-toffee: #d9a15f; /* price sticker */
-  --color-cherry: #d94a47; /* promo only (≤2%), hand-drawn heart */
   --color-whipped: #ffffff; /* Polaroid paper, cards */
-  --color-ticker: oklch(0.53 0.17 2);
-  --color-ticker-star: #f2d48a;
+  --color-strawberry-milk: #f9e9e9; /* placeholder fills */
+  /* Support */
+  --color-blueberry: #1a56a7; /* action colour: buttons, links, dark bands, footer */
+  --color-raspberry: #e75e83; /* ticker, hand-drawn heart */
+  --color-caramel: #c9874a; /* hand-drawn underline/circle, link underline */
+  --color-toffee: #d9a15f; /* price sticker, review stars */
+  /* Promo */
+  --color-cherry: #d94a47; /* promo only */
+
+  /* Roles (always one of the colours above) */
+  --color-blueberry-hover: color-mix(in oklab, var(--color-blueberry), black 18%);
+  --color-ticker: var(--color-raspberry);
+  --color-ticker-ink: var(--color-whipped);
+  --color-ticker-star: var(--color-strawberry-cream);
 
   --breakpoint-desk: 51.25rem; /* 820px: mobile below, desktop above */
 
@@ -257,32 +266,24 @@ html[lang="ar"] {
 
 /* ── Section backgrounds ──────────────────────────────────────── */
 @utility hero-scrim {
-  /* blueberry wash so the headline reads over any photo */
+  /* chocolate wash so the headline reads over any photo */
   background: linear-gradient(
     0deg,
-    rgb(36 91 120 / 0.94) 0%,
-    rgb(36 91 120 / 0.7) 40%,
-    rgb(36 91 120 / 0) 74%
+    rgb(53 37 34 / 0.8) 0%,
+    rgb(53 37 34 / 0.55) 40%,
+    rgb(53 37 34 / 0) 74%
   );
 
   @variant desk {
     background:
       linear-gradient(
         var(--scrim-angle, 90deg),
-        rgb(36 91 120 / 0.86) 0%,
-        rgb(36 91 120 / 0.5) 42%,
-        rgb(36 91 120 / 0) 72%
+        rgb(53 37 34 / 0.72) 0%,
+        rgb(53 37 34 / 0.38) 42%,
+        rgb(53 37 34 / 0) 72%
       ),
-      linear-gradient(0deg, rgb(36 91 120 / 0.55) 0%, rgb(36 91 120 / 0) 45%);
+      linear-gradient(0deg, rgb(53 37 34 / 0.45) 0%, rgb(53 37 34 / 0) 45%);
   }
-}
-
-@utility candy-stripes {
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--color-cotton-candy) 0 14px,
-    var(--color-cotton-candy-light) 14px 28px
-  );
 }
 
 /* ── Motion ───────────────────────────────────────────────────── */
@@ -492,7 +493,7 @@ html:has(dialog[open]) {
   translate: 0 0;
 }
 .drawer::backdrop {
-  background: rgb(36 91 120 / 0.36);
+  background: rgb(26 86 167 / 0.3);
   backdrop-filter: blur(3px);
   opacity: 0;
   transition:

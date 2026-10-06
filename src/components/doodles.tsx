@@ -74,13 +74,13 @@ export function ArrowSweepRight({ className = "", style }: DoodleProps) {
   );
 }
 
-/** Cherry heart at the end of a line. */
+/** Raspberry heart at the end of a line. */
 export function Heart({ className = "", style }: DoodleProps) {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 34 32"
-      className={`${base} stroke-cherry ${className}`}
+      className={`${base} stroke-raspberry ${className}`}
       style={style}
     >
       <path
