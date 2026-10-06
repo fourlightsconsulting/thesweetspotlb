@@ -44,7 +44,19 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
       </head>
       <body className="min-h-full">
         <div className="page flex min-h-full flex-col overflow-x-clip">
-          <SiteHeader lang={lang} nav={dict.nav} />
+          <SiteHeader
+            lang={lang}
+            nav={dict.nav}
+            menu={{
+              orderNow: dict.common.orderNow,
+              branch: dict.locations.tripoli,
+              hours: [
+                `${dict.locations.monThu} · ${dict.locations.tripoliWeekHours}`,
+                `${dict.locations.friSun} · ${dict.locations.tripoliWeekendHours}`,
+              ],
+              follow: dict.instagram.follow,
+            }}
+          />
           <main className="flex-1">{children}</main>
           <SiteFooter lang={lang} dict={dict} />
         </div>

@@ -21,8 +21,9 @@ type Props = { reviews: Review[]; t: Dictionary["reviews"]; rtl: boolean };
 export function Reviews({ reviews, t, rtl }: Props) {
   const count = reviews.length;
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false); // explicit pause button
-  const [holding, setHolding] = useState(false); // hover / focus / touch
+  // Hover, keyboard focus (anywhere in the section, controls included) or a
+  // finger on the slides pauses the rotation.
+  const [holding, setHolding] = useState(false);
   const [inView, setInView] = useState(false);
   const reducedMotion = useSyncExternalStore(
     subscribeToMotionPref,
@@ -32,7 +33,7 @@ export function Reviews({ reviews, t, rtl }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const swipeStart = useRef<number | null>(null);
 
-  const playing = !paused && !holding && inView && !reducedMotion;
+  const playing = !holding && inView && !reducedMotion;
   const step = (delta: number) => setActive((i) => wrap(i + delta, count));
 
   useEffect(() => {
@@ -66,7 +67,11 @@ export function Reviews({ reviews, t, rtl }: Props) {
       id="reviews"
       aria-roledescription="carousel"
       aria-labelledby="reviews-title"
-      className="overflow-x-clip pt-[clamp(80px,9cqw,140px)]"
+      className="overflow-x-clip py-[clamp(72px,8cqw,128px)]"
+      onMouseEnter={() => setHolding(true)}
+      onMouseLeave={() => setHolding(false)}
+      onFocus={() => setHolding(true)}
+      onBlur={() => setHolding(false)}
     >
       <div className="shell flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <h2
@@ -82,10 +87,6 @@ export function Reviews({ reviews, t, rtl }: Props) {
 
       <div
         className="relative mx-auto mt-[clamp(28px,3cqw,48px)] grid max-w-[1440px] touch-pan-y justify-items-center select-none"
-        onMouseEnter={() => setHolding(true)}
-        onMouseLeave={() => setHolding(false)}
-        onFocus={() => setHolding(true)}
-        onBlur={() => setHolding(false)}
         onPointerDown={(e) => {
           swipeStart.current = e.clientX;
           if (e.pointerType !== "mouse") setHolding(true);
@@ -196,23 +197,6 @@ export function Reviews({ reviews, t, rtl }: Props) {
         >
           <span aria-hidden="true">{rtl ? "←" : "→"}</span>
         </button>
-
-        {!reducedMotion && (
-          <button
-            type="button"
-            onClick={() => setPaused((p) => !p)}
-            aria-label={paused ? t.play : t.pause}
-            className="ms-2 inline-flex size-11 items-center justify-center rounded-full text-cacao transition-colors hover:text-chocolate"
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-current">
-              {paused ? (
-                <path d="M8 5.5v13l10.5-6.5z" />
-              ) : (
-                <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" />
-              )}
-            </svg>
-          </button>
-        )}
       </div>
     </section>
   );

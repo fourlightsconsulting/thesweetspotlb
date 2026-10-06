@@ -17,6 +17,7 @@ const ar: Dictionary = {
     langSwitch: "English",
     openMenu: "فتح القائمة",
     closeMenu: "إغلاق القائمة",
+    menuLabel: "قائمة الموقع",
   },
   common: {
     orderNow: "اطلب الآن",
@@ -81,13 +82,10 @@ const ar: Dictionary = {
     rating: "Google rating · to come",
     previous: "التقييم السابق",
     next: "التقييم التالي",
-    pause: "إيقاف التقييمات مؤقتاً",
-    play: "تشغيل التقييمات",
     goTo: "عرض التقييم",
   },
   instagram: {
-    title: "طازة من إنستغرام",
-    subtitle: "جديدنا، عروض الأسبوع، وشو عم يصير ورا الكاونتر.",
+    title: "مجتمعنا",
     follow: "تابعنا @thesweetspotlb",
     followShort: "تابعنا",
     bio: ["كريب · وافل · آيس كريم رولز", "طرابلس · استلام وتوصيل", "مفتوحين لـ 1 فجراً بالويكند"],

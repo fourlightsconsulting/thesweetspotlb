@@ -15,6 +15,7 @@ const en = {
     langSwitch: "عربي",
     openMenu: "Open menu",
     closeMenu: "Close menu",
+    menuLabel: "Site menu",
   },
   common: {
     orderNow: "Order now",
@@ -77,17 +78,14 @@ const en = {
     shopAlt: "The Sweet Spot shopfront",
   },
   reviews: {
-    title: "What people are saying",
+    title: "Word on the street",
     rating: "Google rating · to come",
     previous: "Previous review",
     next: "Next review",
-    pause: "Pause reviews",
-    play: "Play reviews",
     goTo: "Show review",
   },
   instagram: {
-    title: "Fresh from the feed",
-    subtitle: "New drops, weekly specials and life behind the counter.",
+    title: "Our community",
     follow: "Follow @thesweetspotlb",
     followShort: "Follow",
     // Draft bio; the live feed will supply the real one.

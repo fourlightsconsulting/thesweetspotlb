@@ -98,11 +98,12 @@ html[lang="ar"] {
 }
 
 @utility text-link {
+  /* override --link / --link-hover on dark bands */
   display: inline-flex;
   align-items: center;
   gap: 10px;
   min-height: 48px;
-  color: var(--color-blueberry);
+  color: var(--link, var(--color-blueberry));
   font-family: var(--font-ui);
   font-weight: 700;
   font-size: 17px;
@@ -113,7 +114,7 @@ html[lang="ar"] {
   transition: color 0.2s;
 
   &:hover {
-    color: var(--color-chocolate);
+    color: var(--link-hover, var(--color-chocolate));
   }
 }
 
@@ -460,4 +461,59 @@ html[lang="ar"] {
 /* No page scroll behind an open pop-up (Instagram posts). */
 html:has(dialog[open]) {
   overflow: hidden;
+}
+
+/* Side menu (a modal <dialog>): slides in from the inline end. */
+.drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline: auto 0;
+  width: min(86vw, 380px);
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-start-start-radius: 28px;
+  border-end-start-radius: 28px;
+  background: var(--color-vanilla);
+  color: var(--color-chocolate);
+  box-shadow: calc(-18px * var(--dir, 1)) 0 40px -24px rgb(53 37 34 / 0.45);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  translate: calc(100% * var(--dir, 1)) 0;
+  transition:
+    translate 0.38s var(--ease-soft),
+    overlay 0.38s allow-discrete,
+    display 0.38s allow-discrete;
+}
+.drawer[open] {
+  translate: 0 0;
+}
+.drawer::backdrop {
+  background: rgb(36 91 120 / 0.36);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition:
+    opacity 0.38s,
+    overlay 0.38s allow-discrete,
+    display 0.38s allow-discrete;
+}
+.drawer[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .drawer[open] {
+    translate: calc(100% * var(--dir, 1)) 0;
+  }
+  .drawer[open]::backdrop {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer,
+  .drawer::backdrop {
+    transition: none;
+  }
 }

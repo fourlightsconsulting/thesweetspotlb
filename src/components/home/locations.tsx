@@ -13,7 +13,7 @@ type Props = { lang: Locale; t: Dictionary["locations"]; orderNow: string };
 
 export function Locations({ lang, t, orderNow }: Props) {
   return (
-    <section id="locations" className="pt-[clamp(110px,11cqw,170px)] pb-[clamp(100px,10cqw,150px)]">
+    <section id="locations" className="pt-[clamp(72px,8cqw,128px)] pb-[clamp(100px,10cqw,150px)]">
       <Reveal className="shell grid grid-cols-[repeat(auto-fit,minmax(min(100%,300px),1fr))] items-start gap-[clamp(36px,4cqw,64px)]">
         <h2 className="font-display text-[clamp(46px,5.4cqw,80px)] leading-[0.95] font-black tracking-[-0.035em] text-balance">
           {t.title}

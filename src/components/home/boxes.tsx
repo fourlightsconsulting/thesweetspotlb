@@ -26,7 +26,7 @@ export function Boxes({ lang, t }: Props) {
   return (
     <section
       id="boxes"
-      className="relative mx-auto mt-[clamp(110px,11cqw,180px)] grid max-w-[1440px] items-center gap-[clamp(32px,6cqw,96px)] desk:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
+      className="relative mx-auto grid max-w-[1440px] items-center gap-[clamp(32px,6cqw,96px)] pb-[clamp(64px,7cqw,112px)] desk:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
     >
       {/* Desktop: bleeds to the start edge. Phones: full-width square. */}
       <Image
