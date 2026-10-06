@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { site } from "@/data/site";
 import { hasLocale, localeDir, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { fontVariables } from "../fonts";
@@ -18,9 +19,19 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
   if (!hasLocale(lang)) return {};
   const { meta } = await getDictionary(lang);
   return {
+    metadataBase: new URL(site.url),
     title: { default: meta.title, template: meta.titleTemplate },
     description: meta.description,
     alternates: { languages: { en: "/en", ar: "/ar" } },
+    // Link previews (WhatsApp, Instagram, iMessage): one image per language,
+    // made from the brand cut-outs (public/og/).
+    openGraph: {
+      type: "website",
+      siteName: "The Sweet Spot",
+      locale: lang === "ar" ? "ar_LB" : "en_LB",
+      images: [{ url: `/og/${lang}.jpg`, width: 1200, height: 630, alt: meta.shareImageAlt }],
+    },
+    twitter: { card: "summary_large_image" },
   };
 }
 

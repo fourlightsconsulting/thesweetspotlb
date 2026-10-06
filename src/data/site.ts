@@ -1,6 +1,9 @@
 // Business details. Handle, links and hours are drafts from the design handoff:
 // confirm with the client before launch.
 export const site = {
+  // The live address: link previews (WhatsApp, Instagram) need absolute URLs.
+  // Placeholder until the new domain is chosen.
+  url: "http://localhost:3000",
   instagramHandle: "thesweetspotlb",
   instagramUrl: "https://www.instagram.com/thesweetspotlb/",
   tripoliDirectionsUrl:

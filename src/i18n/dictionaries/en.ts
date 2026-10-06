@@ -4,6 +4,8 @@ const en = {
     titleTemplate: "%s · The Sweet Spot",
     description:
       "Crêpes, waffles, pancakes, ice cream rolls and more, made to order in Tripoli. Ready in 10–15 min for pickup or delivery.",
+    shareImageAlt:
+      "The Sweet Spot logo beside a cup of Oreo ice cream rolls and an open dessert box",
   },
   nav: {
     home: "The Sweet Spot home",
