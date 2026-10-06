@@ -61,7 +61,7 @@ const ar: Dictionary = {
     regularServes: "تكفي 2–3",
     party: "علبة الحفلة",
     partyServes: "تكفي 5–6",
-    photoAlt: "علبة حلو من سويت سبوت فيها بروفيترول وفريز",
+    photoAlt: "علبة سويت سبوت مفتوحة فيها ثلاث قطع حلو",
   },
   dessert: {
     lead: "دايماً في محل",

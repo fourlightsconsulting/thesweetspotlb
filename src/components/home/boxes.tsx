@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import boxCutout from "@/assets/images/box-cutout.webp";
+import boxCutout from "@/assets/images/box-blue-cutout.png";
 import { Heart } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
 import { formatPriceShort, getItem, PARTY_BOX_EXTRA } from "@/data/menu";
@@ -44,7 +44,7 @@ export function Boxes({ lang, t }: Props) {
           src={boxCutout}
           alt={t.photoAlt}
           sizes="(min-width: 820px) 480px, 70vw"
-          className="absolute inset-[11%] size-[78%] -rotate-4 object-contain drop-shadow-[0_28px_26px_rgba(53,37,34,.28)] transition-transform duration-500 ease-soft hover:scale-[1.02] hover:-rotate-1"
+          className="absolute inset-[12%] size-[76%] -rotate-4 object-contain drop-shadow-[0_28px_26px_rgba(53,37,34,.28)] transition-transform duration-500 ease-soft hover:scale-[1.02] hover:-rotate-1"
         />
       </div>
 

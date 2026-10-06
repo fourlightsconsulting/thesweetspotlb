@@ -61,7 +61,7 @@ const en = {
     regularServes: "Serves 2–3",
     party: "Party Box",
     partyServes: "Serves 5–6",
-    photoAlt: "Sweet Spot dessert box with profiteroles and strawberries",
+    photoAlt: "An open Sweet Spot dessert box with three dessert slices",
   },
   dessert: {
     lead: "There’s always room for",
