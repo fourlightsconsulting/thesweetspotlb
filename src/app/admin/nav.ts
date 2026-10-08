@@ -10,10 +10,29 @@ export type NavItem = {
   minimum: StaffRole;
 };
 
-export type NavIcon = "home" | "team" | "account";
+export type NavIcon =
+  | "home"
+  | "orders"
+  | "customers"
+  | "dishes"
+  | "bundles"
+  | "prices"
+  | "offers"
+  | "site"
+  | "store"
+  | "team"
+  | "account";
 
 export const navItems: NavItem[] = [
   { href: "/admin", label: "Home", icon: "home", minimum: "staff" },
+  { href: "/admin/orders", label: "Orders", icon: "orders", minimum: "staff" },
+  { href: "/admin/customers", label: "Customers", icon: "customers", minimum: "staff" },
+  { href: "/admin/menu", label: "Menu", icon: "dishes", minimum: "staff" },
+  { href: "/admin/bundles", label: "Bundles", icon: "bundles", minimum: "manager" },
+  { href: "/admin/prices", label: "Prices", icon: "prices", minimum: "manager" },
+  { href: "/admin/offers", label: "Offers", icon: "offers", minimum: "manager" },
+  { href: "/admin/site", label: "Site", icon: "site", minimum: "manager" },
+  { href: "/admin/store", label: "Store", icon: "store", minimum: "manager" },
   { href: "/admin/team", label: "Team", icon: "team", minimum: "owner" },
 ];
 

@@ -10,13 +10,13 @@ import {
   menu as builtInMenu,
 } from "@/data/menu";
 import { type DeliveryZone, deliveryZones, type Fulfilment, ordering } from "@/data/ordering";
-import { builtInSchedule, type Schedule } from "@/lib/hours";
+import { builtInSchedule, type Ordering, type Schedule } from "@/lib/hours";
 import { parseSiteSettings, type SiteSettings } from "@/lib/site-settings";
 import { storageUrl } from "@/lib/supabase/env";
 import { publicClient } from "@/lib/supabase/service";
 
 // What the public pages read from Supabase: the menu, the branches (hours,
-// zones, the pause switch) and the site settings. Each is cached under a tag;
+// zones, the ordering switch) and the site settings. Each is cached under a tag;
 // the admin revalidates the tag when it saves, and the pages that used it
 // regenerate. Without Supabase (development, tests), the built-in data is used.
 
@@ -44,7 +44,8 @@ const bundledPhotos = new Map<string, StaticImageData>(
   ),
 );
 
-function photo(path: string | null): StaticImageData | undefined {
+/** A menu photo by its stored path: a bundled file name, or an upload in the "menu" bucket. */
+export function menuPhoto(path: string | null): StaticImageData | undefined {
   if (!path) return undefined;
   return (
     bundledPhotos.get(path) ?? {
@@ -62,7 +63,7 @@ async function loadMenu(): Promise<Menu> {
   const [categories, products, groups, options, links] = await Promise.all([
     db.from("categories").select("*").order("sort_order"),
     db.from("products").select("*").eq("orderable_online", true).order("sort_order"),
-    db.from("option_groups").select("*").eq("kind", "options"),
+    db.from("option_groups").select("*"),
     db.from("options").select("*").eq("is_available", true).order("sort_order"),
     db.from("product_option_groups").select("*").order("sort_order"),
   ]);
@@ -75,7 +76,7 @@ async function loadMenu(): Promise<Menu> {
   const linkRows = links.data!;
 
   const groupById = new Map<string, OptionGroup>();
-  for (const g of groups.data!) {
+  for (const g of groups.data!.filter((g) => g.kind === "options")) {
     groupById.set(g.id, {
       id: g.key,
       name: localized(g, "name"),
@@ -89,6 +90,7 @@ async function loadMenu(): Promise<Menu> {
 
   const categoryById = new Map(categoryRows.map((c) => [c.id, c]));
   const items: MenuItem[] = [];
+  const bundles: { item: MenuItem; productId: string }[] = [];
   for (const p of products.data!) {
     const own = categoryById.get(p.category_id);
     if (!own) continue; // its category is hidden
@@ -102,7 +104,7 @@ async function loadMenu(): Promise<Menu> {
       if (l.default_options.length > 0) defaults[groupById.get(l.group_id)!.id] = l.default_options;
     }
 
-    items.push({
+    const item: MenuItem = {
       id: p.slug,
       category: top.slug,
       ...(parent ? { subcategory: own.slug } : {}),
@@ -110,11 +112,47 @@ async function loadMenu(): Promise<Menu> {
       ...(p.tag ? { tag: p.tag } : {}),
       name: localized(p, "name"),
       description: localized(p, "description"),
-      image: photo(p.image_path),
+      image: menuPhoto(p.image_path),
       groups: productLinks.map((l) => groupById.get(l.group_id)!.id),
       ...(Object.keys(defaults).length > 0 ? { defaults } : {}),
       ...(p.is_available ? {} : { available: false }),
-    });
+    };
+    items.push(item);
+    if (p.kind === "bundle") bundles.push({ item, productId: p.id });
+  }
+
+  // Bundle slots, once every item is known: the slot's listed items (with
+  // their surcharges), then the rest of its source category at no extra.
+  const slugOfProduct = new Map(products.data!.map((p) => [p.id, p.slug]));
+  const itemById = new Map(
+    items.filter((i) => !bundles.some((b) => b.item === i)).map((i) => [i.id, i]),
+  );
+  for (const bundle of bundles) {
+    bundle.item.slots = linkRows
+      .filter((l) => l.product_id === bundle.productId)
+      .flatMap((l) => {
+        const slot = groups.data!.find((g) => g.id === l.group_id && g.kind === "items");
+        if (!slot) return [];
+        const listed = optionRows
+          .filter((o) => o.group_id === slot.id && o.product_id)
+          .map((o) => ({ itemId: slugOfProduct.get(o.product_id!) ?? "", price: o.price_cents }));
+        const source = slot.source_category_id && categoryById.get(slot.source_category_id);
+        const fromCategory = source
+          ? [...itemById.values()]
+              .filter((i) => i.category === source.slug || i.subcategory === source.slug)
+              .map((i) => ({ itemId: i.id, price: 0 }))
+          : [];
+        const choices = [...listed, ...fromCategory].filter(
+          (c, index, all) =>
+            itemById.has(c.itemId) && all.findIndex((x) => x.itemId === c.itemId) === index,
+        );
+        return [{ id: slot.key, name: localized(slot, "name"), choices }];
+      });
+    // Sold out when any slot has nothing left to pick.
+    const pickable = bundle.item.slots.every((slot) =>
+      slot.choices.some((c) => itemById.get(c.itemId)?.available !== false),
+    );
+    if (!pickable) bundle.item.available = false;
   }
 
   const menuCategories: Category[] = categoryRows
@@ -127,7 +165,8 @@ async function loadMenu(): Promise<Menu> {
         id: c.slug,
         name: localized(c, "name"),
         description: localized(c, "description"),
-        image: photo(c.image_path) ?? items.find((i) => i.category === c.slug && i.image)?.image,
+        image:
+          menuPhoto(c.image_path) ?? items.find((i) => i.category === c.slug && i.image)?.image,
         ...(subcategories.length > 0 ? { subcategories } : {}),
       };
     })
@@ -147,7 +186,7 @@ export type Branch = {
   phone: string | null;
   mapsUrl: string | null;
   acceptsOnlineOrders: boolean;
-  /** Shop hours; `paused` is set when online ordering is off or paused. */
+  /** Shop hours and the ordering switch ("paused" when the branch takes no online orders). */
   schedule: Schedule;
   eta: Record<Fulfilment, [number, number]>;
   zones: DeliveryZone[];
@@ -174,7 +213,7 @@ const builtInBranches: Branch[] = [
       hours: Array(7).fill([780, 1440]),
       closures: [],
       lastOrderMinutes: 15,
-      paused: true,
+      ordering: "paused",
     },
     eta: ordering.eta,
     zones: [],
@@ -223,7 +262,7 @@ async function loadBranches(): Promise<Branch[]> {
         hours: week,
         closures: closures.data!.filter((c) => c.branch_id === b.id).map((c) => c.on_date),
         lastOrderMinutes: b.last_order_minutes,
-        paused: !b.accepts_online_orders || b.ordering_paused,
+        ordering: b.accepts_online_orders ? (b.ordering as Ordering) : "paused",
       },
       eta: {
         pickup: [b.pickup_eta_min, b.pickup_eta_max],

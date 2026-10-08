@@ -7,7 +7,11 @@ type OrderEvent =
   | "view_cart"
   | "begin_checkout"
   | "add_promo_code"
-  | "purchase";
+  | "purchase"
+  | "popup_viewed"
+  | "popup_cta"
+  | "popup_code_copied"
+  | "popup_dismissed";
 
 export function track(event: OrderEvent, params: Record<string, unknown> = {}) {
   if (process.env.NODE_ENV !== "production") console.debug("[track]", event, params);

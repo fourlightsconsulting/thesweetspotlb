@@ -39,7 +39,7 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
   return (
     <ul className="flex flex-col gap-4">
       {lines.map(({ line, item, total }) => {
-        const mods = describeSelections(item, menu.groups, line.selections, lang);
+        const mods = describeSelections(item, menu, line.selections, lang);
         return (
           <li key={line.key} className="flex items-start gap-3">
             <ItemImage item={item} sizes="56px" className="size-14 flex-none rounded-[14px]" />

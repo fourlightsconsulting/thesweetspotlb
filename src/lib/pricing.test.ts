@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { getItem, menu, type OptionGroup } from "@/data/menu";
+import { getItem, menu, type MenuItem, type OptionGroup } from "@/data/menu";
 import {
   checkSelections,
+  chosenOptions,
   defaultSelections,
   describeSelections,
   lineSignature,
@@ -16,9 +17,9 @@ const choice = { chocolate: ["nutella"], fruit: ["strawberry"], toppings: ["spri
 
 describe("selections", () => {
   it("starts required choices empty, so customers pick on purpose", () => {
-    const start = defaultSelections(profiteroles, menu.groups);
+    const start = defaultSelections(profiteroles, menu);
     expect(start.chocolate).toEqual([]);
-    expect(checkSelections(profiteroles, menu.groups, start)).toMatchObject({
+    expect(checkSelections(profiteroles, menu, start)).toMatchObject({
       ok: false,
       missing: ["chocolate"],
       invalid: false,
@@ -26,7 +27,7 @@ describe("selections", () => {
   });
 
   it("accepts a complete choice", () => {
-    expect(checkSelections(profiteroles, menu.groups, choice).ok).toBe(true);
+    expect(checkSelections(profiteroles, menu, choice).ok).toBe(true);
   });
 
   it("flags unknown groups and options, duplicates and over-limit picks", () => {
@@ -37,7 +38,7 @@ describe("selections", () => {
       { ...choice, chocolate: ["nutella", "dark"] },
     ];
     for (const selections of bad) {
-      expect(checkSelections(profiteroles, menu.groups, selections).invalid).toBe(true);
+      expect(checkSelections(profiteroles, menu, selections).invalid).toBe(true);
     }
   });
 
@@ -50,25 +51,23 @@ describe("selections", () => {
       options: ["a", "b", "c"].map((id) => ({ id, name: { en: id, ar: id }, price: 0 })),
     };
     const item = { ...profiteroles, groups: ["two"] };
-    const groups = { two: small };
-    expect(checkSelections(item, groups, { two: ["a", "b"] }).ok).toBe(true);
-    expect(checkSelections(item, groups, { two: ["a", "b", "c"] }).invalid).toBe(true);
+    const lookup = { items: [], groups: { two: small } };
+    expect(checkSelections(item, lookup, { two: ["a", "b"] }).ok).toBe(true);
+    expect(checkSelections(item, lookup, { two: ["a", "b", "c"] }).invalid).toBe(true);
   });
 });
 
 describe("prices", () => {
   it("adds every option to the base price", () => {
     // $10 + strawberries $2 + sprinkles $0.50
-    expect(unitPrice(profiteroles, menu.groups, choice)).toBe(1250);
+    expect(unitPrice(profiteroles, menu, choice)).toBe(1250);
   });
 
   it("describes the choices in both languages", () => {
-    expect(describeSelections(profiteroles, menu.groups, choice, "en")).toBe(
+    expect(describeSelections(profiteroles, menu, choice, "en")).toBe(
       "Nutella · Strawberries · Sprinkles",
     );
-    expect(describeSelections(profiteroles, menu.groups, choice, "ar")).toBe(
-      "نوتيلا · فريز · سبرينكلز",
-    );
+    expect(describeSelections(profiteroles, menu, choice, "ar")).toBe("نوتيلا · فريز · سبرينكلز");
   });
 
   it("prices lines and sets aside the ones it can't price", () => {
@@ -89,6 +88,83 @@ describe("prices", () => {
     expect(lineSignature("x", { a: ["1", "2"], b: [] }, " hi ")).toBe(
       lineSignature("x", { a: ["2", "1"] }, "hi"),
     );
+  });
+});
+
+describe("bundles", () => {
+  // A box: pick a crêpe (Lotus costs $1 more), and an Oreo milkshake that's always in it.
+  const box: MenuItem = {
+    id: "crepe-box",
+    category: "boxes",
+    price: 1500,
+    name: { en: "Crêpe Box", ar: "علبة كريب" },
+    description: { en: "", ar: "" },
+    groups: [],
+    slots: [
+      {
+        id: "crepe",
+        name: { en: "Your crêpe", ar: "الكريب" },
+        choices: [
+          { itemId: "nutella-crepe", price: 0 },
+          { itemId: "lotus-crepe", price: 100 },
+        ],
+      },
+      {
+        id: "drink",
+        name: { en: "Drink", ar: "مشروب" },
+        choices: [{ itemId: "oreo-milkshake", price: 0 }],
+      },
+    ],
+  };
+  const lookup = { items: [...menu.items, box], groups: menu.groups };
+
+  it("picks fixed parts and leaves choices to the customer", () => {
+    const start = defaultSelections(box, lookup);
+    expect(start.drink).toEqual(["oreo-milkshake"]);
+    expect(start.crepe).toEqual([]);
+    expect(checkSelections(box, lookup, start)).toMatchObject({ ok: false, missing: ["crepe"] });
+  });
+
+  it("adds the surcharge and the picked item's add-ons at their usual prices", () => {
+    const selections = {
+      crepe: ["lotus-crepe"],
+      "crepe/fruit": ["banana"],
+      "crepe/extra-chocolate": ["dark"],
+      drink: ["oreo-milkshake"],
+    };
+    expect(checkSelections(box, lookup, selections).ok).toBe(true);
+    // $15 + Lotus $1 + banana $1.50 + dark chocolate $3
+    expect(unitPrice(box, lookup, selections)).toBe(2050);
+    expect(describeSelections(box, lookup, selections, "en")).toBe(
+      "Lotus Crêpe (Dark chocolate, Banana) · Oreo Milkshake",
+    );
+  });
+
+  it("lists each pick, then its own choices, as orders store them", () => {
+    const selections = {
+      crepe: ["nutella-crepe"],
+      "crepe/fruit": ["kiwi"],
+      drink: ["oreo-milkshake"],
+    };
+    expect(chosenOptions(box, lookup, selections).map((o) => [o.key, o.id, o.price])).toEqual([
+      ["crepe", "nutella-crepe", 0],
+      ["crepe/fruit", "kiwi", 150],
+      ["drink", "oreo-milkshake", 0],
+    ]);
+  });
+
+  it("refuses items that aren't choices, sold-out picks and stray groups", () => {
+    const soldOut = {
+      items: lookup.items.map((i) => (i.id === "nutella-crepe" ? { ...i, available: false } : i)),
+      groups: menu.groups,
+    };
+    const base = { drink: ["oreo-milkshake"] };
+    expect(checkSelections(box, lookup, { ...base, crepe: ["sushi-crepe"] }).invalid).toBe(true);
+    expect(checkSelections(box, soldOut, { ...base, crepe: ["nutella-crepe"] }).invalid).toBe(true);
+    expect(
+      checkSelections(box, lookup, { ...base, crepe: ["nutella-crepe"], "drink/fruit": ["kiwi"] })
+        .invalid,
+    ).toBe(true);
   });
 });
 

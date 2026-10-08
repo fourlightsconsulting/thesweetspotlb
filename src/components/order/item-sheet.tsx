@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
-import type { Menu, MenuItem, OptionGroup } from "@/data/menu";
+import type { BundleSlot, Menu, MenuItem, OptionGroup } from "@/data/menu";
 import { ordering } from "@/data/ordering";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -11,10 +11,13 @@ import { track } from "@/lib/analytics";
 import { type CartLine, cartActions, useCart } from "@/lib/cart";
 import { formatAddOn, formatPrice } from "@/lib/money";
 import {
+  bundlePicks,
   checkSelections,
   defaultSelections,
   isSingleChoice,
+  pickDefaults,
   type Selections,
+  slotKey,
   unitPrice,
 } from "@/lib/pricing";
 import { ItemImage } from "./item-image";
@@ -114,30 +117,41 @@ type FormProps = {
 function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSaved }: FormProps) {
   const groups = item.groups.map((id) => menu.groups[id]).filter(Boolean);
   const [selections, setSelections] = useState<Selections>(() =>
-    line
-      ? structuredClone(line.selections)
-      : { ...defaultSelections(item, menu.groups), ...presets },
+    line ? structuredClone(line.selections) : { ...defaultSelections(item, menu), ...presets },
   );
   const [qty, setQty] = useState(line?.qty ?? 1);
   const [note, setNote] = useState(line?.note ?? "");
   const [triedSubmit, setTriedSubmit] = useState(false);
 
-  const check = checkSelections(item, menu.groups, selections);
-  const total = unitPrice(item, menu.groups, selections) * qty;
+  const check = checkSelections(item, menu, selections);
+  const total = unitPrice(item, menu, selections) * qty;
   const soldOut = item.available === false;
 
-  const toggle = (group: OptionGroup, optionId: string) => {
+  /** `key`: the group's selections key ("slot/group" for a bundle pick's own group). */
+  const toggle = (key: string, group: OptionGroup, optionId: string) => {
     setSelections((prev) => {
-      const chosen = prev[group.id] ?? [];
+      const chosen = prev[key] ?? [];
       if (isSingleChoice(group)) {
         // A required single choice can only switch; an optional one can also be cleared.
         const clear = group.min === 0 && chosen[0] === optionId;
-        return { ...prev, [group.id]: clear ? [] : [optionId] };
+        return { ...prev, [key]: clear ? [] : [optionId] };
       }
       if (chosen.includes(optionId)) {
-        return { ...prev, [group.id]: chosen.filter((id) => id !== optionId) };
+        return { ...prev, [key]: chosen.filter((id) => id !== optionId) };
       }
-      return chosen.length >= group.max ? prev : { ...prev, [group.id]: [...chosen, optionId] };
+      return chosen.length >= group.max ? prev : { ...prev, [key]: [...chosen, optionId] };
+    });
+  };
+
+  /** Picks an item in a bundle slot: its own choices start over from its defaults. */
+  const pick = (slot: BundleSlot, itemId: string) => {
+    const picked = menu.items.find((i) => i.id === itemId);
+    if (!picked) return;
+    setSelections((prev) => {
+      const next: Selections = {};
+      for (const [key, value] of Object.entries(prev))
+        if (!key.startsWith(`${slot.id}/`)) next[key] = value;
+      return { ...next, [slot.id]: [itemId], ...pickDefaults(picked, menu, slot.id) };
     });
   };
 
@@ -210,13 +224,47 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
           </p>
         </div>
 
+        {bundlePicks(item, menu, selections).map(({ slot, item: picked }) => (
+          <div key={slot.id}>
+            <SlotFieldset
+              slot={slot}
+              menu={menu}
+              chosen={picked?.id}
+              missing={triedSubmit && check.missing.includes(slot.id)}
+              onPick={(itemId) => pick(slot, itemId)}
+              lang={lang}
+              t={t}
+            />
+            {picked?.groups.map((groupId) => {
+              const group = menu.groups[groupId];
+              const key = slotKey(slot.id, groupId);
+              return (
+                group && (
+                  <OptionFieldset
+                    key={key}
+                    fieldKey={key}
+                    title={`${picked.name[lang]} · ${group.name[lang]}`}
+                    group={group}
+                    chosen={selections[key] ?? []}
+                    missing={triedSubmit && check.missing.includes(key)}
+                    onToggle={(optionId) => toggle(key, group, optionId)}
+                    lang={lang}
+                    t={t}
+                  />
+                )
+              );
+            })}
+          </div>
+        ))}
+
         {groups.map((group) => (
           <OptionFieldset
             key={group.id}
+            fieldKey={group.id}
             group={group}
             chosen={selections[group.id] ?? []}
             missing={triedSubmit && check.missing.includes(group.id)}
-            onToggle={(optionId) => toggle(group, optionId)}
+            onToggle={(optionId) => toggle(group.id, group, optionId)}
             lang={lang}
             t={t}
           />
@@ -260,6 +308,10 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
 }
 
 type FieldsetProps = {
+  /** The selections key: the group id, or "slot/group" inside a bundle. */
+  fieldKey: string;
+  /** Shown instead of the group's name. */
+  title?: string;
   group: OptionGroup;
   chosen: string[];
   missing: boolean;
@@ -268,7 +320,16 @@ type FieldsetProps = {
   t: Dictionary["order"];
 };
 
-function OptionFieldset({ group, chosen, missing, onToggle, lang, t }: FieldsetProps) {
+function OptionFieldset({
+  fieldKey,
+  title,
+  group,
+  chosen,
+  missing,
+  onToggle,
+  lang,
+  t,
+}: FieldsetProps) {
   const single = isSingleChoice(group);
   const required = group.min > 0;
   const unlimited = group.max >= group.options.length;
@@ -281,14 +342,16 @@ function OptionFieldset({ group, chosen, missing, onToggle, lang, t }: FieldsetP
 
   return (
     <fieldset
-      id={`group-${group.id}`}
-      aria-describedby={`rule-${group.id}`}
+      id={`group-${fieldKey}`}
+      aria-describedby={`rule-${fieldKey}`}
       className="scroll-mt-4 border-t border-dashed border-chocolate/20 px-6 pt-5 pb-6"
     >
       <legend className="float-start mb-3 flex w-full items-center justify-between gap-3">
-        <span className="font-display text-lg leading-tight font-bold">{group.name[lang]}</span>
+        <span className="font-display text-lg leading-tight font-bold">
+          {title ?? group.name[lang]}
+        </span>
         <span
-          id={`rule-${group.id}`}
+          id={`rule-${fieldKey}`}
           className={`flex-none rounded-full px-2.5 py-1 font-ui text-xs leading-4 font-bold ${missing ? "bg-raspberry text-whipped" : required ? "bg-blueberry text-vanilla" : "bg-strawberry-milk text-cacao"}`}
         >
           {rule}
@@ -319,7 +382,7 @@ function OptionFieldset({ group, chosen, missing, onToggle, lang, t }: FieldsetP
             >
               <input
                 type={single && required ? "radio" : "checkbox"}
-                name={group.id}
+                name={fieldKey}
                 value={option.id}
                 checked={checked}
                 disabled={disabled}
@@ -352,6 +415,106 @@ function OptionFieldset({ group, chosen, missing, onToggle, lang, t }: FieldsetP
         })}
       </div>
       {full && !unlimited && <p className="mt-2 font-ui text-[13px] text-cacao">{t.maxReached}</p>}
+    </fieldset>
+  );
+}
+
+type SlotProps = {
+  slot: BundleSlot;
+  menu: Menu;
+  /** The picked item's id. */
+  chosen: string | undefined;
+  missing: boolean;
+  onPick: (itemId: string) => void;
+  lang: Locale;
+  t: Dictionary["order"];
+};
+
+/** A bundle slot: the items to pick from (or the one it includes), with surcharges. */
+function SlotFieldset({ slot, menu, chosen, missing, onPick, lang, t }: SlotProps) {
+  const choices = slot.choices.flatMap((choice) => {
+    const item = menu.items.find((i) => i.id === choice.itemId);
+    return item ? [{ ...choice, item }] : [];
+  });
+  const fixed = choices.length === 1;
+
+  return (
+    <fieldset
+      id={`group-${slot.id}`}
+      aria-describedby={`rule-${slot.id}`}
+      className="scroll-mt-4 border-t border-dashed border-chocolate/20 px-6 pt-5 pb-6"
+    >
+      <legend className="float-start mb-3 flex w-full items-center justify-between gap-3">
+        <span className="font-display text-lg leading-tight font-bold">{slot.name[lang]}</span>
+        <span
+          id={`rule-${slot.id}`}
+          className={`flex-none rounded-full px-2.5 py-1 font-ui text-xs leading-4 font-bold ${missing ? "bg-raspberry text-whipped" : fixed ? "bg-strawberry-milk text-cacao" : "bg-blueberry text-vanilla"}`}
+        >
+          {fixed ? t.included : `${t.required} · ${t.pickOne}`}
+        </span>
+      </legend>
+      {missing && (
+        <p
+          role="alert"
+          className="clear-both mb-3 flex items-center gap-2 font-ui text-sm font-semibold"
+        >
+          <span
+            aria-hidden="true"
+            className="flex size-5 flex-none items-center justify-center rounded-full bg-raspberry font-ui text-xs font-bold text-whipped"
+          >
+            !
+          </span>
+          {t.chooseOne}
+        </p>
+      )}
+      <div className="clear-both flex flex-col gap-2">
+        {choices.map(({ item, price }) => {
+          const soldOut = item.available === false;
+          const content = (
+            <>
+              <ItemImage item={item} sizes="44px" className="size-11 flex-none rounded-[10px]" />
+              <span className="flex-1 font-ui text-[15px] leading-5 font-medium">
+                {item.name[lang]}
+              </span>
+              <span className="font-ui text-sm font-semibold text-cacao">
+                {soldOut ? t.soldOut : formatAddOn(price, lang)}
+              </span>
+            </>
+          );
+          if (fixed)
+            return (
+              <div
+                key={item.id}
+                className="flex min-h-[52px] items-center gap-3 rounded-[14px] border-[1.5px] border-chocolate/12 bg-whipped px-3 py-2"
+              >
+                {content}
+              </div>
+            );
+          return (
+            <label
+              key={item.id}
+              className="group/opt relative flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-chocolate/12 bg-whipped px-3 py-2 transition-colors has-checked:border-blueberry has-checked:bg-strawberry-milk has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel has-disabled:cursor-not-allowed has-disabled:opacity-45"
+            >
+              <input
+                type="radio"
+                name={slot.id}
+                value={item.id}
+                checked={chosen === item.id}
+                disabled={soldOut}
+                onChange={() => onPick(item.id)}
+                className="sr-only"
+              />
+              <span
+                aria-hidden="true"
+                className="flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-chocolate/45 transition-colors group-has-checked/opt:border-blueberry group-has-checked/opt:bg-blueberry"
+              >
+                <span className="size-2 scale-0 rounded-full bg-whipped transition-transform group-has-checked/opt:scale-100" />
+              </span>
+              {content}
+            </label>
+          );
+        })}
+      </div>
     </fieldset>
   );
 }

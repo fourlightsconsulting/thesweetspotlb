@@ -154,6 +154,7 @@ const en = {
     upTo: "Up to {count}",
     pickOne: "Pick 1",
     maxReached: "Max reached",
+    included: "Included",
     chooseOne: "Choose one to continue",
     notes: "Special instructions",
     notesPlaceholder: "Allergies, extra napkins, cut in half…",
@@ -249,6 +250,12 @@ const en = {
     notFoundTitle: "We couldn’t find that order.",
     notFoundBody: "Orders show here on the device they were placed from.",
     demo: "Test order: online ordering isn’t connected to the shop yet.",
+  },
+  popup: {
+    close: "Close",
+    code: "Your code",
+    copy: "Copy",
+    copied: "Copied",
   },
   footer: {
     tagline: "Life is sweeter here.",

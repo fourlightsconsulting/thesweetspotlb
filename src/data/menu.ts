@@ -88,6 +88,16 @@ export type OptionGroup = {
 
 export type ItemTag = "fav" | "new" | "limited";
 
+/**
+ * One pick in a bundle: the menu items to choose from, each with its
+ * surcharge in cents. A slot with a single item is a fixed part.
+ */
+export type BundleSlot = {
+  id: string;
+  name: Localized;
+  choices: { itemId: string; price: number }[];
+};
+
 export type MenuItem = {
   id: string;
   category: CategoryId;
@@ -107,6 +117,8 @@ export type MenuItem = {
   defaults?: Record<string, string | string[]>;
   /** False while sold out: still listed, but it can't be ordered. */
   available?: boolean;
+  /** Bundles only: the picks, in order. Picked items keep their own groups. */
+  slots?: BundleSlot[];
 };
 
 export type Menu = {

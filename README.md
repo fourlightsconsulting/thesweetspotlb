@@ -32,6 +32,10 @@ Open http://localhost:3000. Without `.env.local` the site runs on its built-in m
 
 Migrations live in `supabase/migrations/` and are applied to the linked project with `supabase db push` (no local database needed); `supabase/seed.sql` holds the starting menu and settings. After a migration, run `npm run db:types`. The first owner is made with `node --env-file=.env.local scripts/make-owner.mjs <email> "<name>"`; owners add everyone else from the admin's Team page.
 
+## Admin
+
+Staff (orders board, customers, sold-out switches) < managers (menu, bundles, prices, offers, site, store) < owners (team). Each section lives in `src/app/admin/(app)/<section>/` with its page, client forms and server actions; access is checked in each action and again by row level security. The orders board updates live (Supabase Realtime) and chimes for new orders. Bundles are products of kind `bundle` whose parts are option groups of kind `items`; the customer's picks are stored as `selections[slot] = [itemId]` with each pick's own choices under `"slot/group"` (see `src/lib/pricing.ts`).
+
 ## Deployment (Cloudflare Workers Builds)
 
 Deploys happen only through Cloudflare's GitHub integration: every push to `main` builds and deploys. Connect the GitHub repo to a Worker named `thesweetspotlb` (it must match `name` in `wrangler.jsonc`) and set:
@@ -40,6 +44,7 @@ Deploys happen only through Cloudflare's GitHub integration: every push to `main
 - Deploy command: `npx opennextjs-cloudflare deploy`
 - Build variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 - Runtime secret: `SUPABASE_SECRET_KEY`
+- WhatsApp new-order alerts (optional until connected): `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TOKEN` (secret), and if they differ from the defaults `WHATSAPP_ALERT_TEMPLATE` (`new_order_alert`) and `WHATSAPP_TEMPLATE_LANGUAGE` (`en`). The template text is in `src/server/order-alerts.ts`; the numbers that get alerts are set in the admin (Store).
 - Custom domains: `thesweetspotlb.com`, `www.thesweetspotlb.com` (redirects to the bare domain) and `admin.thesweetspotlb.com`
 
 Pages are cached in the R2 bucket `thesweetspotlb-cache`, with revalidation tags in the D1 database `thesweetspotlb-tags` (see `open-next.config.ts`); admin saves revalidate the `menu`, `store` and `settings` tags.

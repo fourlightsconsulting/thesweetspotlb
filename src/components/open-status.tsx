@@ -16,7 +16,7 @@ type Props = { schedule: Schedule; openLabel: string; closedLabel: string };
 /** Whether the shop's doors are open (its hours, whatever online ordering is doing). */
 export function OpenStatus({ schedule, openLabel, closedLabel }: Props) {
   const isOpenNow = useCallback(
-    () => storeStatus({ ...schedule, paused: false, lastOrderMinutes: 0 }).open,
+    () => storeStatus({ ...schedule, ordering: "hours", lastOrderMinutes: 0 }).open,
     [schedule],
   );
   const open = useSyncExternalStore(subscribeToMinute, isOpenNow, unknownOnServer);

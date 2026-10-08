@@ -1,8 +1,14 @@
 // Opening hours, always in Beirut time whatever the visitor's own time zone.
-// The schedule comes from the database (branch hours, closures, the pause
+// The schedule comes from the database (branch hours, closures, the ordering
 // switch), loaded by src/server/catalog.ts and passed down to the browser.
 import { site, tripoliHours } from "@/data/site";
 import type { Locale } from "@/i18n/config";
+
+/**
+ * The admin's online-ordering switch: follow the opening hours, take orders
+ * whatever the hours say, or take none.
+ */
+export type Ordering = "hours" | "open" | "paused";
 
 /**
  * A branch's week. `hours` is [open, close] in minutes after midnight per
@@ -14,8 +20,8 @@ export type Schedule = {
   closures: string[];
   /** Online orders stop this many minutes before closing. */
   lastOrderMinutes: number;
-  /** Online ordering switched off or paused from the admin. */
-  paused: boolean;
+  /** "paused" also when the branch doesn't take online orders at all. */
+  ordering: Ordering;
 };
 
 /** The built-in Tripoli week, used while Supabase isn't configured. */
@@ -23,7 +29,7 @@ export const builtInSchedule: Schedule = {
   hours: tripoliHours,
   closures: [],
   lastOrderMinutes: 15,
-  paused: false,
+  ordering: "hours",
 };
 
 const beirutClock = new Intl.DateTimeFormat("en-US", {
@@ -56,8 +62,11 @@ function addDays(isoDate: string, days: number) {
 }
 
 export type StoreStatus =
-  /** `closesAt`: minutes after today's midnight; past 1440 runs into tomorrow. */
-  | { open: true; closesAt: number }
+  /**
+   * `closesAt`: minutes after today's midnight; past 1440 runs into tomorrow.
+   * Null while ordering is switched open whatever the hours.
+   */
+  | { open: true; closesAt: number | null }
   /**
    * `reopens`: when online orders start again, `inDays` days from today at
    * `at` minutes after midnight. Null while paused, or with no hours ahead.
@@ -67,10 +76,11 @@ export type StoreStatus =
 /**
  * Whether online orders are being taken. Orders stop `lastOrderMinutes`
  * before closing; a closure day cancels that day's session (including the
- * part past midnight).
+ * part past midnight). The ordering switch overrides the hours.
  */
 export function storeStatus(schedule: Schedule, date = new Date()): StoreStatus {
-  if (schedule.paused) return { open: false, reopens: null };
+  if (schedule.ordering === "paused") return { open: false, reopens: null };
+  if (schedule.ordering === "open") return { open: true, closesAt: null };
   const { hours, closures, lastOrderMinutes } = schedule;
   const now = beirutTime(date);
   const closedOn = (inDays: number) => closures.includes(addDays(now.date, inDays));

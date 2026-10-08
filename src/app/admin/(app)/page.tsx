@@ -1,24 +1,14 @@
 import type { Metadata } from "next";
+import { startOfBeirutDay } from "@/components/admin/format";
 import { PageHeader } from "@/components/admin/page-header";
 import { storeStatus } from "@/lib/hours";
 import { adminClient } from "@/lib/supabase/server";
 import { getOrderingBranch } from "@/server/catalog";
-import { requireStaff } from "@/server/admin/session";
+import { atLeast, requireStaff } from "@/server/admin/session";
+import { orderingNote } from "./store/ordering-note";
+import { OrderingSwitch } from "./store/ordering-switch";
 
 export const metadata: Metadata = { title: "Home" };
-
-/** Midnight today in Beirut, as an ISO timestamp. */
-function startOfBeirutDay(now = new Date()) {
-  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Beirut" }).format(now);
-  const offset = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Beirut",
-    timeZoneName: "longOffset",
-  })
-    .formatToParts(now)
-    .find((p) => p.type === "timeZoneName")!
-    .value.replace("GMT", "");
-  return new Date(`${date}T00:00:00${offset || "+00:00"}`).toISOString();
-}
 
 export default async function AdminHome() {
   const staff = await requireStaff();
@@ -32,7 +22,6 @@ export default async function AdminHome() {
   ]);
   const orders = (today.data ?? []).filter((o) => o.status !== "cancelled");
   const revenue = orders.reduce((sum, o) => sum + Number(o.total_cents), 0);
-  const status = storeStatus(branch.schedule);
 
   const tiles = [
     { label: "Orders today", value: String(orders.length) },
@@ -42,11 +31,6 @@ export default async function AdminHome() {
       value: String(waiting.count ?? 0),
       tone: (waiting.count ?? 0) > 0 ? "text-wait" : "",
     },
-    {
-      label: "Online ordering",
-      value: branch.schedule.paused ? "Paused" : status.open ? "Open" : "Closed",
-      tone: status.open ? "text-good" : "text-muted",
-    },
   ];
 
   return (
@@ -55,7 +39,7 @@ export default async function AdminHome() {
         title={`Hi, ${staff.name.split(" ")[0]}`}
         description="Today at the Tripoli branch, in Beirut time."
       />
-      <div className="grid grid-cols-2 gap-3 wide:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 wide:grid-cols-3">
         {tiles.map((tile) => (
           <div key={tile.label} className="card p-4">
             <p className="text-[13px] text-muted">{tile.label}</p>
@@ -64,6 +48,14 @@ export default async function AdminHome() {
             </p>
           </div>
         ))}
+      </div>
+      <div className="mt-6">
+        <OrderingSwitch
+          value={branch.schedule.ordering}
+          open={storeStatus(branch.schedule).open}
+          note={orderingNote(branch.schedule)}
+          canChange={atLeast(staff.role, "manager")}
+        />
       </div>
     </>
   );

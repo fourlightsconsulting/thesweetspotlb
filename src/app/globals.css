@@ -526,6 +526,58 @@ html:has(dialog[open]) {
 
 /* Item customiser and the phone cart (modal <dialog>s): a bottom sheet on
    phones, a side panel from the inline end on desktop. */
+/* ── Welcome popup: a sticker card, centred (a bottom card on phones) ── */
+.welcome-popup {
+  width: min(440px, calc(100% - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto auto 16px;
+  padding: 0;
+  border: 2.5px solid var(--color-chocolate);
+  border-radius: 26px;
+  background: var(--color-vanilla);
+  color: var(--color-chocolate);
+  box-shadow: 6px 8px 0 var(--color-chocolate);
+  overflow: auto;
+  opacity: 0;
+  translate: 0 24px;
+  transition:
+    opacity 0.3s,
+    translate 0.38s var(--ease-soft),
+    overlay 0.38s allow-discrete,
+    display 0.38s allow-discrete;
+}
+.welcome-popup[open] {
+  opacity: 1;
+  translate: 0 0;
+}
+.welcome-popup::backdrop {
+  background: rgb(26 86 167 / 0.3);
+  backdrop-filter: blur(3px);
+  opacity: 0;
+  transition:
+    opacity 0.38s,
+    overlay 0.38s allow-discrete,
+    display 0.38s allow-discrete;
+}
+.welcome-popup[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .welcome-popup[open] {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  .welcome-popup[open]::backdrop {
+    opacity: 0;
+  }
+}
+@media (width >= 40rem) {
+  .welcome-popup {
+    margin: auto;
+  }
+}
+
 .sheet {
   position: fixed;
   inset: 48px 0 0;

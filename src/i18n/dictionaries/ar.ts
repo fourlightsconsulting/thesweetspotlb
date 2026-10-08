@@ -152,6 +152,7 @@ const ar: Dictionary = {
     upTo: "حتى {count}",
     pickOne: "اختر 1",
     maxReached: "وصلت للحد الأقصى",
+    included: "ضمن العلبة",
     chooseOne: "اختار واحد لتكمّل",
     notes: "ملاحظات خاصة",
     notesPlaceholder: "حساسية، محارم إضافية، قصّه نصّين…",
@@ -246,6 +247,12 @@ const ar: Dictionary = {
     notFoundTitle: "ما لقينا هالطلب.",
     notFoundBody: "الطلبات بتبيّن هون على الجهاز اللي انطلبت منه.",
     demo: "طلب تجريبي: الطلب أونلاين مش موصول بالمحل بعد.",
+  },
+  popup: {
+    close: "إغلاق",
+    code: "الرمز",
+    copy: "نسخ",
+    copied: "تم النسخ",
   },
   footer: {
     tagline: "الحياة أحلى هون.",

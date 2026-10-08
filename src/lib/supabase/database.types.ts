@@ -101,7 +101,6 @@ export type Database = {
           accepts_online_orders: boolean;
           address_ar: string;
           address_en: string;
-          alert_phone: string | null;
           created_at: string;
           delivery_eta_max: number;
           delivery_eta_min: number;
@@ -110,7 +109,7 @@ export type Database = {
           maps_url: string | null;
           name_ar: string;
           name_en: string;
-          ordering_paused: boolean;
+          ordering: string;
           phone: string | null;
           pickup_eta_max: number;
           pickup_eta_min: number;
@@ -122,7 +121,6 @@ export type Database = {
           accepts_online_orders?: boolean;
           address_ar?: string;
           address_en?: string;
-          alert_phone?: string | null;
           created_at?: string;
           delivery_eta_max?: number;
           delivery_eta_min?: number;
@@ -131,7 +129,7 @@ export type Database = {
           maps_url?: string | null;
           name_ar: string;
           name_en: string;
-          ordering_paused?: boolean;
+          ordering?: string;
           phone?: string | null;
           pickup_eta_max?: number;
           pickup_eta_min?: number;
@@ -143,7 +141,6 @@ export type Database = {
           accepts_online_orders?: boolean;
           address_ar?: string;
           address_en?: string;
-          alert_phone?: string | null;
           created_at?: string;
           delivery_eta_max?: number;
           delivery_eta_min?: number;
@@ -152,7 +149,7 @@ export type Database = {
           maps_url?: string | null;
           name_ar?: string;
           name_en?: string;
-          ordering_paused?: boolean;
+          ordering?: string;
           phone?: string | null;
           pickup_eta_max?: number;
           pickup_eta_min?: number;
@@ -783,6 +780,13 @@ export type Database = {
             foreignKeyName: "orders_customer_id_fkey";
             columns: ["customer_id"];
             isOneToOne: false;
+            referencedRelation: "customer_summaries";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
             referencedRelation: "customers";
             referencedColumns: ["id"];
           },
@@ -792,6 +796,13 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "delivery_zones";
             referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "orders_discount_code_id_fkey";
+            columns: ["discount_code_id"];
+            isOneToOne: false;
+            referencedRelation: "discount_code_usage";
+            referencedColumns: ["code_id"];
           },
           {
             foreignKeyName: "orders_discount_code_id_fkey";
@@ -956,9 +967,50 @@ export type Database = {
       };
     };
     Views: {
-      [_ in never]: never;
+      customer_summaries: {
+        Row: {
+          created_at: string | null;
+          email: string | null;
+          first_order_at: string | null;
+          id: string | null;
+          last_order_at: string | null;
+          marketing_opt_in_at: string | null;
+          name: string | null;
+          orders: number | null;
+          phone: string | null;
+          preferred_locale: Database["public"]["Enums"]["locale"] | null;
+          spent_cents: number | null;
+        };
+        Relationships: [];
+      };
+      discount_code_usage: {
+        Row: {
+          code_id: string | null;
+          discount_cents: number | null;
+          last_used_at: string | null;
+          sales_cents: number | null;
+          uses: number | null;
+        };
+        Relationships: [];
+      };
     };
     Functions: {
+      audit_trail: {
+        Args: {
+          p_column?: string;
+          p_limit?: number;
+          p_row_id?: string;
+          p_table?: string;
+        };
+        Returns: {
+          action: string;
+          actor_name: string;
+          at: string;
+          changes: Json;
+          row_id: string;
+          table_name: string;
+        }[];
+      };
       branch_is_open: {
         Args: { p_at?: string; p_branch: string };
         Returns: boolean;

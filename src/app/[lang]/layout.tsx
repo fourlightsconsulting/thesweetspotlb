@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { WelcomePopup } from "@/components/welcome-popup";
 import { site } from "@/data/site";
 import { hasLocale, localeDir, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { weekHours } from "@/lib/hours";
-import { getOrderingBranch } from "@/server/catalog";
+import { getOrderingBranch, getSiteSettings } from "@/server/catalog";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
@@ -40,7 +41,11 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
 export default async function RootLayout({ children, params }: LayoutProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
-  const [dict, branch] = await Promise.all([getDictionary(lang), getOrderingBranch()]);
+  const [dict, branch, settings] = await Promise.all([
+    getDictionary(lang),
+    getOrderingBranch(),
+    getSiteSettings(),
+  ]);
   const hours = weekHours(branch.schedule, lang, dict.locations).map(
     (row) => `${row.days} · ${row.hours}`,
   );
@@ -67,6 +72,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           <main className="flex-1">{children}</main>
           <SiteFooter lang={lang} dict={dict} hours={hours} />
         </div>
+        <WelcomePopup popup={settings.welcomePopup} lang={lang} t={dict.popup} />
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 import "server-only";
+import { after } from "next/server";
 import { z } from "zod";
-import type { Menu } from "@/data/menu";
+import type { Menu, MenuItem } from "@/data/menu";
 import { ordering } from "@/data/ordering";
 import { locales } from "@/i18n/config";
 import {
@@ -11,9 +12,16 @@ import {
 } from "@/lib/checkout";
 import { storeStatus } from "@/lib/hours";
 import { normalisePhone } from "@/lib/phone";
-import { describeSelections, orderTotals, priceLines, type Selections } from "@/lib/pricing";
+import {
+  chosenOptions,
+  describeSelections,
+  orderTotals,
+  priceLines,
+  type Selections,
+} from "@/lib/pricing";
 import { serviceClient } from "@/lib/supabase/service";
 import { getMenu, getOrderingBranch, ORDERING_BRANCH } from "./catalog";
+import { sendOrderAlerts } from "./order-alerts";
 import { checkPromo } from "./promotions";
 
 // The request is untrusted: only ids, quantities, choices and contact details
@@ -40,7 +48,7 @@ const inputSchema = z.object({
       z.object({
         itemId: text(64),
         qty: z.int().min(1).max(ordering.maxQuantity),
-        selections: z.record(text(40), z.array(text(40)).max(30)),
+        selections: z.record(text(80), z.array(text(64)).max(30)),
         note: text(ordering.noteMaxLength),
       }),
     )
@@ -53,27 +61,21 @@ export function quotePromo(code: string, subtotal: number): Promise<CheckPromoRe
   return checkPromo(code, subtotal);
 }
 
-/** The order's choices as create_order stores them: names and prices as the customer saw them. */
-function optionSnapshot(menu: Menu, groupIds: string[], selections: Selections) {
-  return groupIds.flatMap((groupId) => {
-    const group = menu.groups[groupId];
-    if (!group) return [];
-    return (selections[groupId] ?? []).flatMap((optionId) => {
-      const option = group.options.find((o) => o.id === optionId);
-      if (!option) return [];
-      return [
-        {
-          group: group.id,
-          group_name_en: group.name.en,
-          group_name_ar: group.name.ar,
-          option: option.id,
-          name_en: option.name.en,
-          name_ar: option.name.ar,
-          price_cents: option.price,
-        },
-      ];
-    });
-  });
+/**
+ * The order's choices as create_order stores them: names and prices as the
+ * customer saw them. A bundle's picks come first, each followed by its own
+ * choices under "slot/group".
+ */
+function optionSnapshot(menu: Menu, item: MenuItem, selections: Selections) {
+  return chosenOptions(item, menu, selections).map((o) => ({
+    group: o.key,
+    group_name_en: o.groupName.en,
+    group_name_ar: o.groupName.ar,
+    option: o.id,
+    name_en: o.name.en,
+    name_ar: o.name.ar,
+    price_cents: o.price,
+  }));
 }
 
 export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult> {
@@ -113,8 +115,8 @@ export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult
   const lines = priced.map(({ line, item, total }) => ({
     name: item.name,
     options: {
-      en: describeSelections(item, menu.groups, line.selections, "en"),
-      ar: describeSelections(item, menu.groups, line.selections, "ar"),
+      en: describeSelections(item, menu, line.selections, "en"),
+      ar: describeSelections(item, menu, line.selections, "ar"),
     },
     note: line.note.trim(),
     qty: line.qty,
@@ -173,15 +175,23 @@ export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult
           base_price_cents: item.price,
           quantity: line.qty,
           note: line.note.trim(),
-          options: optionSnapshot(menu, item.groups, line.selections),
+          options: optionSnapshot(menu, item, line.selections),
         })),
       },
     })
-    .single<{ order_number: number; public_token: string; total_cents: number }>();
+    .single<{
+      order_id: string;
+      order_number: number;
+      public_token: string;
+      total_cents: number;
+      already_placed: boolean;
+    }>();
   if (error || !data) {
     console.error("create_order failed", error);
     return { ok: false, code: "failed" };
   }
+  // The shop's WhatsApp alerts go out once the customer has their answer.
+  if (!data.already_placed) after(() => sendOrderAlerts(data.order_id));
 
   return {
     ok: true,

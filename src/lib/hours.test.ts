@@ -54,10 +54,24 @@ describe("storeStatus", () => {
   });
 
   it("takes nothing while paused", () => {
-    expect(storeStatus({ ...online, paused: true }, at("2026-10-06T12:00:00Z"))).toEqual({
+    expect(storeStatus({ ...online, ordering: "paused" }, at("2026-10-06T12:00:00Z"))).toEqual({
       open: false,
       reopens: null,
     });
+  });
+
+  it("takes orders whatever the hours when switched open", () => {
+    // Tuesday 9 am, before opening; and a closure day.
+    expect(storeStatus({ ...online, ordering: "open" }, at("2026-10-06T06:00:00Z"))).toEqual({
+      open: true,
+      closesAt: null,
+    });
+    expect(
+      storeStatus(
+        { ...online, ordering: "open", closures: ["2026-10-06"] },
+        at("2026-10-06T12:00:00Z"),
+      ).open,
+    ).toBe(true);
   });
 
   it("finds the next open day across closed weekdays", () => {
