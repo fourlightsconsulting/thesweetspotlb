@@ -3,13 +3,13 @@ import Link from "next/link";
 import cup from "@/assets/images/cutout-icecream-cup.png";
 import { ArrowUpLeft, Rays } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
-import { getItem, WEEKLY_SPECIAL_ID } from "@/data/menu";
+import type { MenuItem } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 import { formatPrice } from "@/lib/money";
 
-type Props = { lang: Locale; t: Dictionary["special"] };
+type Props = { lang: Locale; t: Dictionary["special"]; item: MenuItem };
 
 /**
  * Cotton Candy band with a cut-out cup that breaks above the band into the pink
@@ -17,9 +17,9 @@ type Props = { lang: Locale; t: Dictionary["special"] };
  * section's bottom padding leaves room. On phones the cup box is sized in cqw
  * and capped, so the layout holds from 320px phones to 819px tablets.
  */
-export function WeeklySpecial({ lang, t }: Props) {
-  const href = routes(lang).item(WEEKLY_SPECIAL_ID);
-  const price = formatPrice(getItem(WEEKLY_SPECIAL_ID).price, lang);
+export function WeeklySpecial({ lang, t, item }: Props) {
+  const href = routes(lang).item(item.id);
+  const price = formatPrice(item.price, lang);
 
   return (
     <section id="special" className="relative overflow-x-clip bg-cotton-candy text-chocolate">

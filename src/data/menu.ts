@@ -1,7 +1,7 @@
-// The Tripoli menu, imported from the old site's database (Firestore) on
-// 2026-10-06: names tidied, Arabic added, prices in integer cents. It moves to
-// Supabase with the admin side; the shapes mirror the planned tables
-// (categories, products, option groups and options, and the links between them).
+// The menu's shapes, and the Tripoli menu as imported from the old site's
+// database (Firestore) on 2026-10-06. The live menu comes from Supabase
+// (src/server/catalog.ts); this copy is the fallback while Supabase isn't
+// configured (development, tests) and the source of the bundled photos.
 import type { StaticImageData } from "next/image";
 import type { Locale } from "@/i18n/config";
 import belgianChocolateCrepe from "@/assets/images/menu/belgian-chocolate-crepe.webp";
@@ -58,14 +58,15 @@ import whiteChocolateWaffle from "@/assets/images/menu/white-chocolate-waffle.we
 
 export type Localized = Record<Locale, string>;
 
-export type CategoryId =
-  "crepes" | "waffles" | "pancakes" | "profiteroles" | "rolls" | "bowls" | "boxes" | "drinks";
+/** A category's slug; the built-in ones have menu icons (src/components/icons.tsx). */
+export type CategoryId = string;
 
 export type Category = {
   id: CategoryId;
   name: Localized;
   description: Localized;
-  image: StaticImageData;
+  /** Missing only for a category whose items have no photo yet. */
+  image?: StaticImageData;
   /** Optional headings inside the category (drinks). */
   subcategories?: { id: string; name: Localized }[];
 };
@@ -95,7 +96,10 @@ export type MenuItem = {
   tag?: ItemTag;
   name: Localized;
   description: Localized;
-  /** Missing until the shop photographs it; the menu shows a branded tile. */
+  /**
+   * Missing until the shop photographs it; the menu shows a branded tile.
+   * Bundled photos are static imports; uploaded ones are storage URLs.
+   */
   image?: StaticImageData;
   /** Option groups, in the order the customiser shows them. */
   groups: string[];
@@ -862,5 +866,5 @@ export const getItem = (id: string) => {
 };
 
 /** The cheapest base price in a category, for "From $X" labels. */
-export const lowestPrice = (category: CategoryId) =>
-  Math.min(...items.filter((i) => i.category === category).map((i) => i.price));
+export const lowestPrice = (menu: Menu, category: CategoryId) =>
+  Math.min(...menu.items.filter((i) => i.category === category).map((i) => i.price));

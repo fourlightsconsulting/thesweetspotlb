@@ -1,15 +1,15 @@
-// Ordering rules for the Tripoli branch: drafts from the design handoff, to
-// confirm with the client before launch. They move to Supabase (branches,
-// delivery zones, settings) once the admin side exists.
+// Ordering limits, and the Tripoli branch's ETAs and delivery zones as
+// built-in fallbacks. The live ETAs, zones, fees and hours come from Supabase
+// (branches, delivery_zones; see src/server/catalog.ts) and are edited in the
+// admin. Online orders are ASAP only, no scheduling.
+import type { Schedule } from "@/lib/hours";
 import type { Localized } from "./menu";
 
 export type Fulfilment = "pickup" | "delivery";
 
 export const ordering = {
   /** Lead time shown to customers, in minutes: [from, to]. */
-  eta: { pickup: [10, 15], delivery: [30, 45] } satisfies Record<Fulfilment, [number, number]>,
-  /** Online orders stop this many minutes before closing time. ASAP orders only, no scheduling. */
-  lastOrderMinutes: 15,
+  eta: { pickup: [10, 15], delivery: [30, 45] } as Record<Fulfilment, [number, number]>,
   /** Per line. */
   maxQuantity: 20,
   maxLines: 30,
@@ -18,7 +18,7 @@ export const ordering = {
 
 export type DeliveryZone = { id: string; name: Localized; fee: number };
 
-/** Areas we deliver to, with the fee in cents. */
+/** Areas we deliver to, with the fee in cents (built-in fallback). */
 export const deliveryZones: DeliveryZone[] = [
   { id: "mina", name: { en: "Mina", ar: "الميناء" }, fee: 200 },
   { id: "tal", name: { en: "Tal", ar: "التل" }, fee: 200 },
@@ -29,5 +29,15 @@ export const deliveryZones: DeliveryZone[] = [
 ];
 
 /** The lowest delivery fee, and whether every area pays the same. */
-export const deliveryFeeFrom = Math.min(...deliveryZones.map((z) => z.fee));
-export const deliveryFeeIsFlat = deliveryZones.every((z) => z.fee === deliveryFeeFrom);
+export function deliveryFees(zones: DeliveryZone[]) {
+  const from = zones.length > 0 ? Math.min(...zones.map((z) => z.fee)) : 0;
+  return { from, flat: zones.every((z) => z.fee === from) };
+}
+
+/** What the order and checkout pages know about the branch taking orders. */
+export type OrderingInfo = {
+  schedule: Schedule;
+  /** Lead time shown to customers, in minutes: [from, to]. */
+  eta: Record<Fulfilment, [number, number]>;
+  zones: DeliveryZone[];
+};

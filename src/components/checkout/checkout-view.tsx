@@ -13,10 +13,10 @@ import {
 import { checkPromoAction, placeOrderAction } from "@/app/[lang]/checkout/actions";
 import { CartLines, CartTotals, usePricedCart } from "@/components/order/cart-summary";
 import { ClockIcon } from "@/components/order/item-sheet";
-import { etaLabel, opensLabel } from "@/components/order/order-view";
+import { ClosedNote, etaLabel, opensLabel } from "@/components/order/order-view";
 import { useOrderingStatus } from "@/components/order/use-store-status";
 import type { Menu } from "@/data/menu";
-import { deliveryFeeFrom, deliveryFeeIsFlat, deliveryZones, ordering } from "@/data/ordering";
+import { deliveryFees, type OrderingInfo, ordering } from "@/data/ordering";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
@@ -39,6 +39,7 @@ type Props = {
   t: Dictionary["checkout"];
   order: Dictionary["order"];
   menu: Menu;
+  branch: OrderingInfo;
 };
 
 const SAVED_KEY = "tss.customer.v1";
@@ -113,11 +114,12 @@ function CheckoutForm({
   t,
   order,
   menu,
+  branch,
   initialFields,
 }: Props & { initialFields: CheckoutFields }) {
   const router = useRouter();
   const { cart, lines, subtotal, count } = usePricedCart(menu);
-  const status = useOrderingStatus();
+  const status = useOrderingStatus(branch.schedule);
   const [fields, setFields] = useState<CheckoutFields>(initialFields);
   const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFields, FieldError>>>({});
@@ -132,8 +134,9 @@ function CheckoutForm({
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const mode = cart.mode;
-  const zone = deliveryZones.find((z) => z.id === fields.zone);
-  const fee = mode === "delivery" ? (zone?.fee ?? deliveryFeeFrom) : 0;
+  const fees = deliveryFees(branch.zones);
+  const zone = branch.zones.find((z) => z.id === fields.zone);
+  const fee = mode === "delivery" ? (zone?.fee ?? fees.from) : 0;
   const totals = orderTotals(subtotal, fee, promo);
   const closed = status?.open === false;
 
@@ -229,9 +232,11 @@ function CheckoutForm({
           case "closed":
             showBanner({
               tone: "info",
-              text: fill(t.serverErrors.closed, {
-                when: opensLabel({ open: false, ...result }, lang, order),
-              }),
+              text: result.reopens
+                ? fill(t.serverErrors.closed, {
+                    when: opensLabel({ open: false, reopens: result.reopens }, lang, order),
+                  })
+                : t.serverErrors.paused,
             });
             break;
           case "items":
@@ -244,6 +249,9 @@ function CheckoutForm({
             break;
           case "unavailable":
             showBanner({ tone: "info", text: t.serverErrors.unavailable });
+            break;
+          case "failed":
+            showBanner({ tone: "error", text: t.serverErrors.generic });
             break;
         }
       } catch {
@@ -281,12 +289,10 @@ function CheckoutForm({
   }
 
   const feeLabel =
-    mode === "delivery" && !zone && !deliveryFeeIsFlat
-      ? `${formatPrice(deliveryFeeFrom, lang)}+`
-      : undefined;
+    mode === "delivery" && !zone && !fees.flat ? `${formatPrice(fees.from, lang)}+` : undefined;
   const placeLabel = `${placing ? t.placing : t.place} · ${formatPrice(totals.total, lang)}`;
   const disabled = placing || placed || closed;
-  const eta = etaLabel(mode, order);
+  const eta = etaLabel(mode, order, branch.eta);
 
   const summary = (
     <>
@@ -359,10 +365,7 @@ function CheckoutForm({
               <span className="mt-0.5">
                 <ClockIcon />
               </span>
-              <p>
-                <span className="font-bold">{order.closedTitle}</span>{" "}
-                {fill(order.closedBody, { when: opensLabel(status, lang, order) })}
-              </p>
+              <ClosedNote status={status} lang={lang} t={order} />
             </div>
           )}
 
@@ -374,7 +377,7 @@ function CheckoutForm({
                 checked={mode === "pickup"}
                 onChange={() => cartActions.setMode("pickup")}
                 title={order.pickup}
-                description={fill(t.pickupDesc, { range: range(ordering.eta.pickup) })}
+                description={fill(t.pickupDesc, { range: range(branch.eta.pickup) })}
               />
               <ChoiceCard
                 name="mode"
@@ -382,10 +385,10 @@ function CheckoutForm({
                 onChange={() => cartActions.setMode("delivery")}
                 title={order.delivery}
                 description={fill(t.deliveryDesc, {
-                  range: range(ordering.eta.delivery),
-                  fee: deliveryFeeIsFlat
-                    ? formatPrice(deliveryFeeFrom, lang)
-                    : `${formatPrice(deliveryFeeFrom, lang)}+`,
+                  range: range(branch.eta.delivery),
+                  fee: fees.flat
+                    ? formatPrice(fees.from, lang)
+                    : `${formatPrice(fees.from, lang)}+`,
                 })}
               />
             </fieldset>
@@ -450,7 +453,7 @@ function CheckoutForm({
                 >
                   <legend className="mb-2.5 font-ui text-sm font-semibold">{t.area}</legend>
                   <div className="flex flex-wrap gap-2">
-                    {deliveryZones.map((z) => (
+                    {branch.zones.map((z) => (
                       <label
                         key={z.id}
                         className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel ${errors.zone ? "border-caramel" : "border-chocolate/15 hover:border-chocolate/40"}`}
@@ -464,7 +467,7 @@ function CheckoutForm({
                           className="sr-only"
                         />
                         {z.name[lang]}
-                        {!deliveryFeeIsFlat && (
+                        {!fees.flat && (
                           <span className="opacity-75">· {formatPrice(z.fee, lang)}</span>
                         )}
                       </label>

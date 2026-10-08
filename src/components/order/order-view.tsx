@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
 import type { Category, Menu, MenuItem } from "@/data/menu";
-import { deliveryFeeFrom, deliveryFeeIsFlat, type Fulfilment, ordering } from "@/data/ordering";
+import { deliveryFees, type Fulfilment, type OrderingInfo } from "@/data/ordering";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
 import { routes } from "@/i18n/routes";
 import { track } from "@/lib/analytics";
 import { type CartLine, cartActions } from "@/lib/cart";
-import { formatClock, type StoreStatus } from "@/lib/hours";
+import { beirutTime, formatClock, type StoreStatus } from "@/lib/hours";
 import { formatPrice } from "@/lib/money";
 import { orderTotals } from "@/lib/pricing";
 import { CartLines, CartTotals, usePricedCart } from "./cart-summary";
@@ -20,28 +20,62 @@ import { openItem } from "./item-route";
 import { ClockIcon, ItemSheet } from "./item-sheet";
 import { useOrderingStatus } from "./use-store-status";
 
-type Props = { lang: Locale; t: Dictionary["order"]; menu: Menu };
+type Props = { lang: Locale; t: Dictionary["order"]; menu: Menu; branch: OrderingInfo };
 
-/** When online orders reopen: "today at 12 pm" / "tomorrow at 12 pm". */
+/**
+ * When online orders reopen: "today at 12 pm", "tomorrow at 12 pm", "on
+ * Saturday at 12 pm". Empty while ordering is paused.
+ */
 export function opensLabel(status: StoreStatus, lang: Locale, t: Dictionary["order"]) {
-  if (status.open) return "";
-  const time = formatClock(status.opensAt, lang);
-  return fill(status.opensTomorrow ? t.opensTomorrow : t.opensToday, { time });
+  if (status.open || !status.reopens) return "";
+  const { inDays, at } = status.reopens;
+  const time = formatClock(at, lang);
+  if (inDays === 0) return fill(t.opensToday, { time });
+  if (inDays === 1) return fill(t.opensTomorrow, { time });
+  return fill(t.opensOn, { day: t.weekdays[(beirutTime().day + inDays) % 7], time });
 }
 
-export const etaLabel = (mode: Fulfilment, t: Dictionary["order"]) =>
-  fill(mode === "delivery" ? t.etaDelivery : t.etaPickup, { range: range(ordering.eta[mode]) });
+export const etaLabel = (mode: Fulfilment, t: Dictionary["order"], eta: OrderingInfo["eta"]) =>
+  fill(mode === "delivery" ? t.etaDelivery : t.etaPickup, { range: range(eta[mode]) });
 
-export function OrderView({ lang, t, menu }: Props) {
+/** The note shown while online orders are closed or paused. */
+export function ClosedNote({
+  status,
+  lang,
+  t,
+}: {
+  status: StoreStatus;
+  lang: Locale;
+  t: Dictionary["order"];
+}) {
+  if (status.open) return null;
+  return (
+    <p className="font-ui text-[15px] leading-[1.45]">
+      {status.reopens ? (
+        <>
+          <span className="font-bold">{t.closedTitle}</span>{" "}
+          {fill(t.closedBody, { when: opensLabel(status, lang, t) })}
+        </>
+      ) : (
+        <>
+          <span className="font-bold">{t.pausedTitle}</span> {t.pausedBody}
+        </>
+      )}
+    </p>
+  );
+}
+
+export function OrderView({ lang, t, menu, branch }: Props) {
   const { cart, lines, subtotal, count } = usePricedCart(menu);
-  const status = useOrderingStatus();
+  const status = useOrderingStatus(branch.schedule);
   const closed = status?.open === false;
   const cartSheetRef = useRef<HTMLDialogElement>(null);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
 
-  const totals = orderTotals(subtotal, cart.mode === "delivery" ? deliveryFeeFrom : 0);
-  const feeLabel = deliveryFeeIsFlat ? undefined : `${formatPrice(deliveryFeeFrom, lang)}+`;
-  const eta = etaLabel(cart.mode, t);
+  const fees = deliveryFees(branch.zones);
+  const totals = orderTotals(subtotal, cart.mode === "delivery" ? fees.from : 0);
+  const feeLabel = fees.flat ? undefined : `${formatPrice(fees.from, lang)}+`;
+  const eta = etaLabel(cart.mode, t, branch.eta);
 
   const inCart = (item: MenuItem) =>
     cart.lines.reduce((n, l) => (l.itemId === item.id ? n + l.qty : n), 0);
@@ -80,7 +114,11 @@ export function OrderView({ lang, t, menu }: Props) {
       t={t}
       total={totals.total}
       disabledLabel={
-        closed && status ? fill(t.opensAt, { when: opensLabel(status, lang, t) }) : null
+        status && !status.open
+          ? status.reopens
+            ? fill(t.opensAt, { when: opensLabel(status, lang, t) })
+            : t.pausedShort
+          : null
       }
       onClick={() => track("begin_checkout", { value: totals.total / 100, items: count })}
     />
@@ -105,10 +143,7 @@ export function OrderView({ lang, t, menu }: Props) {
             <span className="mt-0.5">
               <ClockIcon />
             </span>
-            <p className="font-ui text-[15px] leading-[1.45]">
-              <span className="font-bold">{t.closedTitle}</span>{" "}
-              {fill(t.closedBody, { when: opensLabel(status, lang, t) })}
-            </p>
+            <ClosedNote status={status} lang={lang} t={t} />
           </div>
         ) : (
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[18px] bg-strawberry-milk px-4 py-3 font-ui text-sm leading-5 font-medium">

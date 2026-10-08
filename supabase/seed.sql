@@ -333,3 +333,34 @@ join public.option_groups g on g.key = l.group_key;
 
 insert into public.discount_codes (code, description, kind, value, first_order_only)
 values ('SWEET20', '20% off your first online order', 'percent', 20, true);
+
+-- Site settings the admin edits. The ticker starts with the website's
+-- built-in phrases; the welcome popup starts switched off.
+insert into public.site_settings (key, is_public, value)
+values
+  ('home_ticker', true, jsonb_build_object(
+    'enabled', true,
+    'phrases', jsonb_build_array(
+      jsonb_build_object('en', 'Order now', 'ar', 'اطلب الآن'),
+      jsonb_build_object('en', 'Pickup or delivery', 'ar', 'استلام أو توصيل'),
+      jsonb_build_object('en', 'Open late', 'ar', 'مفتوحين للسهرة'),
+      jsonb_build_object('en', 'Ready in 10–15 min', 'ar', 'جاهز خلال 10–15 دقيقة'),
+      jsonb_build_object('en', '20% off · code SWEET20', 'ar', 'خصم 20% · الرمز SWEET20')
+    )
+  )),
+  ('welcome_popup', true, jsonb_build_object(
+    'enabled', false,
+    'title', jsonb_build_object('en', '20% off your first order', 'ar', 'خصم 20% على أول طلب'),
+    'body', jsonb_build_object(
+      'en', 'Order online for pickup or delivery and use the code at checkout.',
+      'ar', 'اطلب أونلاين استلام أو توصيل واستعمل الرمز عند الدفع.'
+    ),
+    'code', 'SWEET20',
+    'cta', jsonb_build_object(
+      'label', jsonb_build_object('en', 'Order now', 'ar', 'اطلب الآن'),
+      'target', 'order'
+    ),
+    'delay_seconds', 4,
+    'repeat_after_days', 7,
+    'pages', 'all'
+  ));

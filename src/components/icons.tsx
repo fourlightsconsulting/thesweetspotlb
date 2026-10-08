@@ -2,9 +2,7 @@
 // the doodles. Decorative only (aria-hidden). Strokes keep the same width at
 // any size; set it with [--icon-stroke:…] (default 2px) and the colour with a
 // stroke-* utility.
-import type { CategoryId } from "@/data/menu";
-
-const drawings: Record<CategoryId, string[]> = {
+const drawings = {
   // Folded in quarters with a chocolate drizzle, on a plate
   crepes: [
     "M6 24 L6.8 5.6 C 16.4 5.6, 25.6 13.6, 26.4 23.6 C 19.6 24.4, 12.6 24.4, 6 24 Z",
@@ -69,10 +67,15 @@ const drawings: Record<CategoryId, string[]> = {
   ],
 };
 
-/** All icons in menu order, for decorative rows (ticker, footer). */
-export const menuIconNames = Object.keys(drawings) as CategoryId[];
+export type MenuIconName = keyof typeof drawings;
 
-type Props = { name: CategoryId; className?: string };
+/** All icons in menu order, for decorative rows (ticker, footer). */
+export const menuIconNames = Object.keys(drawings) as MenuIconName[];
+
+const isMenuIconName = (name: string): name is MenuIconName => name in drawings;
+
+/** A category slug without its own drawing (added in the admin) gets the crêpe. */
+type Props = { name: string; className?: string };
 
 export function MenuIcon({ name, className = "" }: Props) {
   return (
@@ -81,7 +84,7 @@ export function MenuIcon({ name, className = "" }: Props) {
       viewBox="0 0 32 32"
       className={`flex-none overflow-visible fill-none [stroke-width:var(--icon-stroke,2px)] [stroke-linecap:round] [stroke-linejoin:round] ${className}`}
     >
-      {drawings[name].map((d) => (
+      {drawings[isMenuIconName(name) ? name : "crepes"].map((d) => (
         <path key={d} d={d} vectorEffect="non-scaling-stroke" />
       ))}
     </svg>

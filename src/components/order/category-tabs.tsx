@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { MenuIcon } from "@/components/icons";
 import type { Category } from "@/data/menu";
 import type { Locale } from "@/i18n/config";
 
@@ -90,12 +91,21 @@ export function CategoryTabs({ categories, lang, label }: Props) {
               }}
               className="flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-chocolate/15 bg-whipped ps-1.5 pe-4 font-ui text-[15px] font-semibold whitespace-nowrap transition-colors duration-200 hover:border-chocolate/40 aria-[current=true]:border-blueberry aria-[current=true]:bg-blueberry aria-[current=true]:text-vanilla"
             >
-              <Image
-                src={category.image}
-                alt=""
-                sizes="32px"
-                className="size-8 rounded-full bg-cotton-candy object-cover"
-              />
+              {category.image ? (
+                <Image
+                  src={category.image}
+                  alt=""
+                  sizes="32px"
+                  className="size-8 rounded-full bg-cotton-candy object-cover"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="flex size-8 items-center justify-center rounded-full bg-cotton-candy"
+                >
+                  <MenuIcon name={category.id} className="size-5 stroke-blueberry" />
+                </span>
+              )}
               {category.name[lang]}
             </a>
           </li>

@@ -2,8 +2,9 @@
 // confirm with the client before launch.
 export const site = {
   // The live address: link previews (WhatsApp, Instagram) need absolute URLs.
-  // Placeholder until the new domain is chosen.
-  url: "http://localhost:3000",
+  url: "https://thesweetspotlb.com",
+  /** The admin's own host (next.config.ts sends /admin there from the live site). */
+  adminUrl: "https://admin.thesweetspotlb.com",
   instagramHandle: "thesweetspot_lb",
   instagramUrl: "https://www.instagram.com/thesweetspot_lb/",
   tripoliDirectionsUrl:

@@ -113,8 +113,7 @@ describe("placeOrder", () => {
     expect(await placeOrder(base())).toEqual({
       ok: false,
       code: "closed",
-      opensAt: 720,
-      opensTomorrow: false,
+      reopens: { inDays: 0, at: 720 },
     });
   });
 

@@ -5,6 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import { site } from "@/data/site";
 import { hasLocale, localeDir, locales } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { weekHours } from "@/lib/hours";
+import { getOrderingBranch } from "@/server/catalog";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
@@ -38,7 +40,10 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
 export default async function RootLayout({ children, params }: LayoutProps<"/[lang]">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
-  const dict = await getDictionary(lang);
+  const [dict, branch] = await Promise.all([getDictionary(lang), getOrderingBranch()]);
+  const hours = weekHours(branch.schedule, lang, dict.locations).map(
+    (row) => `${row.days} · ${row.hours}`,
+  );
 
   return (
     <html
@@ -55,15 +60,12 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
             menu={{
               orderNow: dict.common.orderNow,
               branch: dict.locations.tripoli,
-              hours: [
-                `${dict.locations.monThu} · ${dict.locations.tripoliWeekHours}`,
-                `${dict.locations.friSun} · ${dict.locations.tripoliWeekendHours}`,
-              ],
+              hours,
               follow: dict.instagram.follow,
             }}
           />
           <main className="flex-1">{children}</main>
-          <SiteFooter lang={lang} dict={dict} />
+          <SiteFooter lang={lang} dict={dict} hours={hours} />
         </div>
       </body>
     </html>

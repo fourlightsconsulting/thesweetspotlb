@@ -1,10 +1,8 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import { Circle } from "@/components/doodles";
-import { storeStatus } from "@/lib/hours";
-
-const isOpenNow = () => storeStatus().open;
+import { type Schedule, storeStatus } from "@/lib/hours";
 
 const subscribeToMinute = (onChange: () => void) => {
   const timer = setInterval(onChange, 60_000);
@@ -13,9 +11,14 @@ const subscribeToMinute = (onChange: () => void) => {
 // Pages are prerendered, so the status is only known in the browser.
 const unknownOnServer = () => null;
 
-type Props = { openLabel: string; closedLabel: string };
+type Props = { schedule: Schedule; openLabel: string; closedLabel: string };
 
-export function OpenStatus({ openLabel, closedLabel }: Props) {
+/** Whether the shop's doors are open (its hours, whatever online ordering is doing). */
+export function OpenStatus({ schedule, openLabel, closedLabel }: Props) {
+  const isOpenNow = useCallback(
+    () => storeStatus({ ...schedule, paused: false, lastOrderMinutes: 0 }).open,
+    [schedule],
+  );
   const open = useSyncExternalStore(subscribeToMinute, isOpenNow, unknownOnServer);
   if (open === null) return <span className="min-h-8" />;
 

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CheckoutView } from "@/components/checkout/checkout-view";
-import { menu } from "@/data/menu";
 import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
+import { getMenu, getOrderingBranch } from "@/server/catalog";
 
 export async function generateMetadata({
   params,
@@ -17,7 +17,20 @@ export async function generateMetadata({
 export default async function Checkout({ params }: PageProps<"/[lang]/checkout">) {
   const { lang } = await params;
   if (!hasLocale(lang)) notFound();
-  const t = await getDictionary(lang);
+  const [t, menu, branch] = await Promise.all([
+    getDictionary(lang),
+    getMenu(),
+    getOrderingBranch(),
+  ]);
+  const { schedule, eta, zones } = branch;
 
-  return <CheckoutView lang={lang} t={t.checkout} order={t.order} menu={menu} />;
+  return (
+    <CheckoutView
+      lang={lang}
+      t={t.checkout}
+      order={t.order}
+      menu={menu}
+      branch={{ schedule, eta, zones }}
+    />
+  );
 }

@@ -7,9 +7,10 @@ import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 
-type Props = { lang: Locale; dict: Dictionary };
+/** `hours`: the Tripoli branch's week, one line per run of days ("Mon–Thu · 12 pm – 12 am"). */
+type Props = { lang: Locale; dict: Dictionary; hours: string[] };
 
-export function SiteFooter({ lang, dict }: Props) {
+export function SiteFooter({ lang, dict, hours }: Props) {
   const r = routes(lang);
   const { nav, locations: loc, footer, instagram } = dict;
   const links = [
@@ -48,12 +49,11 @@ export function SiteFooter({ lang, dict }: Props) {
 
         <div className="flex flex-col gap-2.5 font-ui text-[15px] leading-[22px]">
           <span className="font-semibold">{loc.tripoli}</span>
-          <span className="text-vanilla/85">
-            {loc.monThu} · {loc.tripoliWeekHours}
-          </span>
-          <span className="text-vanilla/85">
-            {loc.friSun} · {loc.tripoliWeekendHours}
-          </span>
+          {hours.map((line) => (
+            <span key={line} className="text-vanilla/85">
+              {line}
+            </span>
+          ))}
           <a
             href={site.instagramUrl}
             target="_blank"

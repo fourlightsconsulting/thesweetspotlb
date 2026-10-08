@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import { Underline } from "@/components/doodles";
 import { MenuIcon } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
-import { categories, lowestPrice } from "@/data/menu";
+import { lowestPrice, type Menu } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
@@ -23,12 +23,14 @@ type Props = {
   lang: Locale;
   t: Dictionary["categories"];
   from: string;
+  menu: Menu;
 };
 
 // Bottom padding leaves room for the weekly special cup, which rises into this
 // section (see weekly-special.tsx; the two min()/clamp() values must agree).
-export function Categories({ lang, t, from }: Props) {
+export function Categories({ lang, t, from, menu }: Props) {
   const r = routes(lang);
+  const { categories } = menu;
 
   return (
     <section
@@ -53,12 +55,16 @@ export function Categories({ lang, t, from }: Props) {
               style={{ "--rot": tilt[i], "--i": i } as CSSProperties}
             >
               <span className="relative">
-                <Image
-                  src={category.image}
-                  alt=""
-                  sizes="(min-width: 820px) 22vw, 260px"
-                  className="aspect-square w-full rounded-[clamp(10px,1cqw,14px)] bg-strawberry-milk object-cover"
-                />
+                {category.image ? (
+                  <Image
+                    src={category.image}
+                    alt=""
+                    sizes="(min-width: 820px) 22vw, 260px"
+                    className="aspect-square w-full rounded-[clamp(10px,1cqw,14px)] bg-strawberry-milk object-cover"
+                  />
+                ) : (
+                  <span className="block aspect-square w-full rounded-[clamp(10px,1cqw,14px)] bg-strawberry-milk" />
+                )}
                 {/* The category's icon, stuck on like a sticker */}
                 <span className="absolute end-[clamp(10px,1cqw,14px)] -bottom-3 flex size-[clamp(40px,3.4cqw,50px)] -rotate-8 items-center justify-center rounded-full border-2 border-chocolate bg-vanilla shadow-[2px_2px_0_var(--color-chocolate)]">
                   <MenuIcon name={category.id} className="size-[62%] stroke-blueberry" />
@@ -70,7 +76,7 @@ export function Categories({ lang, t, from }: Props) {
                   {category.description[lang]}
                 </span>
                 <span className="mt-0.5 font-ui text-[13px] leading-4 font-semibold text-blueberry">
-                  {from} {formatPrice(lowestPrice(category.id), lang)}
+                  {from} {formatPrice(lowestPrice(menu, category.id), lang)}
                 </span>
               </span>
             </Link>

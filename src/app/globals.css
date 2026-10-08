@@ -1,27 +1,10 @@
 @import "tailwindcss";
 
 /* ── Design tokens ─────────────────────────────────────────────
-   The twelve official brand colours (Brand Guidelines, 03 Color). Change a
-   colour here and it updates everywhere. */
-@theme {
-  /* Primary */
-  --color-strawberry-cream: #f2cfd4; /* the store pink: brand sections, hover fills */
-  --color-cotton-candy: #8fc7dd; /* the store blue: weekly special band, accents */
-  /* Dark */
-  --color-chocolate: #352522; /* text, outlines, hard shadows, dark backgrounds */
-  --color-cacao: #5a3a32; /* supporting warm dark: secondary text */
-  /* Neutral */
-  --color-vanilla: #fff8ee; /* page background */
-  --color-whipped: #ffffff; /* Polaroid paper, cards */
-  --color-strawberry-milk: #f9e9e9; /* placeholder fills */
-  /* Support */
-  --color-blueberry: #1a56a7; /* action colour: buttons, links, dark bands, footer */
-  --color-raspberry: #e75e83; /* ticker, hand-drawn heart */
-  --color-caramel: #c9874a; /* hand-drawn underline/circle, link underline */
-  --color-toffee: #d9a15f; /* price sticker, review stars */
-  /* Promo */
-  --color-cherry: #d94a47; /* promo only */
+   Brand colours live in brand-colors.css; roles and scales below. */
+@import "./brand-colors.css";
 
+@theme {
   /* Roles (always one of the colours above) */
   --color-blueberry-hover: color-mix(in oklab, var(--color-blueberry), black 18%);
   --color-ticker: var(--color-raspberry);

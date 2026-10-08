@@ -18,6 +18,21 @@
   "images": {
     "binding": "IMAGES",
   },
+  // OpenNext's page cache (prerendered pages, data) and its revalidation tags;
+  // see open-next.config.ts.
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "thesweetspotlb-cache",
+    },
+  ],
+  "d1_databases": [
+    {
+      "binding": "NEXT_TAG_CACHE_D1",
+      "database_name": "thesweetspotlb-tags",
+      "database_id": "c1a29092-8f75-4266-9072-ab868df8fc32",
+    },
+  ],
   "observability": {
     "enabled": true,
   },

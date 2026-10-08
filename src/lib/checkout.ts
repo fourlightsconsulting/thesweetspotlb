@@ -48,15 +48,18 @@ export type PlacedOrder = {
   demo: boolean;
 };
 
-export type PromoError = "invalid" | "expired" | "minimum" | "firstOrder";
+export type PromoError = "invalid" | "expired" | "minimum" | "firstOrder" | "usedUp";
 
 export type PlaceOrderResult =
   | { ok: true; order: PlacedOrder }
   | { ok: false; code: "invalid"; fields: Partial<Record<keyof CheckoutFields, FieldError>> }
-  | { ok: false; code: "closed"; opensAt: number; opensTomorrow: boolean }
+  /** `reopens` as in StoreStatus: null while ordering is paused. */
+  | { ok: false; code: "closed"; reopens: { inDays: number; at: number } | null }
   | { ok: false; code: "items" }
   | { ok: false; code: "promo"; error: PromoError }
-  | { ok: false; code: "unavailable" };
+  | { ok: false; code: "unavailable" }
+  /** The order couldn't be saved (a network or database error); retrying is safe. */
+  | { ok: false; code: "failed" };
 
 export type CheckPromoResult =
   { ok: true; rule: PromoRule } | { ok: false; error: PromoError; shortBy?: number };

@@ -3,15 +3,16 @@ import Link from "next/link";
 import boxCutout from "@/assets/images/box-blue-cutout.png";
 import { Heart } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
-import { items } from "@/data/menu";
+import type { MenuItem } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 import { formatPriceShort } from "@/lib/money";
 
-type Props = { lang: Locale; t: Dictionary["boxes"] };
+/** `items`: the menu's items; the boxes among them are listed. */
+type Props = { lang: Locale; t: Dictionary["boxes"]; items: MenuItem[] };
 
-export function Boxes({ lang, t }: Props) {
+export function Boxes({ lang, t, items }: Props) {
   const r = routes(lang);
   // Every box on the menu, biggest first, so new ones appear here too.
   const rows = items

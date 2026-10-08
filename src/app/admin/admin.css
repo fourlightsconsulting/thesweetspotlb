@@ -1,0 +1,182 @@
+@import "tailwindcss";
+@import "../brand-colors.css";
+
+/* The admin is a working tool: calm surfaces, one action colour, dense but
+   readable. It uses the brand palette through these roles only. */
+@theme {
+  --color-canvas: color-mix(in oklab, var(--color-vanilla) 60%, var(--color-whipped));
+  --color-surface: var(--color-whipped);
+  --color-ink: var(--color-chocolate);
+  --color-muted: color-mix(in oklab, var(--color-cacao) 82%, var(--color-whipped));
+  --color-line: color-mix(in oklab, var(--color-chocolate) 12%, transparent);
+  --color-line-strong: color-mix(in oklab, var(--color-chocolate) 24%, transparent);
+  --color-tint: color-mix(in oklab, var(--color-chocolate) 4%, transparent);
+  --color-accent: var(--color-blueberry);
+  --color-accent-hover: color-mix(in oklab, var(--color-blueberry), black 18%);
+  --color-accent-soft: color-mix(in oklab, var(--color-blueberry) 10%, var(--color-whipped));
+  /* Status: good news in blueberry, problems in cherry, waiting in caramel. */
+  --color-good: var(--color-blueberry);
+  --color-bad: var(--color-cherry);
+  --color-bad-soft: color-mix(in oklab, var(--color-cherry) 10%, var(--color-whipped));
+  --color-wait: color-mix(in oklab, var(--color-caramel), black 12%);
+  --color-wait-soft: color-mix(in oklab, var(--color-caramel) 14%, var(--color-whipped));
+
+  --font-ui: var(--font-google-sans), system-ui, sans-serif;
+  /* Arabic fields: Readex Pro for Arabic, Google Sans for the Latin in between. */
+  --font-ar: var(--font-ar-text), var(--font-google-sans), system-ui, sans-serif;
+
+  --breakpoint-wide: 64rem; /* 1024px: sidebar from here up */
+}
+
+@layer base {
+  html {
+    background: var(--color-canvas);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  [lang="ar"] {
+    font-family: var(--font-ar);
+  }
+}
+
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition:
+      background-color 150ms,
+      border-color 150ms,
+      color 150ms;
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-whipped);
+
+    &:hover:not(:disabled) {
+      background: var(--color-accent-hover);
+    }
+  }
+
+  .btn-secondary {
+    background: var(--color-surface);
+    border-color: var(--color-line-strong);
+
+    &:hover:not(:disabled) {
+      background: var(--color-tint);
+    }
+  }
+
+  .btn-ghost {
+    color: var(--color-muted);
+
+    &:hover:not(:disabled) {
+      background: var(--color-tint);
+      color: var(--color-ink);
+    }
+  }
+
+  .btn-danger {
+    background: var(--color-surface);
+    border-color: color-mix(in oklab, var(--color-bad) 40%, transparent);
+    color: var(--color-bad);
+
+    &:hover:not(:disabled) {
+      background: var(--color-bad-soft);
+    }
+  }
+
+  .btn-sm {
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .field {
+    width: 100%;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 10px;
+    background: var(--color-surface);
+
+    &::placeholder {
+      color: color-mix(in oklab, var(--color-muted) 70%, transparent);
+    }
+
+    &:focus {
+      border-color: var(--color-accent);
+      outline: 3px solid var(--color-accent-soft);
+      outline-offset: 0;
+    }
+
+    &[aria-invalid="true"] {
+      border-color: var(--color-bad);
+    }
+  }
+
+  .label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .hint {
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--color-muted);
+  }
+
+  .card {
+    border: 1px solid var(--color-line);
+    border-radius: 14px;
+    background: var(--color-surface);
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--color-tint);
+    color: var(--color-muted);
+  }
+}
