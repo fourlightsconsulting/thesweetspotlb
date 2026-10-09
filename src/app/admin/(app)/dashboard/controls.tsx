@@ -4,15 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { presets } from "./period";
-
-export const dashboardTabs = [
-  { key: "overview", label: "Overview" },
-  { key: "orders", label: "Orders" },
-  { key: "marketing", label: "Marketing" },
-  { key: "web", label: "Website" },
-] as const;
-
-export type DashboardTab = (typeof dashboardTabs)[number]["key"];
+import { type DashboardTab, dashboardTabs } from "./tabs";
 
 type Props = {
   tab: DashboardTab;
