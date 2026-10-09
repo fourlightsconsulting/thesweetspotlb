@@ -45,9 +45,15 @@ Scheduled jobs bring in ad results and audience numbers (`supabase/functions/`, 
 
 The "Retries" job (`POST /api/jobs/sweep` on the website) resends WhatsApp alerts and Meta events that failed at the time.
 
+## Health and ad tools
+
+The admin's Health page (managers) says whether everything is working: orders waiting, WhatsApp alerts, website analytics, the Meta Conversions API, imports, every pg_cron job and database space, plus a "What's connected" checklist of every setting (whether each is set, never its value). Its Problems tab groups what visitors hit (page errors, orders that didn't go through, refused codes, missing pages) into needs attention, got in the way and nothing to do (robots, staff, Meta's and Google's own scripts), and the Visit trail shows everything one visit did. It reads `health_overview()`, `health_problems()` and `health_attention()`; the last also drives "Needs attention" on the home page and the count beside Health in the menu. A daily `housekeeping` job trims pg_cron's log and old job runs.
+
+Ad tools (managers): tracking links with QR codes (`tracking_links`; each has a short address `/l/<id>` that sends visitors on with its tags, so printed codes keep working), ad, creative and audience names (`src/lib/ad-tools/`, saved in `ad_registry`) with the URL parameters to paste into Meta, Google Ads and TikTok, and the Meta catalog feed: `/feeds/meta-catalog.csv` and its Arabic language feed `/feeds/meta-catalog-ar.csv`, with photos converted to JPEG at `/feeds/photos/<item>.jpg` (Meta doesn't take WebP).
+
 ## Admin
 
-Staff (orders board, customers, sold-out switches) < managers (menu, bundles, prices, offers, site, store) < owners (team). Each section lives in `src/app/admin/(app)/<section>/` with its page, client forms and server actions; access is checked in each action and again by row level security. The orders board updates live (Supabase Realtime) and chimes for new orders. Bundles are products of kind `bundle` whose parts are option groups of kind `items`; the customer's picks are stored as `selections[slot] = [itemId]` with each pick's own choices under `"slot/group"` (see `src/lib/pricing.ts`).
+Staff (orders board, customers, sold-out switches) < managers (menu, bundles, prices, offers, site, store, dashboards, ad tools, connections, health) < owners (team). Each section lives in `src/app/admin/(app)/<section>/` with its page, client forms and server actions; access is checked in each action and again by row level security. The orders board updates live (Supabase Realtime) and chimes for new orders. Bundles are products of kind `bundle` whose parts are option groups of kind `items`; the customer's picks are stored as `selections[slot] = [itemId]` with each pick's own choices under `"slot/group"` (see `src/lib/pricing.ts`).
 
 ## Deployment (Cloudflare Workers Builds)
 

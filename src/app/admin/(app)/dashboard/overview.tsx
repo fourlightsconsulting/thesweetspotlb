@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { Bars, Kpi, KpiGrid, Panel, percent, TrendChart } from "@/components/admin/charts";
+import { AttentionList } from "@/components/admin/attention-list";
 import { money } from "@/components/admin/format";
+import type { Attention } from "@/server/admin/attention";
 import { dayLabel, type Period } from "./period";
 import type { MarketingData, OrdersData, WebData } from "./types";
-
-export type Attention = { text: string; href: string; tone: "bad" | "wait" }[];
 
 type Props = {
   period: Period;
@@ -37,23 +36,7 @@ export function Overview({
 
   return (
     <div className="flex flex-col gap-6">
-      {attention.length > 0 && (
-        <section className="card border-wait/50 p-4">
-          <h2 className="text-base font-bold">Needs attention</h2>
-          <ul className="mt-2 flex flex-col gap-1.5">
-            {attention.map((item) => (
-              <li key={item.text} className="flex items-center gap-2">
-                <span
-                  className={`size-2 flex-none rounded-full ${item.tone === "bad" ? "bg-bad" : "bg-wait"}`}
-                />
-                <Link href={item.href} className="hover:text-accent">
-                  {item.text}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <AttentionList items={attention} />
 
       <KpiGrid>
         <Kpi

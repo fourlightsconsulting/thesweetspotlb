@@ -98,6 +98,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      ad_registry: {
+        Row: {
+          archived: boolean;
+          code: string;
+          created_at: string;
+          created_by: string | null;
+          details: Json;
+          id: string;
+          kind: string;
+          name: string;
+          note: string;
+        };
+        Insert: {
+          archived?: boolean;
+          code: string;
+          created_at?: string;
+          created_by?: string | null;
+          details?: Json;
+          id?: string;
+          kind: string;
+          name?: string;
+          note?: string;
+        };
+        Update: {
+          archived?: boolean;
+          code?: string;
+          created_at?: string;
+          created_by?: string | null;
+          details?: Json;
+          id?: string;
+          kind?: string;
+          name?: string;
+          note?: string;
+        };
+        Relationships: [];
+      };
       analytics_events: {
         Row: {
           bot: boolean;
@@ -1255,6 +1291,54 @@ export type Database = {
         };
         Relationships: [];
       };
+      tracking_links: {
+        Row: {
+          archived: boolean;
+          created_at: string;
+          created_by: string | null;
+          destination: string;
+          id: string;
+          label: string;
+          url: string;
+          utm_campaign: string;
+          utm_content: string;
+          utm_id: string;
+          utm_medium: string;
+          utm_source: string;
+          utm_term: string;
+        };
+        Insert: {
+          archived?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          destination: string;
+          id?: string;
+          label?: string;
+          url: string;
+          utm_campaign: string;
+          utm_content?: string;
+          utm_id: string;
+          utm_medium: string;
+          utm_source: string;
+          utm_term?: string;
+        };
+        Update: {
+          archived?: boolean;
+          created_at?: string;
+          created_by?: string | null;
+          destination?: string;
+          id?: string;
+          label?: string;
+          url?: string;
+          utm_campaign?: string;
+          utm_content?: string;
+          utm_id?: string;
+          utm_medium?: string;
+          utm_source?: string;
+          utm_term?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       customer_summaries: {
@@ -1338,6 +1422,28 @@ export type Database = {
         }[];
       };
       get_order_status: { Args: { token: string }; Returns: Json };
+      health_attention: { Args: never; Returns: Json };
+      health_bucket: {
+        Args: {
+          p_bot: boolean;
+          p_event: string;
+          p_internal: boolean;
+          p_params: Json;
+        };
+        Returns: string;
+      };
+      health_handled: {
+        Args: {
+          p_bot: boolean;
+          p_event: string;
+          p_internal: boolean;
+          p_params: Json;
+        };
+        Returns: string;
+      };
+      health_overview: { Args: never; Returns: Json };
+      health_problems: { Args: { p_from: string; p_to: string }; Returns: Json };
+      housekeeping: { Args: never; Returns: undefined };
       is_staff: {
         Args: { minimum?: Database["public"]["Enums"]["staff_role"] };
         Returns: boolean;
@@ -1403,6 +1509,16 @@ export type Database = {
           last_sign_in_at: string;
           role: Database["public"]["Enums"]["staff_role"];
           user_id: string;
+        }[];
+      };
+      tracking_link_results: {
+        Args: never;
+        Returns: {
+          last_visit: string;
+          orders: number;
+          sales_cents: number;
+          utm_id: string;
+          visits: number;
         }[];
       };
       traffic_channel: {

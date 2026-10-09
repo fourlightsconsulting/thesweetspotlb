@@ -368,8 +368,8 @@ export function DataTable({
       <table className="w-full min-w-[320px] text-[13px]">
         <thead className="text-[12px] text-muted">
           <tr className="[&>th]:px-5 [&>th]:pb-2 [&>th]:font-semibold [&>th:first-child]:text-start [&>th:not(:first-child)]:text-end">
-            {head.map((h) => (
-              <th key={h}>{h}</th>
+            {head.map((h, i) => (
+              <th key={i}>{h}</th>
             ))}
           </tr>
         </thead>

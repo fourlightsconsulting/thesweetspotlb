@@ -8,6 +8,8 @@ export type NavItem = {
   label: string;
   icon: NavIcon;
   minimum: StaffRole;
+  /** A count beside the label (Health's problems). */
+  badge?: { count: number; tone: "bad" | "wait" };
 };
 
 export type NavIcon =
@@ -20,7 +22,9 @@ export type NavIcon =
   | "offers"
   | "site"
   | "store"
+  | "ads"
   | "connections"
+  | "health"
   | "team"
   | "account";
 
@@ -34,7 +38,9 @@ export const navItems: NavItem[] = [
   { href: "/admin/offers", label: "Offers", icon: "offers", minimum: "manager" },
   { href: "/admin/site", label: "Site", icon: "site", minimum: "manager" },
   { href: "/admin/store", label: "Store", icon: "store", minimum: "manager" },
+  { href: "/admin/ads", label: "Ad tools", icon: "ads", minimum: "manager" },
   { href: "/admin/connections", label: "Connections", icon: "connections", minimum: "manager" },
+  { href: "/admin/health", label: "Health", icon: "health", minimum: "manager" },
   { href: "/admin/team", label: "Team", icon: "team", minimum: "owner" },
 ];
 
