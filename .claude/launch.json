@@ -22,6 +22,12 @@
       ],
       "port": 4100,
       "url": "http://localhost:4100"
+    },
+    {
+      "name": "worker",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["opennextjs-cloudflare", "preview"],
+      "port": 8787
     }
   ]
 }

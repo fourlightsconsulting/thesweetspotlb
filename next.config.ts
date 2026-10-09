@@ -7,7 +7,12 @@ import { defaultLocale } from "./src/i18n/config";
 // admin.thesweetspotlb.com/admin/… (admin.localhost:3000 in development;
 // plain localhost:3000/admin works too). The admin host serves only the
 // admin, and the live website sends /admin there.
-const host = (value: string) => [{ type: "host" as const, value }];
+//
+// Host patterns are anchored: Next.js anchors them itself, but OpenNext's
+// redirect matcher on Cloudflare doesn't, so an unanchored
+// "thesweetspotlb\.com" also matched admin.thesweetspotlb.com and sent every
+// admin page back to itself.
+const host = (value: string) => [{ type: "host" as const, value: `^${value}$` }];
 const adminHost = host("admin\\..*");
 const liveSite = host(new URL(site.url).hostname.replaceAll(".", "\\."));
 const wwwSite = host(`www\\.${new URL(site.url).hostname.replaceAll(".", "\\.")}`);
