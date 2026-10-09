@@ -22,6 +22,7 @@ import {
 import { serviceClient } from "@/lib/supabase/service";
 import { getMenu, getOrderingBranch, ORDERING_BRANCH } from "./catalog";
 import { sendOrderAlerts } from "./order-alerts";
+import { reportOrderPlaced, type RequestInfo } from "./tracking";
 import { checkPromo } from "./promotions";
 
 // The request is untrusted: only ids, quantities, choices and contact details
@@ -55,6 +56,14 @@ const inputSchema = z.object({
     .min(1)
     .max(ordering.maxLines),
   quotedTotal: z.int().min(0),
+  tracking: z
+    .object({
+      visitorId: text(64).nullable(),
+      visitId: text(64).nullable(),
+      fbp: text(120).nullable(),
+      fbc: text(500).nullable(),
+    })
+    .nullish(),
 });
 
 export function quotePromo(code: string, subtotal: number): Promise<CheckPromoResult> {
@@ -78,7 +87,13 @@ function optionSnapshot(menu: Menu, item: MenuItem, selections: Selections) {
   }));
 }
 
-export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult> {
+/** Who's ordering, from the request (the server action reads it). */
+const noRequest: RequestInfo = { ip: null, userAgent: null, internal: false };
+
+export async function placeOrder(
+  raw: PlaceOrderInput,
+  request: RequestInfo = noRequest,
+): Promise<PlaceOrderResult> {
   const parsed = inputSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, code: "invalid", fields: {} };
   const input = parsed.data;
@@ -168,6 +183,14 @@ export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult
         discount_cents: totals.discount,
         delivery_fee_cents: totals.deliveryFee,
         quoted_total_cents: input.quotedTotal,
+        tracking: {
+          visitor_id: input.tracking?.visitorId ?? null,
+          visit_id: input.tracking?.visitId ?? null,
+          fbp: input.tracking?.fbp ?? null,
+          fbc: input.tracking?.fbc ?? null,
+          ip: request.ip,
+          user_agent: request.userAgent,
+        },
         lines: priced.map(({ line, item }) => ({
           product: item.id,
           name_en: item.name.en,
@@ -190,8 +213,31 @@ export async function placeOrder(raw: PlaceOrderInput): Promise<PlaceOrderResult
     console.error("create_order failed", error);
     return { ok: false, code: "failed" };
   }
-  // The shop's WhatsApp alerts go out once the customer has their answer.
-  if (!data.already_placed) after(() => sendOrderAlerts(data.order_id));
+  // The shop's WhatsApp alerts and the order's tracking happen once the
+  // customer has their answer.
+  if (!data.already_placed)
+    after(async () => {
+      await sendOrderAlerts(data.order_id);
+      await reportOrderPlaced(
+        {
+          id: data.order_id,
+          ref: data.public_token,
+          lang: input.lang,
+          name,
+          phone,
+          fulfilment: input.mode,
+          total: data.total_cents,
+          foodValue: totals.subtotal - totals.discount,
+          items: priced.map(({ item, line, unit }) => ({
+            id: item.id,
+            quantity: line.qty,
+            price: unit,
+          })),
+        },
+        input.tracking ?? null,
+        request,
+      );
+    });
 
   return {
     ok: true,

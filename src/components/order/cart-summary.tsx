@@ -6,7 +6,7 @@ import { ordering } from "@/data/ordering";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill } from "@/i18n/format";
-import { track } from "@/lib/analytics";
+import { track } from "@/lib/tracking";
 import { type CartLine, cartActions, useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/money";
 import { describeSelections, priceLines, type Totals } from "@/lib/pricing";
@@ -25,6 +25,15 @@ export function usePricedCart(menu: Menu) {
 }
 
 type PricedLines = ReturnType<typeof usePricedCart>["lines"];
+
+/** The order's lines as the tracking reports them. */
+export const trackItems = (lines: PricedLines) =>
+  lines.map(({ item, line, unit }) => ({
+    id: item.id,
+    name: item.name.en,
+    price: unit,
+    quantity: line.qty,
+  }));
 
 type LinesProps = {
   lines: PricedLines;

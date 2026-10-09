@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import logo from "@/assets/images/logo-blueberry.png";
+import { NotFoundTracking } from "@/components/site-tracking";
 import { fontVariables } from "./fonts";
 import "./globals.css";
 
@@ -44,6 +45,7 @@ export default function GlobalNotFound() {
   return (
     <html lang="en" className={`${fontVariables} h-full antialiased`}>
       <body className="page flex min-h-full flex-col">
+        <NotFoundTracking />
         <div aria-hidden="true" className="awning" />
         <main className="flex flex-1 flex-col items-center justify-center gap-6 px-5 py-section-sm text-center">
           <Link href="/en" aria-label="The Sweet Spot home">

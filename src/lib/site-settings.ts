@@ -41,9 +41,17 @@ export const welcomePopupSchema = z.object({
 });
 export type WelcomePopup = z.infer<typeof welcomePopupSchema>;
 
+/**
+ * The website's own visitor records (/api/e). Switched off from the admin if
+ * the database nears the free plan's 500 MB; the ad platforms' tags carry on.
+ */
+export const trackingSchema = z.object({ first_party: z.boolean() });
+export type TrackingSettings = z.infer<typeof trackingSchema>;
+
 export const siteSettingKeys = {
   homeTicker: "home_ticker",
   welcomePopup: "welcome_popup",
+  tracking: "tracking",
 } as const;
 
 /** The home ticker's phrases until the admin sets them (same as the seed). */
@@ -72,15 +80,21 @@ export const defaultWelcomePopup: WelcomePopup = {
   pages: "all",
 };
 
-export type SiteSettings = { homeTicker: HomeTicker; welcomePopup: WelcomePopup };
+export type SiteSettings = {
+  homeTicker: HomeTicker;
+  welcomePopup: WelcomePopup;
+  tracking: TrackingSettings;
+};
 
 /** Reads the stored rows, keeping the default for anything missing or malformed. */
 export function parseSiteSettings(rows: { key: string; value: unknown }[]): SiteSettings {
   const value = (key: string) => rows.find((r) => r.key === key)?.value;
   const ticker = homeTickerSchema.safeParse(value(siteSettingKeys.homeTicker));
   const popup = welcomePopupSchema.safeParse(value(siteSettingKeys.welcomePopup));
+  const tracking = trackingSchema.safeParse(value(siteSettingKeys.tracking));
   return {
     homeTicker: ticker.success ? ticker.data : defaultHomeTicker,
     welcomePopup: popup.success ? popup.data : defaultWelcomePopup,
+    tracking: tracking.success ? tracking.data : { first_party: true },
   };
 }

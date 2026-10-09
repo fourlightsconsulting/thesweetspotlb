@@ -8,12 +8,12 @@ import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
 import { routes } from "@/i18n/routes";
-import { track } from "@/lib/analytics";
+import { track } from "@/lib/tracking";
 import { type CartLine, cartActions } from "@/lib/cart";
 import { beirutTime, formatClock, type StoreStatus } from "@/lib/hours";
 import { formatPrice } from "@/lib/money";
 import { orderTotals } from "@/lib/pricing";
-import { CartLines, CartTotals, usePricedCart } from "./cart-summary";
+import { CartLines, CartTotals, trackItems, usePricedCart } from "./cart-summary";
 import { CategoryTabs } from "./category-tabs";
 import { ItemImage } from "./item-image";
 import { openItem } from "./item-route";
@@ -82,7 +82,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
 
   const openCartSheet = () => {
     if (!cartSheetRef.current?.open) cartSheetRef.current?.showModal();
-    track("view_cart", { value: subtotal / 100 });
+    track("view_cart", { value: subtotal, items: trackItems(lines) });
   };
 
   // The header's cart button links to #your-order: on phones that opens the cart sheet.
@@ -120,7 +120,13 @@ export function OrderView({ lang, t, menu, branch }: Props) {
             : t.pausedShort
           : null
       }
-      onClick={() => track("begin_checkout", { value: totals.total / 100, items: count })}
+      onClick={() =>
+        track("begin_checkout", {
+          value: totals.total,
+          food_value: subtotal,
+          items: trackItems(lines),
+        })
+      }
     />
   );
 

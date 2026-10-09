@@ -29,6 +29,13 @@ export type PlaceOrderInput = {
    * difference (prices changed mid-checkout); it never blocks the order.
    */
   quotedTotal: number;
+  /** This browser's visitor and visit, and Meta's cookies: joins the order to its visits. */
+  tracking?: {
+    visitorId: string | null;
+    visitId: string | null;
+    fbp: string | null;
+    fbc: string | null;
+  } | null;
 };
 
 export type PlacedOrder = {

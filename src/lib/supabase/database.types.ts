@@ -8,6 +8,128 @@ export type Database = {
   };
   public: {
     Tables: {
+      analytics_events: {
+        Row: {
+          bot: boolean;
+          bot_reason: string | null;
+          browser: string | null;
+          city: string | null;
+          client_ip: string | null;
+          country: string | null;
+          device_type: string | null;
+          event_name: string;
+          fbc: string | null;
+          fbclid: string | null;
+          fbp: string | null;
+          gclid: string | null;
+          id: number;
+          internal: boolean;
+          item_id: string | null;
+          landing_page: string | null;
+          locale: Database["public"]["Enums"]["locale"] | null;
+          meta_event_id: string | null;
+          meta_relayed_at: string | null;
+          occurred_at: string;
+          order_id: string | null;
+          os: string | null;
+          params: Json;
+          path: string | null;
+          referrer: string | null;
+          user_agent: string | null;
+          utm_campaign: string | null;
+          utm_content: string | null;
+          utm_id: string | null;
+          utm_medium: string | null;
+          utm_source: string | null;
+          utm_term: string | null;
+          value_cents: number | null;
+          visit_id: string | null;
+          visitor_id: string | null;
+        };
+        Insert: {
+          bot?: boolean;
+          bot_reason?: string | null;
+          browser?: string | null;
+          city?: string | null;
+          client_ip?: string | null;
+          country?: string | null;
+          device_type?: string | null;
+          event_name: string;
+          fbc?: string | null;
+          fbclid?: string | null;
+          fbp?: string | null;
+          gclid?: string | null;
+          id?: never;
+          internal?: boolean;
+          item_id?: string | null;
+          landing_page?: string | null;
+          locale?: Database["public"]["Enums"]["locale"] | null;
+          meta_event_id?: string | null;
+          meta_relayed_at?: string | null;
+          occurred_at?: string;
+          order_id?: string | null;
+          os?: string | null;
+          params?: Json;
+          path?: string | null;
+          referrer?: string | null;
+          user_agent?: string | null;
+          utm_campaign?: string | null;
+          utm_content?: string | null;
+          utm_id?: string | null;
+          utm_medium?: string | null;
+          utm_source?: string | null;
+          utm_term?: string | null;
+          value_cents?: number | null;
+          visit_id?: string | null;
+          visitor_id?: string | null;
+        };
+        Update: {
+          bot?: boolean;
+          bot_reason?: string | null;
+          browser?: string | null;
+          city?: string | null;
+          client_ip?: string | null;
+          country?: string | null;
+          device_type?: string | null;
+          event_name?: string;
+          fbc?: string | null;
+          fbclid?: string | null;
+          fbp?: string | null;
+          gclid?: string | null;
+          id?: never;
+          internal?: boolean;
+          item_id?: string | null;
+          landing_page?: string | null;
+          locale?: Database["public"]["Enums"]["locale"] | null;
+          meta_event_id?: string | null;
+          meta_relayed_at?: string | null;
+          occurred_at?: string;
+          order_id?: string | null;
+          os?: string | null;
+          params?: Json;
+          path?: string | null;
+          referrer?: string | null;
+          user_agent?: string | null;
+          utm_campaign?: string | null;
+          utm_content?: string | null;
+          utm_id?: string | null;
+          utm_medium?: string | null;
+          utm_source?: string | null;
+          utm_term?: string | null;
+          value_cents?: number | null;
+          visit_id?: string | null;
+          visitor_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_order_id_fkey";
+            columns: ["order_id"];
+            isOneToOne: false;
+            referencedRelation: "orders";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       audit_log: {
         Row: {
           action: string;
@@ -1029,6 +1151,14 @@ export type Database = {
           total_cents: number;
         }[];
       };
+      database_usage: {
+        Args: never;
+        Returns: {
+          database_bytes: number;
+          events: number;
+          events_bytes: number;
+        }[];
+      };
       get_order_status: { Args: { token: string }; Returns: Json };
       is_staff: {
         Args: { minimum?: Database["public"]["Enums"]["staff_role"] };
@@ -1038,6 +1168,7 @@ export type Database = {
         Args: { s: Database["public"]["Enums"]["order_status"] };
         Returns: number;
       };
+      purge_event_pii: { Args: never; Returns: number };
       staff_directory: {
         Args: never;
         Returns: {

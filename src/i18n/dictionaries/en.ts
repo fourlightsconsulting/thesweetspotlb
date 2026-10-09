@@ -204,7 +204,8 @@ const en = {
     hideSummary: "Hide order summary",
     place: "Place order",
     placing: "Placing your order…",
-    privacy: "We only use your details to prepare and deliver this order.",
+    privacy: "We use your details for this order, and to measure our ads.",
+    privacyLink: "Privacy",
     errors: {
       name: "Add your name",
       phone: "Add a number we can call",
@@ -256,6 +257,49 @@ const en = {
     code: "Your code",
     copy: "Copy",
     copied: "Copied",
+  },
+  privacy: {
+    title: "Privacy",
+    description: "What The Sweet Spot collects when you visit and order, and why.",
+    updated: "Last updated October 2026",
+    intro:
+      "We keep this short: what we collect when you visit our website and order from it, why, and what you can ask us to do with it.",
+    sections: [
+      {
+        title: "When you order",
+        body: [
+          "We ask for your name and phone number and, for delivery, your area, street, floor and any note for the driver. We use them to prepare and deliver your order and to call or message you about it.",
+          "We don’t take payments online, so we never see card details. Your orders are kept under your phone number, so we know you next time.",
+        ],
+      },
+      {
+        title: "When you browse",
+        body: [
+          "Our website records how it’s used: the pages and items viewed, what goes into an order, and where a visit came from (an Instagram ad, for example), along with your device type, rough location and IP address. We delete IP addresses after 30 days.",
+          "We don’t record anything you type into a form here, and the team’s own visits are kept apart.",
+        ],
+      },
+      {
+        title: "Our ads",
+        body: [
+          "We use Meta’s tools (Facebook and Instagram) and Google’s (Google Analytics and Google Ads) to see which ads lead to orders. They set cookies on this website.",
+          "When you place an order, we send them a scrambled (hashed) copy of your phone number and name so they can match the order to an ad. They never receive your address. Meta and Google handle this under their own privacy policies.",
+        ],
+      },
+      {
+        title: "Where it’s kept",
+        body: [
+          "Orders and website records are stored with Supabase, in the European Union (Frankfurt). The website runs on Cloudflare. We don’t sell your details to anyone.",
+        ],
+      },
+      {
+        title: "Your choices",
+        body: [
+          "You can ask us what we hold about you, or to delete it: message us on Instagram or WhatsApp. You can also block or clear cookies in your browser; the website still works without them.",
+        ],
+      },
+    ],
+    contact: "Message us on Instagram",
   },
   footer: {
     tagline: "Life is sweeter here.",

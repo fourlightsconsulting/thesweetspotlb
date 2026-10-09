@@ -7,7 +7,7 @@ import { ordering } from "@/data/ordering";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill } from "@/i18n/format";
-import { track } from "@/lib/analytics";
+import { track } from "@/lib/tracking";
 import { type CartLine, cartActions, useCart } from "@/lib/cart";
 import { formatAddOn, formatPrice } from "@/lib/money";
 import {
@@ -57,7 +57,11 @@ export function ItemSheet({ menu, lang, t, etaLabel, onSaved }: Props) {
     if (!dialog) return;
     if (item && !dialog.open) {
       dialog.showModal();
-      track("view_item", { item_id: item.id });
+      track("view_item", {
+        item_id: item.id,
+        value: item.price,
+        items: [{ id: item.id, name: item.name.en, price: item.price, quantity: 1 }],
+      });
     } else if (!item && dialog.open) dialog.close();
   }, [item]);
 
@@ -127,8 +131,17 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
   const total = unitPrice(item, menu, selections) * qty;
   const soldOut = item.available === false;
 
+  // The first change to an item's choices (Meta's CustomizeProduct).
+  const [customised, setCustomised] = useState(false);
+  const customise = () => {
+    if (customised) return;
+    setCustomised(true);
+    track("customize_item", { item_id: item.id });
+  };
+
   /** `key`: the group's selections key ("slot/group" for a bundle pick's own group). */
   const toggle = (key: string, group: OptionGroup, optionId: string) => {
+    customise();
     setSelections((prev) => {
       const chosen = prev[key] ?? [];
       if (isSingleChoice(group)) {
@@ -147,6 +160,7 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
   const pick = (slot: BundleSlot, itemId: string) => {
     const picked = menu.items.find((i) => i.id === itemId);
     if (!picked) return;
+    customise();
     setSelections((prev) => {
       const next: Selections = {};
       for (const [key, value] of Object.entries(prev))
@@ -168,7 +182,12 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
     const saved = { itemId: item.id, qty, selections, note: note.trim() };
     if (line) cartActions.update(line.key, saved);
     else cartActions.add(saved);
-    track("add_to_cart", { item_id: item.id, quantity: qty, value: total / 100 });
+    track("add_to_cart", {
+      item_id: item.id,
+      value: total,
+      food_value: total,
+      items: [{ id: item.id, name: item.name.en, price: total / qty, quantity: qty }],
+    });
     onSaved(line ? t.updated : t.added);
   };
 

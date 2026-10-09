@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { SiteTracking } from "@/components/site-tracking";
 import { WelcomePopup } from "@/components/welcome-popup";
 import { site } from "@/data/site";
 import { hasLocale, localeDir, locales } from "@/i18n/config";
@@ -73,6 +74,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
           <SiteFooter lang={lang} dict={dict} hours={hours} />
         </div>
         <WelcomePopup popup={settings.welcomePopup} lang={lang} t={dict.popup} />
+        <SiteTracking />
       </body>
     </html>
   );

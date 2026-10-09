@@ -60,3 +60,9 @@ export async function savePopup(input: unknown): Promise<Result> {
   }
   return store(siteSettingKeys.welcomePopup, popup);
 }
+
+/** The website's own visitor records on or off (the ad platforms' tags carry on). */
+export async function saveTracking(firstParty: boolean): Promise<Result> {
+  await requireStaff("manager");
+  return store(siteSettingKeys.tracking, { first_party: firstParty === true });
+}

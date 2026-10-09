@@ -67,6 +67,9 @@ export function SiteFooter({ lang, dict, hours }: Props) {
 
       <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-3 border-t border-vanilla/16 px-[clamp(20px,5cqw,72px)] pt-[18px] pb-7 font-ui text-[13px] text-vanilla/82">
         <span>{footer.rights}</span>
+        <Link href={r.privacy} className="transition-colors hover:text-strawberry-cream">
+          {dict.privacy.title}
+        </Link>
       </div>
     </footer>
   );

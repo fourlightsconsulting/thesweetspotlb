@@ -11,7 +11,7 @@ import {
   useTransition,
 } from "react";
 import { checkPromoAction, placeOrderAction } from "@/app/[lang]/checkout/actions";
-import { CartLines, CartTotals, usePricedCart } from "@/components/order/cart-summary";
+import { CartLines, CartTotals, trackItems, usePricedCart } from "@/components/order/cart-summary";
 import { ClockIcon } from "@/components/order/item-sheet";
 import { ClosedNote, etaLabel, opensLabel } from "@/components/order/order-view";
 import { useOrderingStatus } from "@/components/order/use-store-status";
@@ -21,7 +21,7 @@ import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
 import { routes } from "@/i18n/routes";
-import { track } from "@/lib/analytics";
+import { rememberCustomer, track, trackingIds } from "@/lib/tracking";
 import { cartActions } from "@/lib/cart";
 import {
   type CheckoutFields,
@@ -180,6 +180,7 @@ function CheckoutForm({
         } else {
           setPromo(null);
           setPromoError(promoMessage(result.error, result.shortBy));
+          track("promo_rejected", { code: code.toUpperCase().slice(0, 24), reason: result.error });
         }
       } catch {
         setPromoError(t.serverErrors.network);
@@ -201,6 +202,7 @@ function CheckoutForm({
       return;
     }
     setBanner(null);
+    rememberCustomer({ phone: fields.phone, name: fields.name });
     startPlacing(async () => {
       try {
         const result = await placeOrderAction({
@@ -216,11 +218,13 @@ function CheckoutForm({
             note: line.note,
           })),
           quotedTotal: totals.total,
+          tracking: trackingIds(),
         });
         if (result.ok) {
           finish(result.order);
           return;
         }
+        track("place_order_failed", { reason: result.code });
         switch (result.code) {
           case "invalid":
             setErrors(result.fields);
@@ -255,6 +259,7 @@ function CheckoutForm({
             break;
         }
       } catch {
+        track("place_order_failed", { reason: "network" });
         showBanner({ tone: "error", text: t.serverErrors.network });
       }
     });
@@ -268,8 +273,12 @@ function CheckoutForm({
     write(sessionStorage, DRAFT_KEY, null);
     write(sessionStorage, ATTEMPT_KEY, null);
     track("purchase", {
-      transaction_id: placedOrder.number,
-      value: placedOrder.totals.total / 100,
+      order_ref: placedOrder.ref,
+      value: placedOrder.totals.total,
+      food_value: placedOrder.totals.subtotal - placedOrder.totals.discount,
+      shipping: placedOrder.totals.deliveryFee,
+      items: trackItems(lines),
+      ...(placedOrder.promoCode ? { coupon: placedOrder.promoCode } : {}),
     });
     cartActions.clear();
     router.replace(routes(lang).orderStatus(placedOrder.ref));
@@ -599,7 +608,15 @@ function CheckoutForm({
             </div>
           </Step>
 
-          <p className="font-ui text-[13px] leading-[1.5] text-cacao">{t.privacy}</p>
+          <p className="font-ui text-[13px] leading-[1.5] text-cacao">
+            {t.privacy}{" "}
+            <Link
+              href={routes(lang).privacy}
+              className="font-semibold text-blueberry underline decoration-caramel decoration-2 underline-offset-4"
+            >
+              {t.privacyLink}
+            </Link>
+          </p>
         </div>
 
         <aside

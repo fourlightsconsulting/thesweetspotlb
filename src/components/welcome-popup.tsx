@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
-import { track } from "@/lib/analytics";
+import { track } from "@/lib/tracking";
 import type { WelcomePopup as Popup } from "@/lib/site-settings";
 
 // The welcome offer, set in the admin (Site). Shown once per visitor (again
