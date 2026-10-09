@@ -3,7 +3,7 @@
 # Project notes
 
 - Site for The Sweet Spot (dessert shop, Tripoli). EN + AR with full RTL, routed as `/en/...` and `/ar/...` (root layout is `src/app/[lang]/layout.tsx`; locale config in `src/i18n/config.ts`).
-- Public pages: home, about, contact & locations, privacy, order → checkout → confirmation. No payments: orders are saved to Supabase and the shop gets a WhatsApp alert.
+- Public pages: home, about, contact, privacy, order → checkout → confirmation. One branch, Tripoli (Kaslik closed in October 2026); the nav is Menu, Our story, Contact us. The shop's social accounts are in `src/data/site.ts` and show as buttons through `src/components/social-links.tsx`. No payments: orders are saved to Supabase and the shop gets a WhatsApp alert.
 - Domain: thesweetspotlb.com (`site.url` in `src/data/site.ts`). The admin lives at admin.thesweetspotlb.com/admin (`src/app/admin/`, its own root layout and `admin.css`); `next.config.ts` routes hosts. Staff sign in with email + password (Supabase Auth); roles staff < manager < owner (`src/server/admin/session.ts`, enforced again by RLS). `src/middleware.ts` only refreshes admin sessions (edge runtime, `/admin` paths). Plan for the admin, tracking and dashboards: phases 1–6, porting Thirty's tracking stack; Odoo is the ERP (POS, stock, finance), so don't add those tables here.
 - Hosted on Cloudflare Workers via `@opennextjs/cloudflare`, deployed by Cloudflare's GitHub integration. Avoid `export const runtime = "edge"`.
 - Design references live in `design_handoff_sweet_spot_site/` (start with its `README.md`) and `mockups/`. They are local-only (gitignored) prototypes, not code to copy; recreate the design in React and copy needed assets into `public/`.

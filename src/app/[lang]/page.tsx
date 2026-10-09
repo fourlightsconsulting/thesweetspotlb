@@ -25,8 +25,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   ]);
 
   const special = menu.items.find((item) => item.id === WEEKLY_SPECIAL_ID);
-  const schedule = (slug: string) =>
-    branches.find((b) => b.slug === slug)?.schedule ?? branches[0].schedule;
+  const tripoli = branches.find((b) => b.slug === ORDERING_BRANCH) ?? branches[0];
   const ticker = settings.homeTicker;
 
   return (
@@ -43,7 +42,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         lang={lang}
         t={t.locations}
         orderNow={t.common.orderNow}
-        hours={{ tripoli: schedule(ORDERING_BRANCH), kaslik: schedule("kaslik") }}
+        hours={tripoli.schedule}
       />
     </>
   );

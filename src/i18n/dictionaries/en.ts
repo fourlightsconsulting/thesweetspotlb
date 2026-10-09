@@ -12,9 +12,8 @@ const en = {
   nav: {
     home: "The Sweet Spot home",
     menu: "Menu",
-    boxes: "Boxes",
     story: "Our story",
-    locations: "Locations",
+    contact: "Contact us",
     cart: "Cart",
     langSwitch: "عربي",
     openMenu: "Open menu",
@@ -77,13 +76,12 @@ const en = {
   },
   instagram: {
     title: "Our community",
-    follow: "Follow @thesweetspot_lb",
     followShort: "Follow",
     // Draft bio; the live feed will supply the real one.
     bio: [
       "Crêpes · Waffles · Ice cream rolls",
       "Tripoli · Pickup & delivery",
-      "Open till 1 am on weekends",
+      "Open every day till midnight",
     ],
     reel: "Reel",
     post: "Instagram post",
@@ -94,8 +92,6 @@ const en = {
     title: "Come say hi.",
     tripoli: "Tripoli",
     tripoliNote: "Pickup and delivery",
-    kaslik: "Kaslik",
-    kaslikNote: "Delivery via Toters",
     /** Short day names for opening hours, Sunday first. */
     days: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     everyDay: "Every day",
@@ -103,22 +99,28 @@ const en = {
     openNow: "Open now",
     closedNow: "Closed now",
     directions: "Get directions",
-    orderToters: "Order on Toters",
+  },
+  /** The shop's accounts, as buttons (footer, side menu) and contact rows. */
+  social: {
+    instagram: "Instagram",
+    whatsapp: "WhatsApp",
+    facebook: "Facebook",
+    tiktok: "TikTok",
   },
   contact: {
-    metaTitle: "Contact & locations",
+    metaTitle: "Contact us",
     metaDescription:
-      "Opening hours and directions for The Sweet Spot in Tripoli, delivery in Kaslik through Toters, and how to reach us on WhatsApp, by phone or on Instagram.",
-    tag: "Get in touch",
+      "Reach The Sweet Spot in Tripoli on WhatsApp or by phone, or find us on Instagram, Facebook and TikTok.",
+    tag: "Contact us",
     title: "Questions? Big order?",
     description:
       "Birthdays, office treats, a box for the whole family: message us and we’ll sort it out.",
-    whatsapp: "WhatsApp",
     whatsappNote: "The quickest way to reach us",
     call: "Call us",
     callNote: "During opening hours",
-    instagram: "Instagram",
     instagramNote: "Specials and new flavours first",
+    facebookNote: "Message us or leave a review",
+    tiktokNote: "Desserts in the making",
   },
   order: {
     metaTitle: "Order online",

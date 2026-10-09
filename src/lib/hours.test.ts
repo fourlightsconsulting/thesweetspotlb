@@ -3,11 +3,18 @@ import ar from "@/i18n/dictionaries/ar";
 import en from "@/i18n/dictionaries/en";
 import { builtInSchedule, formatClock, type Schedule, storeStatus, weekHours } from "./hours";
 
-// Tripoli hours: Mon–Thu 12 pm – 12 am, Fri–Sun 12 pm – 1 am. October 2026 is
-// UTC+3 in Beirut, so 10:00 UTC is 1 pm there.
+// A week with late weekends, to test sessions past midnight: Mon–Thu 12 pm –
+// 12 am, Fri–Sun 12 pm – 1 am. October 2026 is UTC+3 in Beirut, so 10:00 UTC
+// is 1 pm there.
 const at = (iso: string) => new Date(iso);
-const shop: Schedule = { ...builtInSchedule, lastOrderMinutes: 0 };
-const online: Schedule = { ...builtInSchedule, lastOrderMinutes: 15 };
+const lateWeekends: Schedule = {
+  ...builtInSchedule,
+  hours: [0, 1, 2, 3, 4, 5, 6].map((day): [number, number] =>
+    day === 0 || day >= 5 ? [720, 1500] : [720, 1440],
+  ),
+};
+const shop: Schedule = { ...lateWeekends, lastOrderMinutes: 0 };
+const online: Schedule = { ...lateWeekends, lastOrderMinutes: 15 };
 
 describe("storeStatus", () => {
   it("is open in the afternoon", () => {
@@ -89,13 +96,19 @@ describe("storeStatus", () => {
 
 describe("weekHours", () => {
   it("groups days that share hours, Monday first, as the shop writes them", () => {
-    expect(weekHours(builtInSchedule, "en", en.locations)).toEqual([
+    expect(weekHours(lateWeekends, "en", en.locations)).toEqual([
       { days: "Mon–Thu", hours: "12 pm – 12 am" },
       { days: "Fri–Sun", hours: "12 pm – 1 am" },
     ]);
-    expect(weekHours(builtInSchedule, "ar", ar.locations)).toEqual([
+    expect(weekHours(lateWeekends, "ar", ar.locations)).toEqual([
       { days: "الاثنين–الخميس", hours: "12 ظهراً – 12 ليلاً" },
       { days: "الجمعة–الأحد", hours: "12 ظهراً – 1 فجراً" },
+    ]);
+  });
+
+  it("writes the shop's own hours", () => {
+    expect(weekHours(builtInSchedule, "en", en.locations)).toEqual([
+      { days: "Every day", hours: "12 pm – 12 am" },
     ]);
   });
 

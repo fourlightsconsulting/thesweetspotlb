@@ -127,7 +127,6 @@ export const sources = [
   "packaging",
   "menu-card",
   "receipt",
-  "toters",
 ];
 
 /** Where a link can go on the website. */

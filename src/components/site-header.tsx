@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import logo from "@/assets/images/logo-blueberry.png";
-import { site } from "@/data/site";
+import { type SocialLink, SocialLinks } from "@/components/social-links";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
@@ -23,7 +23,7 @@ export type MenuExtras = {
   orderNow: string;
   branch: string;
   hours: string[];
-  follow: string;
+  social: SocialLink[];
 };
 
 type Props = {
@@ -57,9 +57,8 @@ export function SiteHeader({ lang, nav, menu }: Props) {
   const switchHref = pathname.replace(/^\/(en|ar)(?=\/|$)/, `/${otherLang}`);
   const links = [
     { href: r.order, label: nav.menu },
-    { href: r.category("boxes"), label: nav.boxes },
     { href: r.about, label: nav.story },
-    { href: r.contact, label: nav.locations },
+    { href: r.contact, label: nav.contact },
   ];
   const openDrawer = () => drawerRef.current?.showModal();
   const closeDrawer = () => drawerRef.current?.close();
@@ -216,14 +215,12 @@ export function SiteHeader({ lang, nav, menu }: Props) {
                   {line}
                 </p>
               ))}
-              <a
-                href={site.instagramUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 inline-block font-semibold text-blueberry"
-              >
-                {menu.follow}
-              </a>
+              <div className="mt-3">
+                <SocialLinks
+                  links={menu.social}
+                  className="border-chocolate/20 text-blueberry hover:border-blueberry hover:bg-blueberry hover:text-vanilla"
+                />
+              </div>
             </div>
           </div>
         </div>

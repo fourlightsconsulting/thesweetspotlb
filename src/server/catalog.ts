@@ -1,6 +1,7 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
 import { type Localized, type Menu, menu as builtInMenu } from "@/data/menu";
+import { site } from "@/data/site";
 import { type DeliveryZone, deliveryZones, type Fulfilment, ordering } from "@/data/ordering";
 import { builtInSchedule, type Ordering, type Schedule } from "@/lib/hours";
 import { parseSiteSettings, type SiteSettings } from "@/lib/site-settings";
@@ -35,27 +36,12 @@ const builtInBranches: Branch[] = [
   {
     slug: "tripoli",
     name: { en: "Tripoli", ar: "طرابلس" },
-    phone: null,
-    mapsUrl: null,
+    phone: "+96171819112",
+    mapsUrl: site.tripoliDirectionsUrl,
     acceptsOnlineOrders: true,
     schedule: builtInSchedule,
     eta: ordering.eta,
     zones: deliveryZones,
-  },
-  {
-    slug: "kaslik",
-    name: { en: "Kaslik", ar: "الكسليك" },
-    phone: null,
-    mapsUrl: null,
-    acceptsOnlineOrders: false,
-    schedule: {
-      hours: Array(7).fill([780, 1440]),
-      closures: [],
-      lastOrderMinutes: 15,
-      ordering: "paused",
-    },
-    eta: ordering.eta,
-    zones: [],
   },
 ];
 

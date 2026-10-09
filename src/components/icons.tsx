@@ -90,3 +90,47 @@ export function MenuIcon({ name, className = "" }: Props) {
     </svg>
   );
 }
+
+// The shop's social accounts, as line drawings in the same stroke as the
+// menu icons rather than the platforms' filled logos. Decorative: the link
+// around each one carries its name.
+const socialDrawings = {
+  instagram: [
+    "M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3Z",
+    "M12 15.8a3.8 3.8 0 1 0 0-7.6 3.8 3.8 0 0 0 0 7.6Z",
+    "M17.2 6.8h.01",
+  ],
+  whatsapp: [
+    "M3.6 20.4l1.2-4.1A8.5 8.5 0 1 1 7.7 19.2l-4.1 1.2Z",
+    "M9.1 8.4c-.6 1.6.1 3.4 1.6 4.9s3.3 2.2 4.9 1.6l.5-1.6-1.8-.9-.9.8c-.9-.4-2.1-1.6-2.5-2.5l.8-.9-.9-1.8-1.7.4Z",
+  ],
+  facebook: [
+    "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z",
+    "M15.3 7.8h-1.5a2.5 2.5 0 0 0-2.5 2.5V21",
+    "M9 12.8h5.8",
+  ],
+  tiktok: ["M13.8 2.8v12.4a3.9 3.9 0 1 1-3.9-3.9", "M13.8 2.8c.4 2.9 2.4 4.9 5.4 5.1"],
+};
+
+export type SocialNetwork = keyof typeof socialDrawings;
+
+/** Colour it with text-*: the stroke follows the current colour. */
+export function SocialIcon({
+  network,
+  className = "",
+}: {
+  network: SocialNetwork;
+  className?: string;
+}) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className={`flex-none fill-none stroke-current [stroke-width:var(--icon-stroke,1.8px)] [stroke-linecap:round] [stroke-linejoin:round] ${className}`}
+    >
+      {socialDrawings[network].map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </svg>
+  );
+}

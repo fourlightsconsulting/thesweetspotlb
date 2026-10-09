@@ -23,8 +23,9 @@ function linkEvent(anchor: HTMLAnchorElement) {
   if (/(^|\.)google\.[a-z.]+$/.test(host) && url.pathname.startsWith("/maps"))
     return { name: "directions_click" } as const;
   if (host === "maps.app.goo.gl" || host === "goo.gl") return { name: "directions_click" } as const;
-  if (host.endsWith("totersapp.com")) return { name: "toters_click" } as const;
   if (host.endsWith("instagram.com")) return { name: "instagram_click" } as const;
+  if (host.endsWith("facebook.com")) return { name: "facebook_click" } as const;
+  if (host.endsWith("tiktok.com")) return { name: "tiktok_click" } as const;
   // The language switch: the same page in the other language.
   const current = document.documentElement.lang;
   const target = url.origin === location.origin ? url.pathname.split("/")[1] : null;

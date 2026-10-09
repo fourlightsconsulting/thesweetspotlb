@@ -12,20 +12,16 @@ insert into public.branches
    last_order_minutes, pickup_eta_min, pickup_eta_max, delivery_eta_min, delivery_eta_max)
 values
   ('tripoli', 'Tripoli', 'طرابلس', '+96171819112',
-   'https://www.google.com/maps/search/?api=1&query=The+Sweet+Spot+Tripoli+Lebanon', true, 15, 10, 15, 30, 45),
-  ('kaslik', 'Kaslik', 'الكسليك', null, null, false, 15, 10, 15, 30, 45);
+   'https://www.google.com/maps/search/?api=1&query=The+Sweet+Spot+Tripoli+Lebanon', true, 15, 10, 15, 30, 45);
 
--- Tripoli: Mon–Thu 12 pm – 12 am, Fri–Sun 12 pm – 1 am. Kaslik: every day 1 pm – 12 am.
+-- Tripoli: every day 12 pm – 12 am.
 insert into public.branch_hours (branch_id, weekday, opens_at, closes_at)
 select b.id, h.weekday, h.opens_at::time, h.closes_at::time
 from public.branches b
 join (values
-  ('tripoli', 0, '12:00', '01:00'), ('tripoli', 1, '12:00', '00:00'), ('tripoli', 2, '12:00', '00:00'),
-  ('tripoli', 3, '12:00', '00:00'), ('tripoli', 4, '12:00', '00:00'), ('tripoli', 5, '12:00', '01:00'),
-  ('tripoli', 6, '12:00', '01:00'),
-  ('kaslik', 0, '13:00', '00:00'), ('kaslik', 1, '13:00', '00:00'), ('kaslik', 2, '13:00', '00:00'),
-  ('kaslik', 3, '13:00', '00:00'), ('kaslik', 4, '13:00', '00:00'), ('kaslik', 5, '13:00', '00:00'),
-  ('kaslik', 6, '13:00', '00:00')
+  ('tripoli', 0, '12:00', '00:00'), ('tripoli', 1, '12:00', '00:00'), ('tripoli', 2, '12:00', '00:00'),
+  ('tripoli', 3, '12:00', '00:00'), ('tripoli', 4, '12:00', '00:00'), ('tripoli', 5, '12:00', '00:00'),
+  ('tripoli', 6, '12:00', '00:00')
 ) as h (branch, weekday, opens_at, closes_at) on h.branch = b.slug;
 
 insert into public.delivery_zones (branch_id, slug, name_en, name_ar, fee_cents, sort_order)

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { socialLinks } from "@/components/social-links";
 import { SiteTracking } from "@/components/site-tracking";
 import { WelcomePopup } from "@/components/welcome-popup";
 import { site } from "@/data/site";
@@ -50,6 +51,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   const hours = weekHours(branch.schedule, lang, dict.locations).map(
     (row) => `${row.days} · ${row.hours}`,
   );
+  const social = socialLinks(dict.social, branch.phone);
 
   return (
     <html
@@ -67,11 +69,11 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
               orderNow: dict.common.orderNow,
               branch: dict.locations.tripoli,
               hours,
-              follow: dict.instagram.follow,
+              social,
             }}
           />
           <main className="flex-1">{children}</main>
-          <SiteFooter lang={lang} dict={dict} hours={hours} />
+          <SiteFooter lang={lang} dict={dict} hours={hours} social={social} />
         </div>
         <WelcomePopup popup={settings.welcomePopup} lang={lang} t={dict.popup} />
         <SiteTracking />

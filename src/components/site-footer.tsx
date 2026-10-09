@@ -2,22 +2,24 @@ import Image from "next/image";
 import Link from "next/link";
 import logoPink from "@/assets/images/logo-pink.png";
 import { MenuIcon, menuIconNames } from "@/components/icons";
-import { site } from "@/data/site";
+import { type SocialLink, SocialLinks } from "@/components/social-links";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 
-/** `hours`: the Tripoli branch's week, one line per run of days ("Mon–Thu · 12 pm – 12 am"). */
-type Props = { lang: Locale; dict: Dictionary; hours: string[] };
+/**
+ * `hours`: the Tripoli branch's week, one line per run of days ("Every day ·
+ * 12 pm – 12 am"). `social`: the shop's accounts, as buttons.
+ */
+type Props = { lang: Locale; dict: Dictionary; hours: string[]; social: SocialLink[] };
 
-export function SiteFooter({ lang, dict, hours }: Props) {
+export function SiteFooter({ lang, dict, hours, social }: Props) {
   const r = routes(lang);
-  const { nav, locations: loc, footer, instagram } = dict;
+  const { nav, locations: loc, footer } = dict;
   const links = [
     { href: r.order, label: nav.menu },
-    { href: r.category("boxes"), label: nav.boxes },
     { href: r.about, label: nav.story },
-    { href: r.contact, label: nav.locations },
+    { href: r.contact, label: nav.contact },
   ];
 
   return (
@@ -54,14 +56,12 @@ export function SiteFooter({ lang, dict, hours }: Props) {
               {line}
             </span>
           ))}
-          <a
-            href={site.instagramUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-1.5 font-semibold text-strawberry-cream transition-colors hover:text-vanilla"
-          >
-            {instagram.follow}
-          </a>
+          <div className="mt-2">
+            <SocialLinks
+              links={social}
+              className="border-strawberry-cream/45 text-strawberry-cream hover:border-strawberry-cream hover:bg-strawberry-cream hover:text-blueberry"
+            />
+          </div>
         </div>
       </div>
 

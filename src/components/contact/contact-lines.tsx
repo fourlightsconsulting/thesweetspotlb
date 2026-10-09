@@ -1,3 +1,4 @@
+import { whatsappUrl } from "@/components/social-links";
 import { Reveal } from "@/components/reveal";
 import { site } from "@/data/site";
 import { forwardArrow, type Locale } from "@/i18n/config";
@@ -7,43 +8,42 @@ import { formatPhoneLocal } from "@/lib/phone";
 type Props = {
   lang: Locale;
   t: Dictionary["contact"];
-  /** The Tripoli branch's number (E.164), for WhatsApp and calls; rows hide without one. */
+  social: Dictionary["social"];
+  /** The Tripoli branch's number (E.164), for WhatsApp and calls; those rows hide without one. */
   phone: string | null;
 };
 
 /**
- * How to reach the shop: WhatsApp, a call, Instagram. Typographic rows
- * between chocolate rules, like the boxes on the home page. Taps are
- * recorded by SiteTracking (contact_click, instagram_click).
+ * The contact page: WhatsApp, a call, then Instagram, Facebook and TikTok.
+ * Typographic rows between chocolate rules, like the boxes on the home page.
+ * Taps are recorded by SiteTracking from where each link goes.
  */
-export function ContactLines({ lang, t, phone }: Props) {
+export function ContactLines({ lang, t, social, phone }: Props) {
   const number = phone ? `+961 ${formatPhoneLocal(phone)}` : "";
+  const handle = `@${site.instagramHandle}`;
   const rows = [
     ...(phone
       ? [
-          {
-            label: t.whatsapp,
-            note: t.whatsappNote,
-            value: number,
-            href: `https://wa.me/${phone.replace(/^\+/, "")}`,
-          },
+          { label: social.whatsapp, note: t.whatsappNote, value: number, href: whatsappUrl(phone) },
           { label: t.call, note: t.callNote, value: number, href: `tel:${phone}` },
         ]
       : []),
+    { label: social.instagram, note: t.instagramNote, value: handle, href: site.instagramUrl },
     {
-      label: t.instagram,
-      note: t.instagramNote,
-      value: `@${site.instagramHandle}`,
-      href: site.instagramUrl,
+      label: social.facebook,
+      note: t.facebookNote,
+      value: new URL(site.facebookUrl).pathname.slice(1),
+      href: site.facebookUrl,
     },
+    { label: social.tiktok, note: t.tiktokNote, value: handle, href: site.tiktokUrl },
   ];
 
   return (
-    <section className="pb-section-lg">
+    <section className="pt-[clamp(28px,3.4cqw,52px)] pb-section-lg">
       <Reveal className="shell grid items-start gap-[clamp(36px,4cqw,64px)] desk:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className="flex flex-col items-start gap-[18px]">
           <span className="eyebrow text-blueberry">{t.tag}</span>
-          <h2 className="title-section">{t.title}</h2>
+          <h1 className="title-section">{t.title}</h1>
           <p className="max-w-[34ch] font-body text-[clamp(17px,1.3cqw,19px)] leading-normal font-medium text-pretty text-cacao">
             {t.description}
           </p>
