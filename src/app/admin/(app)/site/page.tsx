@@ -67,10 +67,7 @@ export default async function SitePage() {
 
   return (
     <>
-      <PageHeader
-        title="Site"
-        description="Words on the website that change often. The design itself stays as it is."
-      />
+      <PageHeader title="Site" />
       <div className="flex flex-col gap-6">
         <TickerForm initial={homeTicker} />
         <PopupForm

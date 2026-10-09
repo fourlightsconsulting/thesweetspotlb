@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { count, Empty } from "@/components/admin/charts";
+import { Help } from "@/components/admin/help";
 import { when } from "@/components/admin/format";
 import { type Bucket, bucketLabels, handledLabels, problemTitle } from "./labels";
 import type { HealthProblems, ProblemGroup } from "./types";
@@ -123,8 +124,10 @@ export function ProblemsTab({
         const groups = data.groups.filter((g) => g.bucket === b);
         return (
           <section key={b} className="card p-5">
-            <h2 className="text-base font-bold">{bucketLabels[b].title}</h2>
-            <p className="mt-0.5 text-[13px] text-muted">{bucketLabels[b].note}</p>
+            <h2 className="text-base font-bold">
+              {bucketLabels[b].title}
+              <Help>{bucketLabels[b].note}</Help>
+            </h2>
             <div className="mt-3">
               {groups.length ? <GroupList groups={groups} /> : <Empty>None in this period.</Empty>}
             </div>
@@ -134,9 +137,6 @@ export function ProblemsTab({
 
       <section className="card p-5">
         <h2 className="text-base font-bold">Visits that hit a problem</h2>
-        <p className="mt-0.5 text-[13px] text-muted">
-          The latest 30, robots and staff left out. Open one to see everything that visitor did.
-        </p>
         {data.visits.length === 0 ? (
           <Empty>None in this period.</Empty>
         ) : (

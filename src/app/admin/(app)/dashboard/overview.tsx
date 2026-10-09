@@ -44,7 +44,7 @@ export function Overview({
           value={money(t.sales_cents)}
           now={t.sales_cents}
           before={b.sales_cents}
-          hint="Orders not cancelled, delivery included"
+          help="Orders not cancelled, delivery fees included."
         />
         <Kpi label="Orders" value={String(t.orders)} now={t.orders} before={b.orders} />
         <Kpi
@@ -70,14 +70,11 @@ export function Overview({
           value={percent(t.customers - t.new_customers, t.customers)}
           now={repeat}
           before={repeatBefore}
-          hint="Customers in the period who had ordered before"
+          help="Customers in the period who had ordered before."
         />
       </KpiGrid>
 
-      <Panel
-        title="Sales by day"
-        note={`${period.label}, with the ${period.days} days before dashed`}
-      >
+      <Panel title="Sales by day">
         <TrendChart
           labels={orders.daily.map((d) => dayLabel(d.day))}
           format={(n) => money(Math.round(n))}
@@ -94,7 +91,7 @@ export function Overview({
       </Panel>
 
       <div className="grid gap-6 wide:grid-cols-2">
-        <Panel title="Best sellers" note="Items ordered">
+        <Panel title="Best sellers">
           <Bars
             rows={orders.items.slice(0, 8).map((i) => ({
               name: i.name,
@@ -105,7 +102,7 @@ export function Overview({
         </Panel>
         <Panel
           title="Where orders come from"
-          note="The visit credited with each order: an ad tap wins, then any other source"
+          help="Each order goes to the visit that brought it: the last ad tap in the 30 days before, otherwise the last visit that wasn’t direct."
         >
           <Bars
             rows={marketing.channels.map((c) => ({

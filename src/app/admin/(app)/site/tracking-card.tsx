@@ -1,6 +1,7 @@
 "use client";
 
 import { useOptimistic, useTransition } from "react";
+import { Help } from "@/components/admin/help";
 import { Switch } from "@/components/admin/switch";
 import { saveTracking } from "./actions";
 
@@ -28,12 +29,14 @@ export function TrackingCard({
     <section className="card p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold">Website analytics</h2>
-          <p className="mt-1 max-w-[60ch] text-muted">
-            The website records what visitors do (pages, items, carts, orders) for the dashboards.
-            Switch it off if the database gets close to full: orders, the menu and the ad platforms
-            keep working.
-          </p>
+          <h2 className="text-base font-bold">
+            Website analytics
+            <Help>
+              Records what visitors do (pages, items, carts, orders) for the reports. Switch it off
+              if the database gets close to full: orders, the menu and the ad platforms keep
+              working.
+            </Help>
+          </h2>
         </div>
         <label className="flex items-center gap-2">
           <Switch

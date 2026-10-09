@@ -116,11 +116,7 @@ export default async function BundlePage({
     <>
       <PageHeader
         title={b ? b.name_en : "New bundle"}
-        description={
-          created
-            ? "Added to the menu."
-            : "A box or combo: a price, and parts that are set or picked by the customer."
-        }
+        description={created ? "Added to the menu." : undefined}
         actions={
           <>
             {b && (

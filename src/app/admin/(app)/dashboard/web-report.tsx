@@ -11,7 +11,7 @@ import {
   TrendChart,
 } from "@/components/admin/charts";
 import { money, when } from "@/components/admin/format";
-import { dayLabel, type Period } from "./period";
+import { dayLabel } from "./period";
 import type { WebData } from "./types";
 
 const ratio = (part: number, whole: number) => (whole > 0 ? part / whole : 0);
@@ -34,12 +34,10 @@ const deviceName = (code: string) =>
 
 /** The website: visits, where they come from, what they do, where they stop. */
 export function WebReport({
-  period,
   data,
   before,
   itemNames,
 }: {
-  period: Period;
   data: WebData;
   before: WebData;
   itemNames: Record<string, string>;
@@ -57,14 +55,13 @@ export function WebReport({
           value={percent(t.new_visitors, t.visitors)}
           now={ratio(t.new_visitors, t.visitors)}
           before={ratio(b.new_visitors, b.visitors)}
-          hint={`${count(t.new_visitors)} of ${count(t.visitors)} people were here for the first time`}
         />
         <Kpi
           label="Engaged visits"
           value={percent(t.engaged, t.visits)}
           now={ratio(t.engaged, t.visits)}
           before={ratio(b.engaged, b.visits)}
-          hint="Saw two pages or more, or did something"
+          help="Saw two pages or more, or did something (opened an item, tapped a link)."
         />
         <Kpi
           label="Added to order"
@@ -84,14 +81,11 @@ export function WebReport({
           now={abandonment}
           before={ratio(b.checkouts - b.orders, b.checkouts)}
           upIsGood={false}
-          hint="Went to checkout but didn’t order"
+          help="Went to checkout but didn’t order."
         />
       </KpiGrid>
 
-      <Panel
-        title="Visits by day"
-        note={`${period.label}, with the ${period.days} days before dashed`}
-      >
+      <Panel title="Visits by day">
         <TrendChart
           labels={data.daily.map((d) => dayLabel(d.day))}
           series={[
@@ -150,7 +144,7 @@ export function WebReport({
       </div>
 
       <div className="grid gap-6 wide:grid-cols-2">
-        <Panel title="Sources" note="Source / medium of each visit">
+        <Panel title="Sources">
           <DataTable
             head={["Source", "Visits", "Orders", "Rate"]}
             rows={converting(data.sources)}
@@ -170,13 +164,13 @@ export function WebReport({
       </div>
 
       <div className="grid gap-6 wide:grid-cols-2">
-        <Panel title="First pages" note="Where visits start">
+        <Panel title="First pages">
           <DataTable
             head={["Page", "Visits", "Orders", "Rate"]}
             rows={converting(data.landing_pages)}
           />
         </Panel>
-        <Panel title="Last pages" note="Where visits that didn’t order ended">
+        <Panel title="Last pages" help="Where visits that didn’t order ended.">
           <DataTable
             head={["Page", "Visits"]}
             rows={data.exit_pages.map((p) => [p.name, count(p.visits)])}
@@ -184,14 +178,11 @@ export function WebReport({
         </Panel>
       </div>
 
-      <Panel title="When people visit" note="Visits by weekday and hour, Beirut time">
+      <Panel title="When people visit">
         <Heatmap cells={data.heatmap} unit="visits" />
       </Panel>
 
-      <Panel
-        title="Left with something in their order"
-        note="The latest visits that added items but didn’t order"
-      >
+      <Panel title="Left with something in their order">
         <DataTable
           head={["When", "Got to", "From", "Device", "Order value"]}
           rows={data.abandoned.map((a) => [
@@ -220,7 +211,7 @@ export function WebReport({
             ]}
           />
         </Panel>
-        <Panel title="Problems" note="More detail arrives with the Health page">
+        <Panel title="Problems">
           <DataTable
             head={["", "Times"]}
             rows={[
@@ -230,7 +221,7 @@ export function WebReport({
             ]}
           />
         </Panel>
-        <Panel title="Google Analytics" note="GA4’s own counts, once connected">
+        <Panel title="Google Analytics">
           <DataTable
             head={["", ""]}
             rows={[
@@ -259,7 +250,10 @@ export function WebReport({
             empty="Shows once GA4 is connected."
           />
         </Panel>
-        <Panel title="Age and gender (GA4)" note="The last 90 days; Google hides small groups">
+        <Panel
+          title="Age and gender (GA4)"
+          help="The last 90 days. Google hides groups too small to count."
+        >
           <Bars
             rows={data.ga4.audience.map((a) => ({ name: a.name, value: a.users }))}
             empty="Shows once GA4 is connected."

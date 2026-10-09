@@ -115,10 +115,9 @@ type TotalsProps = {
   lang: Locale;
   t: Dictionary["order"];
   /** Delivery fee shown as "from $X" while the area isn't chosen yet. */
-  feeLabel?: string;
 };
 
-export function CartTotals({ totals, lang, t, feeLabel }: TotalsProps) {
+export function CartTotals({ totals, lang, t }: TotalsProps) {
   return (
     <dl className="flex flex-col gap-2.5 border-t border-dashed border-chocolate/25 pt-4 font-ui text-[15px]">
       <div className="flex justify-between gap-3">
@@ -128,7 +127,7 @@ export function CartTotals({ totals, lang, t, feeLabel }: TotalsProps) {
       {totals.deliveryFee > 0 && (
         <div className="flex justify-between gap-3">
           <dt className="text-cacao">{t.deliveryFee}</dt>
-          <dd>{feeLabel ?? formatPrice(totals.deliveryFee, lang)}</dd>
+          <dd>{formatPrice(totals.deliveryFee, lang)}</dd>
         </div>
       )}
       {totals.discount > 0 && (

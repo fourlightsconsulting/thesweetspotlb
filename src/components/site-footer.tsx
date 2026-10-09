@@ -67,7 +67,10 @@ export function SiteFooter({ lang, dict, hours, social }: Props) {
 
       <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-3 border-t border-vanilla/16 px-[clamp(20px,5cqw,72px)] pt-[18px] pb-7 font-ui text-[13px] text-vanilla/82">
         <span>{footer.rights}</span>
-        <Link href={r.privacy} className="transition-colors hover:text-strawberry-cream">
+        <Link
+          href={r.privacy}
+          className="font-semibold text-strawberry-cream underline decoration-strawberry-cream/50 underline-offset-4 transition-colors hover:text-vanilla"
+        >
           {dict.privacy.title}
         </Link>
       </div>

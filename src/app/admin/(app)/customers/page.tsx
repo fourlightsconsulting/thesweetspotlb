@@ -34,7 +34,6 @@ export default async function CustomersPage({ searchParams }: PageProps<"/admin/
     <>
       <PageHeader
         title="Customers"
-        description="Everyone who ordered online, by phone number."
         actions={
           atLeast(staff.role, "manager") && (
             <a href={`/admin/customers/export?${query({})}`} className="btn btn-secondary">

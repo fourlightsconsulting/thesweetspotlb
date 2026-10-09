@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { beirutDate, daysAgo, money, when } from "@/components/admin/format";
+import { Help } from "@/components/admin/help";
 import { PageHeader } from "@/components/admin/page-header";
 import { adminClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
@@ -44,7 +45,7 @@ const jobs = [
   {
     key: "sweep",
     name: "Retries",
-    what: "WhatsApp alerts and Meta events that didn’t go through at the time. Every 10 minutes.",
+    what: "Resends Meta events (and WhatsApp alerts, if set up) that didn’t go through at the time. Every 10 minutes.",
     needs: "",
     backfill: false,
   },
@@ -106,10 +107,7 @@ export default async function ConnectionsPage() {
 
   return (
     <>
-      <PageHeader
-        title="Connections"
-        description="The numbers brought in from Meta and Google, and the jobs that keep them fresh."
-      />
+      <PageHeader title="Connections" />
       <div className="grid gap-4 wide:grid-cols-2">
         {jobs.map((job) => {
           const latest = list.find((r) => r.job === job.key);
@@ -121,10 +119,12 @@ export default async function ConnectionsPage() {
           return (
             <section key={job.key} className="card flex flex-col gap-3 p-5">
               <div className="flex flex-wrap items-start justify-between gap-2">
-                <h2 className="text-base font-bold">{job.name}</h2>
+                <h2 className="text-base font-bold">
+                  {job.name}
+                  <Help>{job.what}</Help>
+                </h2>
                 {label && <span className={`pill ${label.tone}`}>{label.text}</span>}
               </div>
-              <p className="text-muted">{job.what}</p>
               {latest ? (
                 <div className="text-[13px]">
                   <p>

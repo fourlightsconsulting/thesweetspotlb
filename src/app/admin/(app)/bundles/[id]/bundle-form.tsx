@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { Help } from "@/components/admin/help";
 import { idle, useSubmit } from "@/components/admin/form";
 import { money } from "@/components/admin/format";
 import { Icon } from "@/components/admin/icons";
@@ -86,11 +87,14 @@ export function BundleForm({ bundle, slots: initialSlots, categories, items }: P
       <section className="card p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold">What’s in it</h2>
-            <p className="mt-1 text-muted">
-              Each part is either set, or one pick from a list. Picked items keep their own choices
-              and add-ons, at their usual prices.
-            </p>
+            <h2 className="text-base font-bold">
+              What’s in it
+              <Help>
+                Each part is either set, or one pick from a list (new items in a chosen category
+                join the list by themselves). Picked items keep their own choices and add-ons, at
+                their usual prices.
+              </Help>
+            </h2>
           </div>
           <p className="rounded-[10px] bg-accent-soft px-3 py-2 text-[13px]">
             Costs{" "}
@@ -368,7 +372,6 @@ function SlotEditor({
                 </option>
               ))}
             </select>
-            <p className="hint">New items in that category join the choices by themselves.</p>
           </div>
         </div>
       )}

@@ -62,7 +62,7 @@ export default async function OffersPage() {
     <>
       <PageHeader
         title="Offers"
-        description="Discount codes customers type at checkout. Cancelled orders give their use back."
+        help="Discounts apply to food, not delivery. Dates and times are Beirut time. A cancelled order gives its code use back."
       />
       <div className="mb-4">
         <NewCode />

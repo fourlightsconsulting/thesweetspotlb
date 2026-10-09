@@ -250,7 +250,6 @@ export function OrderActions({ order, onMoved }: ActionsProps) {
               Keep it
             </button>
           </div>
-          <p className="hint">Let the customer know: call or WhatsApp them from above.</p>
         </fieldset>
       ) : (
         <div className="flex gap-2">

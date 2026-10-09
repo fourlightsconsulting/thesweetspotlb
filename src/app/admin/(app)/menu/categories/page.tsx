@@ -23,7 +23,7 @@ export default async function CategoriesPage() {
     <>
       <PageHeader
         title="Menu"
-        description="Categories are the menu’s tabs; headings group items inside one (Drinks › Milkshakes)."
+        help="Categories are the menu’s tabs. Headings group items inside a category (Drinks › Milkshakes)."
       />
       <MenuTabs />
       <div className="mb-4">

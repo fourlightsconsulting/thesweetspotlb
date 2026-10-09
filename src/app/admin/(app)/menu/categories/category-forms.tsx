@@ -111,7 +111,6 @@ function CategoryFields({
           folder="categories"
           label="Photo"
         />
-        <p className="hint">Without one, the menu uses its first item’s photo.</p>
       </div>
     </div>
   );

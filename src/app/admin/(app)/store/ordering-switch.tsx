@@ -4,22 +4,10 @@ import { useOptimistic, useState, useTransition } from "react";
 import type { Ordering } from "@/lib/hours";
 import { setOrdering } from "./actions";
 
-const choices: { value: Ordering; title: string; body: string }[] = [
-  {
-    value: "hours",
-    title: "Follow opening hours",
-    body: "Orders open and close with the shop.",
-  },
-  {
-    value: "open",
-    title: "Open now",
-    body: "Take orders whatever the time: previews, events, late nights.",
-  },
-  {
-    value: "paused",
-    title: "Paused",
-    body: "Take no orders until you switch back.",
-  },
+const choices: { value: Ordering; title: string }[] = [
+  { value: "hours", title: "Follow opening hours" },
+  { value: "open", title: "Always open" },
+  { value: "paused", title: "Paused" },
 ];
 
 type Props = {
@@ -72,20 +60,11 @@ export function OrderingSwitch({ value, open, note, canChange }: Props) {
               onChange={() => choose(choice.value)}
               className="mt-0.5 size-4 flex-none accent-accent"
             />
-            <span>
-              <span className="block font-semibold">{choice.title}</span>
-              <span className="block text-[13px] leading-[18px] text-muted">{choice.body}</span>
-            </span>
+            <span className="font-semibold">{choice.title}</span>
           </label>
         ))}
       </fieldset>
 
-      {shown === "open" && (
-        <p className="mt-3 rounded-[10px] bg-wait-soft px-3 py-2 text-[13px]">
-          Orders come in at any hour while this is on. Switch back to opening hours when you’re
-          done.
-        </p>
-      )}
       {!canChange && <p className="hint">Managers and owners can change this.</p>}
       {error && (
         <p role="alert" className="mt-3 text-[13px] text-bad">

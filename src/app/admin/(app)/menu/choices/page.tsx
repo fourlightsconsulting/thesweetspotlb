@@ -41,7 +41,7 @@ export default async function ChoicesPage() {
     <>
       <PageHeader
         title="Menu"
-        description="Groups of choices (sauces, sticks, toppings) and their prices. Add a group to items from each item’s page."
+        help="Groups of choices (sauces, sticks, toppings) and their prices. Add a group to an item from that item’s page."
       />
       <MenuTabs />
       <div className="mb-4">

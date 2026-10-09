@@ -211,11 +211,7 @@ export function OrderBoard({ initial }: { initial: Order[] }) {
             <span
               className={`size-2 rounded-full ${live === "live" ? "bg-good" : live === "offline" ? "bg-bad" : "bg-wait"}`}
             />
-            {live === "live"
-              ? "Live: new orders appear here by themselves."
-              : live === "offline"
-                ? "Reconnecting… the board refreshes every minute meanwhile."
-                : "Connecting…"}
+            {live === "live" ? "Live" : live === "offline" ? "Reconnecting…" : "Connecting…"}
           </span>
         }
         actions={

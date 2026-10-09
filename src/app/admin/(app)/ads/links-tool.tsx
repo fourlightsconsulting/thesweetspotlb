@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { CopyButton, CopyField } from "@/components/admin/copy-button";
 import { Drawer } from "@/components/admin/drawer";
+import { Help } from "@/components/admin/help";
 import { Icon } from "@/components/admin/icons";
 import {
   bumpVersion,
@@ -171,12 +172,14 @@ export function LinksTool({
   return (
     <div className="flex flex-col gap-6">
       <section className="card p-5">
-        <h2 className="text-base font-bold">New tracking link</h2>
-        <p className="mt-1 text-muted">
-          For posts, your bio, WhatsApp broadcasts and anything printed: visits and orders from it
-          show under its campaign in the dashboards. For Meta, Google and TikTok ads, use Ad names
-          instead.
-        </p>
+        <h2 className="text-base font-bold">
+          New tracking link
+          <Help>
+            For posts, your bio, WhatsApp broadcasts and anything printed: its visits and orders
+            show under its campaign in the reports. For Meta, Google and TikTok ads, use Ad names
+            instead. Save a link before using it: its short address works only once saved.
+          </Help>
+        </h2>
         <div className="mt-4 grid gap-4 wide:grid-cols-2">
           <div className="flex flex-col gap-3">
             <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
@@ -325,11 +328,6 @@ export function LinksTool({
               value={ready ? shortLink(siteUrl, id) : ""}
             />
             <CopyField label="Full link" value={ready ? full : ""} />
-            {!ready && (
-              <p className="text-[13px] text-muted">
-                Fill in where it goes, a source and a campaign to see the link.
-              </p>
-            )}
             <div className="mt-auto flex flex-wrap items-center gap-3">
               <button
                 type="button"
@@ -339,9 +337,6 @@ export function LinksTool({
               >
                 {pending ? "Saving…" : "Save link"}
               </button>
-              <span className="text-[13px] text-muted">
-                Save it before using it: the short link only works once saved.
-              </span>
               {error && (
                 <p role="alert" className="w-full text-[13px] text-bad">
                   {error}
@@ -470,9 +465,6 @@ export function LinksTool({
                 </div>
               ))}
             </dl>
-            <p className="text-[13px] text-muted">
-              Archiving only hides it here: a printed code keeps working.
-            </p>
           </div>
         )}
       </Drawer>

@@ -66,10 +66,7 @@ export default async function HealthPage({ searchParams }: PageProps<"/admin/hea
 
   return (
     <>
-      <PageHeader
-        title="Health"
-        description="Whether everything is working: orders, WhatsApp alerts, analytics, imports and the website itself."
-      />
+      <PageHeader title="Health" />
       <nav aria-label="Health" className="mb-5 flex gap-1 overflow-x-auto border-b border-line">
         {tabs.map((t) => (
           <Link

@@ -2,6 +2,7 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { FormCard, FormStatus, idle, useSubmit } from "@/components/admin/form";
+import { Help } from "@/components/admin/help";
 import { dateOf } from "@/components/admin/format";
 import { Icon } from "@/components/admin/icons";
 import {
@@ -49,7 +50,7 @@ export function HoursForm({
   return (
     <FormCard
       title={`${branchName} opening hours`}
-      description="Shown on the website. A closing time at or before the opening time is after midnight."
+      help="A closing time at or before the opening time means after midnight: 12:00 pm to 12:00 am is noon to midnight."
       action={action}
       pending={pending}
       state={state}
@@ -147,9 +148,6 @@ export function ClosuresCard({
   return (
     <section className="card p-5">
       <h2 className="text-base font-bold">Closed days</h2>
-      <p className="mt-1 text-muted">
-        Holidays and other days off. The website shows the branch as closed and takes no orders.
-      </p>
       {closures.length > 0 ? (
         <ul className="mt-4 flex flex-col divide-y divide-line">
           {closures.map((c) => (
@@ -267,7 +265,7 @@ export function TimesForm({
   return (
     <FormCard
       title="Ready times"
-      description="What the website promises (“Ready in 10–15 min”), and when the board marks an order late."
+      help="What the website promises (“Ready in 10–15 min”), and when the Orders board marks an order late."
       action={action}
       pending={pending}
       state={state}
@@ -413,11 +411,10 @@ export function ZonesCard({ branchId, zones }: { branchId: string; zones: Zone[]
 
   return (
     <section className="card p-5">
-      <h2 className="text-base font-bold">Delivery areas</h2>
-      <p className="mt-1 text-muted">
-        Checkout lists the areas that are on, in this order, with their fee. Switch an area off to
-        stop delivering there for now.
-      </p>
+      <h2 className="text-base font-bold">
+        Delivery areas
+        <Help>Checkout lists the areas that are on, in this order, each with its fee.</Help>
+      </h2>
       <div className="mt-4 hidden grid-cols-[1fr_1fr_6.5rem_auto_auto] gap-2 text-[12px] font-semibold text-muted sm:grid">
         <span>English</span>
         <span>Arabic</span>
@@ -533,7 +530,7 @@ export function AlertsForm({
   return (
     <FormCard
       title="New-order alerts"
-      description="Each number gets a WhatsApp message when an order comes in, on top of the board’s sound."
+      help="Each number gets a WhatsApp message when an order comes in."
       action={action}
       pending={pending}
       state={state}

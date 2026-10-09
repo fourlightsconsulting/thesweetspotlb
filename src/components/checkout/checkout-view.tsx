@@ -16,7 +16,7 @@ import { ClockIcon } from "@/components/order/item-sheet";
 import { ClosedNote, etaLabel, opensLabel } from "@/components/order/order-view";
 import { useOrderingStatus } from "@/components/order/use-store-status";
 import type { Menu } from "@/data/menu";
-import { deliveryFees, type OrderingInfo, ordering } from "@/data/ordering";
+import { type OrderingInfo, ordering } from "@/data/ordering";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
@@ -134,9 +134,9 @@ function CheckoutForm({
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const mode = cart.mode;
-  const fees = deliveryFees(branch.zones);
   const zone = branch.zones.find((z) => z.id === fields.zone);
-  const fee = mode === "delivery" ? (zone?.fee ?? fees.from) : 0;
+  // The delivery fee is the area's, added once an area is picked.
+  const fee = mode === "delivery" ? (zone?.fee ?? 0) : 0;
   const totals = orderTotals(subtotal, fee, promo);
   const closed = status?.open === false;
 
@@ -297,8 +297,6 @@ function CheckoutForm({
     );
   }
 
-  const feeLabel =
-    mode === "delivery" && !zone && !fees.flat ? `${formatPrice(fees.from, lang)}+` : undefined;
   const placeLabel = `${placing ? t.placing : t.place} · ${formatPrice(totals.total, lang)}`;
   const disabled = placing || placed || closed;
   const eta = etaLabel(mode, order, branch.eta);
@@ -312,7 +310,7 @@ function CheckoutForm({
       >
         {order.edit}
       </Link>
-      <CartTotals totals={totals} lang={lang} t={order} feeLabel={feeLabel} />
+      <CartTotals totals={totals} lang={lang} t={order} />
       <p className="flex items-center gap-2 font-ui text-sm text-cacao">
         <ClockIcon />
         {eta}
@@ -393,12 +391,7 @@ function CheckoutForm({
                 checked={mode === "delivery"}
                 onChange={() => cartActions.setMode("delivery")}
                 title={order.delivery}
-                description={fill(t.deliveryDesc, {
-                  range: range(branch.eta.delivery),
-                  fee: fees.flat
-                    ? formatPrice(fees.from, lang)
-                    : `${formatPrice(fees.from, lang)}+`,
-                })}
+                description={fill(t.deliveryDesc, { range: range(branch.eta.delivery) })}
               />
             </fieldset>
           </Step>
@@ -420,7 +413,6 @@ function CheckoutForm({
               <Field
                 id="phone"
                 label={t.phone}
-                hint={t.phoneHint}
                 error={
                   errors.phone &&
                   t.errors[errors.phone === "phoneInvalid" ? "phoneInvalid" : "phone"]
@@ -476,9 +468,7 @@ function CheckoutForm({
                           className="sr-only"
                         />
                         {z.name[lang]}
-                        {!fees.flat && (
-                          <span className="opacity-75">· {formatPrice(z.fee, lang)}</span>
-                        )}
+                        <span className="opacity-75">· {formatPrice(z.fee, lang)}</span>
                       </label>
                     ))}
                   </div>
@@ -607,17 +597,6 @@ function CheckoutForm({
               {promoError && <ErrorText id="promo-error" text={promoError} />}
             </div>
           </Step>
-
-          <p className="font-ui text-[15px] leading-[1.5] font-semibold">{t.whatsappNote}</p>
-          <p className="font-ui text-[13px] leading-[1.5] text-cacao">
-            {t.privacy}{" "}
-            <Link
-              href={routes(lang).privacy}
-              className="font-semibold text-blueberry underline decoration-caramel decoration-2 underline-offset-4"
-            >
-              {t.privacyLink}
-            </Link>
-          </p>
         </div>
 
         <aside

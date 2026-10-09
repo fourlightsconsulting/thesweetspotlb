@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import { Help } from "@/components/admin/help";
 import { type FormState, FormStatus, idle, useSubmit } from "@/components/admin/form";
 import { money } from "@/components/admin/format";
 import { Icon } from "@/components/admin/icons";
@@ -74,10 +75,10 @@ export function ItemForm({ item, categories, groups }: Props) {
       <ItemBasics item={item} categories={categories} />
 
       <section className="card p-5">
-        <h2 className="text-base font-bold">Choices & add-ons</h2>
-        <p className="mt-1 text-muted">
-          What the customer picks when ordering it, in this order. Preselected choices start ticked.
-        </p>
+        <h2 className="text-base font-bold">
+          Choices & add-ons
+          <Help>Shown to the customer in this order. Preselected choices start ticked.</Help>
+        </h2>
         <ul className="mt-4 flex flex-col gap-3">
           {attached.map((a, index) => {
             const group = groupOf(a.groupId);
@@ -161,7 +162,7 @@ export function ItemForm({ item, categories, groups }: Props) {
               </li>
             );
           })}
-          {attached.length === 0 && <li className="text-muted">No choices: it’s ordered as is.</li>}
+          {attached.length === 0 && <li className="text-muted">No choices</li>}
         </ul>
         {unattached.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center gap-2">

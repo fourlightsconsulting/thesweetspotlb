@@ -38,14 +38,14 @@ async function Dashboard({ db, tab, period }: { db: Db; tab: DashboardTab; perio
         report<OrdersData>(db, "dashboard_orders", period),
         report<OrdersData>(db, "dashboard_orders", period.previous),
       ]);
-      return <OrdersReport period={period} data={data} before={before} />;
+      return <OrdersReport data={data} before={before} />;
     }
     case "marketing": {
       const [data, before] = await Promise.all([
         report<MarketingData>(db, "dashboard_marketing", period),
         report<MarketingData>(db, "dashboard_marketing", period.previous),
       ]);
-      return <MarketingReport period={period} data={data} before={before} />;
+      return <MarketingReport data={data} before={before} />;
     }
     case "web": {
       const [data, before, products] = await Promise.all([
@@ -54,7 +54,7 @@ async function Dashboard({ db, tab, period }: { db: Db; tab: DashboardTab; perio
         db.from("products").select("slug, name_en"),
       ]);
       const names = Object.fromEntries((products.data ?? []).map((p) => [p.slug, p.name_en]));
-      return <WebReport period={period} data={data} before={before} itemNames={names} />;
+      return <WebReport data={data} before={before} itemNames={names} />;
     }
     default: {
       const [orders, ordersBefore, web, webBefore, marketing, needs] = await Promise.all([
@@ -110,10 +110,7 @@ export default async function AdminHome({ searchParams }: PageProps<"/admin">) {
 
   return (
     <>
-      <PageHeader
-        title={`Hi, ${staff.name.split(" ")[0]}`}
-        description="Today at the Tripoli branch, in Beirut time."
-      />
+      <PageHeader title={`Hi, ${staff.name.split(" ")[0]}`} />
       <div className="grid grid-cols-2 gap-3 wide:grid-cols-3">
         {tiles.map((tile) => (
           <div key={tile.label} className="card p-4">

@@ -73,7 +73,6 @@ export default async function AllOrdersPage({ searchParams }: PageProps<"/admin/
     <>
       <PageHeader
         title="All orders"
-        description="Search by order number, phone number or name."
         actions={
           <Link href="/admin/orders" className="btn btn-secondary">
             Back to the board

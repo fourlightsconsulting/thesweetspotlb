@@ -2,6 +2,7 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { FormStatus, idle, useSubmit } from "@/components/admin/form";
+import { Help } from "@/components/admin/help";
 import { Icon } from "@/components/admin/icons";
 import { addSpend, removeSpend, runJob } from "./actions";
 
@@ -93,11 +94,13 @@ export function SpendCard({ rows, today }: { rows: SpendRow[]; today: string }) 
 
   return (
     <section className="card p-5">
-      <h2 className="text-base font-bold">Other ad spend</h2>
-      <p className="mt-1 text-muted">
-        Money spent on promotion that Meta and Google don’t report: flyers, influencers, printed
-        menus, a sponsored story. It counts towards marketing costs on the dashboards.
-      </p>
+      <h2 className="text-base font-bold">
+        Other ad spend
+        <Help>
+          Promotion Meta and Google don’t report (flyers, influencers, printed menus). It counts
+          towards marketing costs in the reports.
+        </Help>
+      </h2>
 
       <form
         key={formKey}

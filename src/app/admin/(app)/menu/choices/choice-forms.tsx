@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import { Help } from "@/components/admin/help";
 import { FormStatus, idle, useSubmit } from "@/components/admin/form";
 import { Icon } from "@/components/admin/icons";
 import { deleteChoice, deleteGroup, moveChoice, saveChoice, saveGroup } from "../actions";
@@ -331,10 +332,13 @@ export function NewGroup() {
     );
   return (
     <form onSubmit={submit} className="card p-5">
-      <h2 className="mb-1 text-base font-bold">New group of choices</h2>
-      <p className="mb-4 text-muted">
-        “Required, up to 1” is a must-pick (a sauce); “up to 5” lets people add several (toppings).
-      </p>
+      <h2 className="mb-4 text-base font-bold">
+        New group of choices
+        <Help>
+          “Required, up to 1” is a must-pick (a sauce); “up to 5” lets people add several
+          (toppings).
+        </Help>
+      </h2>
       <GroupFields group={null} />
       <div className="mt-4 flex items-center gap-3">
         <button className="btn btn-primary" disabled={pending}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Help } from "@/components/admin/help";
 import { Icon } from "@/components/admin/icons";
 import { Switch } from "@/components/admin/switch";
 import type { HomeTicker, WelcomePopup } from "@/lib/site-settings";
@@ -83,10 +84,10 @@ export function TickerForm({ initial }: { initial: HomeTicker }) {
     <section className="card p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold">Home ticker</h2>
-          <p className="mt-1 text-muted">
-            The scrolling band under the home page’s photo. Short phrases read best.
-          </p>
+          <h2 className="text-base font-bold">
+            Home ticker
+            <Help>The scrolling band under the home page’s photo.</Help>
+          </h2>
         </div>
         <label className="flex items-center gap-2">
           <Switch
@@ -203,11 +204,13 @@ export function PopupForm({
     <section className="card p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold">Welcome popup</h2>
-          <p className="mt-1 text-muted">
-            An offer shown once to each visitor, a few seconds after they arrive. Never during
-            checkout.
-          </p>
+          <h2 className="text-base font-bold">
+            Welcome popup
+            <Help>
+              Shown once to each visitor, a few seconds after they arrive, never during checkout.
+              Changing the title, message or code shows it again to people who closed it.
+            </Help>
+          </h2>
         </div>
         <label className="flex items-center gap-2">
           <Switch
@@ -399,9 +402,6 @@ export function PopupForm({
         </a>
         <StatusLine status={status} />
       </div>
-      <p className="hint">
-        Changing the title, message or code shows it again to people who closed it.
-      </p>
     </section>
   );
 }

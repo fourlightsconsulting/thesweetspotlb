@@ -78,7 +78,8 @@ export function HealthOverviewTab({
 
       <Panel
         title="What’s connected"
-        note={`${connected} of ${checklist.length} in place. Website settings are set in Cloudflare (those starting NEXT_PUBLIC_ need a new build); import secrets in Supabase.`}
+        note={`${connected} of ${checklist.length} in place`}
+        help="Website settings are set in Cloudflare (those starting NEXT_PUBLIC_ need a new build); import secrets in Supabase."
       >
         <ul className="-mx-5 divide-y divide-line">
           {checklist.map((row) => (
@@ -98,7 +99,7 @@ export function HealthOverviewTab({
       </Panel>
 
       <div className="grid gap-6 wide:grid-cols-2">
-        <Panel title="Imported numbers" note="The latest day each source has brought in">
+        <Panel title="Imported numbers">
           <Table
             head={["Source", "Latest day", "Last run", ""]}
             rows={importRows(data).map((row) => [
@@ -115,7 +116,7 @@ export function HealthOverviewTab({
             Connections →
           </Link>
         </Panel>
-        <Panel title="Scheduled jobs" note="What runs on its own, and how it went last time">
+        <Panel title="Scheduled jobs">
           <Table
             head={["Job", "When", "Last run", "Result"]}
             rows={cronRows(data).map((row) => [

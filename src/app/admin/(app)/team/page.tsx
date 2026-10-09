@@ -25,7 +25,7 @@ export default async function Team() {
     <>
       <PageHeader
         title="Team"
-        description="Who can sign in to the admin. Staff work the orders and mark items sold out; managers also run the menu, prices, offers, site and store settings and see the dashboards; owners also manage the team and connections."
+        help="Staff work the orders and mark items sold out. Managers also run the menu, prices, offers, site, store, reports and ad tools. Owners also manage the team."
       />
 
       <div className="grid items-start gap-6 wide:grid-cols-[minmax(0,1fr)_320px]">

@@ -66,7 +66,7 @@ export default async function PricesPage() {
     <>
       <PageHeader
         title="Prices"
-        description="Every price on the menu. Change any, or tick several and change them by % or $; nothing saves until you press Save."
+        help="Tick several items to change them together by % or $. Nothing saves until you press Save."
       />
       <PriceGrid sections={sections} />
       <section className="card p-5">

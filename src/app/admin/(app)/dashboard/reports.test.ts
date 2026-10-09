@@ -258,11 +258,9 @@ describe("dashboards render", () => {
           attention: [],
         }),
       ),
-      render(createElement(OrdersReport, { period, data: emptyOrders, before: emptyOrders })),
-      render(
-        createElement(MarketingReport, { period, data: emptyMarketing, before: emptyMarketing }),
-      ),
-      render(createElement(WebReport, { period, data: emptyWeb, before: emptyWeb, itemNames: {} })),
+      render(createElement(OrdersReport, { data: emptyOrders, before: emptyOrders })),
+      render(createElement(MarketingReport, { data: emptyMarketing, before: emptyMarketing })),
+      render(createElement(WebReport, { data: emptyWeb, before: emptyWeb, itemNames: {} })),
     ])
       expect(html).not.toContain("NaN");
   });
@@ -281,19 +279,16 @@ describe("dashboards render", () => {
     );
     expect(overview).toContain("$20.00");
     expect(overview).toContain("1 order waiting");
-    const ordersHtml = render(
-      createElement(OrdersReport, { period, data: orders, before: emptyOrders }),
-    );
+    const ordersHtml = render(createElement(OrdersReport, { data: orders, before: emptyOrders }));
     expect(ordersHtml).toContain("Lotus Crêpe");
     expect(ordersHtml).toContain("14 min");
     const marketingHtml = render(
-      createElement(MarketingReport, { period, data: marketing, before: emptyMarketing }),
+      createElement(MarketingReport, { data: marketing, before: emptyMarketing }),
     );
     expect(marketingHtml).toContain("Launch");
     expect(marketingHtml).toContain("$1.30");
     const webHtml = render(
       createElement(WebReport, {
-        period,
         data: web,
         before: emptyWeb,
         itemNames: { "lotus-crepe": "Lotus Crêpe" },

@@ -106,11 +106,7 @@ export default async function ItemPage({
       <PageHeader
         title={p ? p.name_en : "New item"}
         description={
-          created
-            ? "Added to the menu."
-            : p
-              ? categoryLabel(categories, p.category_id)
-              : "Add something to the menu."
+          created ? "Added to the menu." : p ? categoryLabel(categories, p.category_id) : undefined
         }
         actions={
           <>

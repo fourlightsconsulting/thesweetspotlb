@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { CopyButton, CopyField } from "@/components/admin/copy-button";
+import { Help } from "@/components/admin/help";
 import { Icon } from "@/components/admin/icons";
 import type { Choice } from "@/lib/ad-tools/links";
 import {
@@ -138,11 +139,13 @@ export function NamesTool({
   return (
     <div className="flex flex-col gap-6">
       <section className="card p-5">
-        <h2 className="text-base font-bold">Name a campaign, {group.toLowerCase()} and ad</h2>
-        <p className="mt-1 text-muted">
-          Type these names into the ad platform exactly. Each ad copies them into its link, and
-          that’s how the Marketing dashboard puts our orders beside each campaign’s spend.
-        </p>
+        <h2 className="text-base font-bold">
+          Name a campaign, {group.toLowerCase()} and ad
+          <Help>
+            Type these names into the ad platform exactly. Each ad copies them into its link, which
+            is how the Marketing report puts our orders beside each campaign’s spend.
+          </Help>
+        </h2>
 
         <h3 className="mt-5 mb-2 font-bold">Campaign</h3>
         <div className="grid gap-3 sm:grid-cols-2 wide:grid-cols-4">
@@ -192,13 +195,7 @@ export function NamesTool({
             choices={audiences.map((a) => ({ value: a.code, note: a.name || a.note }))}
             empty={audiences.length ? "Pick one…" : "Save audiences first"}
           />
-          <Text
-            label="Version"
-            type="number"
-            value={d.version}
-            onChange={set("version")}
-            hint="a copy to restart learning"
-          />
+          <Text label="Version" type="number" value={d.version} onChange={set("version")} />
         </div>
         <div className="mt-3">
           <CopyField label={`${group} name`} value={adSet} />
@@ -222,11 +219,14 @@ export function NamesTool({
       </section>
 
       <section className="card p-5">
-        <h2 className="text-base font-bold">Tag the ads’ links</h2>
-        <p className="mt-1 text-muted">
-          Once per ad account: the platform then fills in the names above on every visit, so nothing
-          needs typing per ad.
-        </p>
+        <h2 className="text-base font-bold">
+          Tag the ads’ links
+          <Help>
+            Once per ad account: the platform then fills in the names above on every visit. Google
+            has no name placeholder, so build the campaign name with platform gg, paste this into
+            that campaign, and keep Google’s auto-tagging on.
+          </Help>
+        </h2>
         <div className="mt-4 flex flex-col gap-4">
           <CopyField
             label="Meta: Ads Manager → each ad → Tracking → URL parameters"
@@ -240,11 +240,6 @@ export function NamesTool({
             label="TikTok: each ad → Tracking → URL parameters"
             value={linkTemplates.tiktok}
           />
-          <p className="text-[13px] text-muted">
-            Google has no name placeholder, so its suffix carries the campaign name typed in: build
-            the name above with platform gg and paste this into that campaign. Keep Google’s
-            auto-tagging on as well.
-          </p>
         </div>
       </section>
     </div>
@@ -399,11 +394,13 @@ export function CreativesTool({ month, creatives }: { month: string; creatives: 
   return (
     <div className="flex flex-col gap-6">
       <section className="card p-5">
-        <h2 className="text-base font-bold">New creative</h2>
-        <p className="mt-1 text-muted">
-          A photo or video idea gets one id, shared by every size exported and every ad that uses
-          it. A new edit of the same idea is a new version.
-        </p>
+        <h2 className="text-base font-bold">
+          New creative
+          <Help>
+            A photo or video idea gets one id, shared by every size exported and every ad that uses
+            it. A new edit of the same idea is a new version.
+          </Help>
+        </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 wide:grid-cols-5">
           <Text label="Month" type="month" value={d.month} onChange={set("month")} />
           <Text
@@ -543,11 +540,13 @@ export function AudiencesTool({ audiences }: { audiences: RegistryRow[] }) {
   return (
     <div className="flex flex-col gap-6">
       <section className="card p-5">
-        <h2 className="text-base font-bold">New audience</h2>
-        <p className="mt-1 text-muted">
-          Its short id (like geo001) goes into ad set names; the full name is what to call it in the
-          platform’s audience list. Write down how it’s defined, so it can be rebuilt.
-        </p>
+        <h2 className="text-base font-bold">
+          New audience
+          <Help>
+            Its short id (like geo001) goes into ad set names; the full name is what to call it in
+            the platform’s audience list.
+          </Help>
+        </h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 wide:grid-cols-5">
           <Pick
             label="Platform"

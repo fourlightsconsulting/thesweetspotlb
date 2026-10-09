@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
 import type { Category, Menu, MenuItem } from "@/data/menu";
-import { deliveryFees, type Fulfilment, type OrderingInfo } from "@/data/ordering";
+import type { Fulfilment, OrderingInfo } from "@/data/ordering";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
@@ -72,9 +72,8 @@ export function OrderView({ lang, t, menu, branch }: Props) {
   const cartSheetRef = useRef<HTMLDialogElement>(null);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
 
-  const fees = deliveryFees(branch.zones);
-  const totals = orderTotals(subtotal, cart.mode === "delivery" ? fees.from : 0);
-  const feeLabel = fees.flat ? undefined : `${formatPrice(fees.from, lang)}+`;
+  // No delivery fee yet: it's the area's, picked at checkout.
+  const totals = orderTotals(subtotal, 0);
   const eta = etaLabel(cart.mode, t, branch.eta);
 
   const inCart = (item: MenuItem) =>
@@ -201,7 +200,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
               <div className="-me-2 min-h-0 flex-1 overflow-y-auto pe-2">
                 <CartLines lines={lines} menu={menu} lang={lang} t={t} onEdit={editLine} />
               </div>
-              <CartTotals totals={totals} lang={lang} t={t} feeLabel={feeLabel} />
+              <CartTotals totals={totals} lang={lang} t={t} />
               {checkout}
             </>
           )}
@@ -272,7 +271,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
         </div>
         {lines.length > 0 && (
           <div className="flex flex-col gap-4 border-t border-chocolate/10 px-5 pt-1 pb-[max(16px,env(safe-area-inset-bottom))]">
-            <CartTotals totals={totals} lang={lang} t={t} feeLabel={feeLabel} />
+            <CartTotals totals={totals} lang={lang} t={t} />
             {checkout}
           </div>
         )}

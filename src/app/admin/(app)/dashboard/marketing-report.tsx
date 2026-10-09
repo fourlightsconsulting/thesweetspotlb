@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Bars,
   count,
@@ -12,7 +11,7 @@ import {
   TrendChart,
 } from "@/components/admin/charts";
 import { money } from "@/components/admin/format";
-import { dayLabel, type Period } from "./period";
+import { dayLabel } from "./period";
 import type { MarketingData } from "./types";
 
 const ratio = (part: number, whole: number) => (whole > 0 ? part / whole : 0);
@@ -37,7 +36,7 @@ function SocialCard({
     ["Website taps", data.website_clicks],
   ];
   return (
-    <Panel title={title} note="Includes activity from ads (Meta doesn’t split it)">
+    <Panel title={title} help="Includes activity from ads: Meta doesn’t split it out.">
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {rows
           .filter(([, v]) => v != null)
@@ -68,33 +67,13 @@ function SocialCard({
 }
 
 /** Ads, sources, social and search: what marketing costs and what it brings. */
-export function MarketingReport({
-  period,
-  data,
-  before,
-}: {
-  period: Period;
-  data: MarketingData;
-  before: MarketingData;
-}) {
+export function MarketingReport({ data, before }: { data: MarketingData; before: MarketingData }) {
   const adSpend = data.spend.meta_cents + data.spend.google_cents;
   const adSpendBefore = before.spend.meta_cents + before.spend.google_cents;
   const c = data.credit;
-  const nothingConnected = data.spend.total_cents === 0 && data.campaigns.length === 0;
 
   return (
     <div className="flex flex-col gap-6">
-      {nothingConnected && (
-        <p className="rounded-[12px] bg-wait-soft px-4 py-3 text-[13px]">
-          No ad spend in this period. Spend arrives from Meta and Google once they’re connected, and
-          by hand under{" "}
-          <Link href="/admin/connections" className="font-semibold underline">
-            Connections
-          </Link>
-          . Orders and sources below come from the website itself.
-        </p>
-      )}
-
       <KpiGrid>
         <Kpi
           label="Ad spend"
@@ -102,7 +81,6 @@ export function MarketingReport({
           now={adSpend}
           before={adSpendBefore}
           upIsGood={false}
-          hint="Meta and Google"
         />
         <Kpi
           label="Orders from ads"
@@ -128,16 +106,16 @@ export function MarketingReport({
           value={adSpend ? `$${(c.ad_food_cents / adSpend).toFixed(2)}` : "—"}
           now={ratio(c.ad_food_cents, adSpend)}
           before={ratio(before.credit.ad_food_cents, adSpendBefore)}
-          hint="Food sold to ad visitors (no delivery fees) for each dollar of ad spend"
+          help="Food sold to ad visitors (without delivery fees) for each dollar spent on ads."
         />
         <Kpi
           label="All marketing"
           value={money(data.spend.total_cents)}
-          hint="Ads plus spend entered by hand"
+          help="Meta and Google ads, plus spend entered by hand under Connections."
         />
       </KpiGrid>
 
-      <Panel title="Spend and what ads brought in" note={period.label}>
+      <Panel title="Spend and what ads brought in">
         <TrendChart
           labels={data.daily.map((d) => dayLabel(d.day))}
           format={(n) => money(Math.round(n))}
@@ -151,7 +129,7 @@ export function MarketingReport({
       <div className="grid gap-6 wide:grid-cols-[3fr_2fr]">
         <Panel
           title="From ad to order"
-          note="The first three steps are Meta’s numbers; the rest are the website’s"
+          help="The first three steps are Meta’s numbers; the rest are the website’s."
         >
           <Funnel
             steps={[
@@ -168,7 +146,7 @@ export function MarketingReport({
         </Panel>
         <Panel
           title="Meta’s count and ours"
-          note="Meta counts views and taps up to a week before; we count orders credited to an ad tap"
+          help="Meta counts an order if the person saw or tapped an ad up to a week before; we count orders credited to an ad tap."
         >
           <DataTable
             head={["", "Meta", "Us"]}
@@ -184,7 +162,7 @@ export function MarketingReport({
 
       <Panel
         title="Campaigns"
-        note="Our orders are matched by the campaign’s name in its links (utm_campaign)"
+        help="Our orders are matched to a campaign by the campaign name in its links (utm_campaign). Ad tools → Ad names sets that up."
       >
         {data.campaigns.length === 0 ? (
           <Empty>No campaigns in this period.</Empty>
@@ -248,10 +226,7 @@ export function MarketingReport({
       </Panel>
 
       <div className="grid gap-6 wide:grid-cols-2">
-        <Panel
-          title="Where orders come from"
-          note="Each order’s credited visit, and that channel’s visits"
-        >
+        <Panel title="Where orders come from">
           <DataTable
             head={["Channel", "Visits", "Orders", "Sales", "Visits that ordered"]}
             rows={data.channels.map((ch) => [
@@ -264,10 +239,7 @@ export function MarketingReport({
             empty="No orders with tracked visits yet."
           />
         </Panel>
-        <Panel
-          title="Campaigns in links"
-          note="Orders by the campaign tag on the visit credited (any source)"
-        >
+        <Panel title="Campaigns in links">
           <DataTable
             head={["Campaign", "Source", "Orders", "Sales"]}
             rows={data.campaigns_credit.map((ca) => [
@@ -282,7 +254,7 @@ export function MarketingReport({
       </div>
 
       <div className="grid gap-6 wide:grid-cols-3">
-        <Panel title="Placements" note="Meta spend by where the ad showed">
+        <Panel title="Placements">
           <Bars
             rows={data.placements.map((p) => ({
               name: p.name,
@@ -305,7 +277,7 @@ export function MarketingReport({
             empty="No codes used."
           />
         </Panel>
-        <Panel title="Other spend" note="Entered by hand under Connections">
+        <Panel title="Other spend" help="Entered by hand under Connections.">
           <Bars
             rows={data.manual.map((m) => ({ name: m.name, value: m.spend_cents }))}
             format={(n) => money(n)}

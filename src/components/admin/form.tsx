@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { Help } from "./help";
 
 // Shared bits for admin forms that save through server actions.
 
@@ -48,10 +49,10 @@ export function useSubmit(action: (form: FormData) => void) {
   };
 }
 
-/** A card with a title, a short explanation and its own save button. */
+/** A card with a title (and a "?" when it needs explaining) and its own save button. */
 export function FormCard({
   title,
-  description,
+  help,
   children,
   action,
   pending,
@@ -60,7 +61,7 @@ export function FormCard({
   className = "",
 }: {
   title: string;
-  description?: React.ReactNode;
+  help?: React.ReactNode;
   children: React.ReactNode;
   action: (form: FormData) => void;
   pending: boolean;
@@ -71,8 +72,10 @@ export function FormCard({
   const submit = useSubmit(action);
   return (
     <form onSubmit={submit} className={`card p-5 ${className}`}>
-      <h2 className="text-base font-bold">{title}</h2>
-      {description && <p className="mt-1 text-muted">{description}</p>}
+      <h2 className="text-base font-bold">
+        {title}
+        {help && <Help>{help}</Help>}
+      </h2>
       <div className="mt-4">{children}</div>
       <div className="mt-4 flex items-center gap-3">
         <button className="btn btn-primary" disabled={pending}>

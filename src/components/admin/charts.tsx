@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Help } from "./help";
 
 // Dashboard charts as plain SVG and HTML: no chart library (they render on
 // the server and ship no JavaScript, which keeps the Worker small). Hover
@@ -49,7 +50,7 @@ export function Kpi({
   now,
   before,
   upIsGood,
-  hint,
+  help,
 }: {
   label: string;
   value: string;
@@ -57,11 +58,15 @@ export function Kpi({
   now?: number;
   before?: number;
   upIsGood?: boolean;
-  hint?: string;
+  /** What the number counts, behind a "?", where the label alone isn't enough. */
+  help?: ReactNode;
 }) {
   return (
-    <div className="card flex flex-col gap-1 p-4" title={hint}>
-      <p className="text-[13px] text-muted">{label}</p>
+    <div className="card flex flex-col gap-1 p-4">
+      <p className="text-[13px] text-muted">
+        {label}
+        {help && <Help>{help}</Help>}
+      </p>
       <p className="text-2xl leading-8 font-bold tabular-nums">{value}</p>
       {now !== undefined && before !== undefined && (
         <div className="flex items-center gap-1.5 text-[12px] text-muted">
@@ -77,21 +82,29 @@ export function KpiGrid({ children }: { children: ReactNode }) {
   return <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 wide:grid-cols-6">{children}</div>;
 }
 
-/** A titled card for one chart or table. */
+/**
+ * A titled card for one chart or table. `note` is a fact about what's shown
+ * (a total, a rate); `help` explains it, behind a "?".
+ */
 export function Panel({
   title,
   note,
+  help,
   children,
   className = "",
 }: {
   title: string;
   note?: ReactNode;
+  help?: ReactNode;
   children: ReactNode;
   className?: string;
 }) {
   return (
     <section className={`card min-w-0 p-5 ${className}`}>
-      <h2 className="text-base font-bold">{title}</h2>
+      <h2 className="text-base font-bold">
+        {title}
+        {help && <Help>{help}</Help>}
+      </h2>
       {note && <p className="mt-0.5 text-[13px] text-muted">{note}</p>}
       <div className="mt-4">{children}</div>
     </section>

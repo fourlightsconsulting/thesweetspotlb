@@ -86,7 +86,6 @@ export function OrderConfirmation({ lang, orderRef, t, order: o, whatsapp, shopP
             <h2 className="font-display text-[clamp(22px,2cqw,28px)] leading-[1.15] font-black">
               {whatsapp.title}
             </h2>
-            <p className="font-body text-[17px] leading-normal text-cacao">{whatsapp.body}</p>
             <a
               href={whatsappMessageUrl(shopPhone, orderMessage(placed, lang, whatsapp, o))}
               target="_blank"

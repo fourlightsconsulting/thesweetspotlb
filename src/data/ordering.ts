@@ -28,12 +28,6 @@ export const deliveryZones: DeliveryZone[] = [
   { id: "bahsas", name: { en: "Bahsas", ar: "البحصاص" }, fee: 200 },
 ];
 
-/** The lowest delivery fee, and whether every area pays the same. */
-export function deliveryFees(zones: DeliveryZone[]) {
-  const from = zones.length > 0 ? Math.min(...zones.map((z) => z.fee)) : 0;
-  return { from, flat: zones.every((z) => z.fee === from) };
-}
-
 /** What the order and checkout pages know about the branch taking orders. */
 export type OrderingInfo = {
   schedule: Schedule;

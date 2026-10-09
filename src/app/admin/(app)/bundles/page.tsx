@@ -29,7 +29,6 @@ export default async function BundlesPage() {
     <>
       <PageHeader
         title="Bundles"
-        description="Boxes and combos: a price, with set parts and parts the customer picks."
         actions={
           <Link href="/admin/bundles/new" className="btn btn-primary">
             <Icon name="plus" className="size-4" />
@@ -40,9 +39,6 @@ export default async function BundlesPage() {
       {sections.length === 0 ? (
         <div className="card p-6 text-center">
           <p className="font-semibold">No bundles yet.</p>
-          <p className="mt-1 text-muted">
-            Make one for a box with a choice of crêpe and drink, or a set combo.
-          </p>
         </div>
       ) : (
         <ItemList sections={sections} canEdit editBase="/admin/bundles" />

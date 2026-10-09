@@ -188,7 +188,7 @@ export default async function CustomerPage({ params }: PageProps<"/admin/custome
                 {found.campaign && <span className="text-muted"> · {found.campaign}</span>}
               </p>
             ) : (
-              <p className="text-muted">Not known: their first order has no tracked visit.</p>
+              <p className="text-muted">Not known</p>
             )}
           </section>
         </div>

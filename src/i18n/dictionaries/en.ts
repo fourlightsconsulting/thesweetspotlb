@@ -188,11 +188,10 @@ const en = {
     title: "Almost there.",
     stepHow: "Pickup or delivery",
     pickupDesc: "Ready in {range} min at our Tripoli branch",
-    deliveryDesc: "{range} min across Tripoli · {fee} fee",
+    deliveryDesc: "{range} min across Tripoli",
     stepDetails: "Your details",
     name: "Full name",
     phone: "Phone number",
-    phoneHint: "We’ll only call if there’s a question about your order.",
     address: "Delivery address",
     area: "Area",
     street: "Street and building",
@@ -221,14 +220,10 @@ const en = {
     hideSummary: "Hide order summary",
     place: "Place order",
     placing: "Placing your order…",
-    privacy: "We use your details for this order, and to measure our ads.",
-    privacyLink: "Privacy",
-    whatsappNote:
-      "After you place it, you’ll send your order to us on WhatsApp, already written out.",
     errors: {
       name: "Add your name",
       phone: "Add a number we can call",
-      phoneInvalid: "That number doesn’t look right. Try 71 234 567.",
+      phoneInvalid: "Wrong format",
       area: "Pick your area",
       street: "Add your street and building",
       summary: "Please check the highlighted fields.",
@@ -274,7 +269,6 @@ const en = {
   /** The order, written out for the customer to send to the shop on WhatsApp. */
   whatsappOrder: {
     title: "Last step: send it to us on WhatsApp",
-    body: "Your order is written out for you. Just tap send, and we’ll confirm it there.",
     button: "Send order on WhatsApp",
     greeting: "Hi The Sweet Spot! Here’s my order {number} from the website.",
     delivery: "Delivery to {address}",

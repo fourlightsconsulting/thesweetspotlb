@@ -34,11 +34,6 @@ export default async function MenuPage() {
     <>
       <PageHeader
         title="Menu"
-        description={
-          canEdit
-            ? "What the website offers. Switch items to sold out while you’re out of them."
-            : "Switch items to sold out while you’re out of them, and back when they’re in."
-        }
         actions={
           canEdit && (
             <Link href="/admin/menu/items/new" className="btn btn-primary">

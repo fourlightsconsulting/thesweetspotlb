@@ -10,22 +10,14 @@ import {
   TrendChart,
 } from "@/components/admin/charts";
 import { money } from "@/components/admin/format";
-import { dayLabel, type Period } from "./period";
+import { dayLabel } from "./period";
 import type { OrdersData } from "./types";
 
 const minutes = (n: number | null) => (n == null ? "—" : `${Math.round(n)} min`);
 const ratio = (part: number, whole: number) => (whole > 0 ? part / whole : 0);
 
 /** Orders: how many, when, how fast, what's in them. */
-export function OrdersReport({
-  period,
-  data,
-  before,
-}: {
-  period: Period;
-  data: OrdersData;
-  before: OrdersData;
-}) {
+export function OrdersReport({ data, before }: { data: OrdersData; before: OrdersData }) {
   const t = data.totals;
   const b = before.totals;
   const delivery = data.fulfilment.find((f) => f.name === "delivery")?.orders ?? 0;
@@ -53,14 +45,12 @@ export function OrdersReport({
           now={ratio(t.cancelled, t.placed)}
           before={ratio(b.cancelled, b.placed)}
           upIsGood={false}
-          hint={`${t.cancelled} of ${t.placed} placed`}
         />
         <Kpi
           label="Delivery"
           value={percent(delivery, t.orders)}
           now={ratio(delivery, t.orders)}
           before={ratio(deliveryBefore, b.orders)}
-          hint="Share of orders delivered rather than picked up"
         />
         <Kpi
           label="Items per order"
@@ -70,10 +60,7 @@ export function OrdersReport({
         />
       </KpiGrid>
 
-      <Panel
-        title="Orders by day"
-        note={`${period.label}, with the ${period.days} days before dashed`}
-      >
+      <Panel title="Orders by day">
         <TrendChart
           labels={data.daily.map((d) => dayLabel(d.day))}
           series={[
@@ -89,12 +76,12 @@ export function OrdersReport({
         />
       </Panel>
 
-      <Panel title="When people order" note="Orders by weekday and hour, Beirut time">
+      <Panel title="When people order">
         <Heatmap cells={data.heatmap} unit="orders" />
       </Panel>
 
       <div className="grid gap-6 wide:grid-cols-3">
-        <Panel title="Speed" note="Typical times (medians)">
+        <Panel title="Speed">
           <dl className="grid grid-cols-2 gap-3 text-[13px]">
             {(
               [

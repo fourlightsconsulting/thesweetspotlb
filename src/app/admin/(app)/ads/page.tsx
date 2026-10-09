@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CopyField } from "@/components/admin/copy-button";
+import { Help } from "@/components/admin/help";
 import { beirutDate, dateOf, money } from "@/components/admin/format";
 import { PageHeader } from "@/components/admin/page-header";
 import { site } from "@/data/site";
@@ -96,12 +97,14 @@ async function Catalog() {
   return (
     <div className="flex flex-col gap-6">
       <section className="card p-5">
-        <h2 className="text-base font-bold">Meta catalog</h2>
-        <p className="mt-1 text-muted">
-          The menu as a catalog for Meta: catalog ads that show each person the items they looked
-          at, and products to tag in Instagram posts. It updates itself from the menu: prices,
-          photos and sold-out items.
-        </p>
+        <h2 className="text-base font-bold">
+          Meta catalog
+          <Help>
+            The menu as a catalog for Meta, for ads that show each person the items they looked at
+            and for tagging products in Instagram posts. It follows the menu: prices, photos and
+            sold-out items.
+          </Help>
+        </h2>
         <div className="mt-4 grid gap-4 wide:grid-cols-2">
           {feeds.map((f) => (
             <CopyField key={f.url} label={f.label} value={f.url} />
@@ -123,7 +126,7 @@ async function Catalog() {
         </dl>
         {noPhoto.length > 0 && (
           <p className="mt-2 text-[13px] text-muted">
-            Meta needs a photo for every product. Add one in{" "}
+            Add a photo in{" "}
             <Link href="/admin/menu" className="font-semibold text-accent">
               Menu
             </Link>{" "}
@@ -152,9 +155,6 @@ async function Catalog() {
             tell which items each person viewed and ordered.
           </li>
         </ol>
-        <p className="mt-3 text-[13px] text-muted">
-          The feed works once the website is live at {new URL(site.url).hostname}.
-        </p>
       </section>
     </div>
   );
@@ -198,10 +198,7 @@ export default async function AdToolsPage({ searchParams }: PageProps<"/admin/ad
 
   return (
     <>
-      <PageHeader
-        title="Ad tools"
-        description="Tagged links and QR codes, names for ads, creatives and audiences, and the menu catalog for Meta."
-      />
+      <PageHeader title="Ad tools" />
       <nav aria-label="Ad tools" className="mb-5 flex gap-1 overflow-x-auto border-b border-line">
         {tabs.map((t) => (
           <Link

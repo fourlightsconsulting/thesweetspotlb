@@ -122,7 +122,6 @@ export function PhotoUpload({ name, path: initialPath, src: initialSrc, folder, 
               Remove photo
             </button>
           )}
-          <p className="hint mt-0">Cropped to a square from the centre.</p>
         </div>
       </div>
       <input

@@ -66,10 +66,7 @@ export default async function StorePage() {
 
   return (
     <>
-      <PageHeader
-        title="Store"
-        description={`Ordering, hours${alertsConnected ? ", delivery and alerts" : " and delivery"}. Changes show on the website straight away.`}
-      />
+      <PageHeader title="Store" />
       <div className="flex flex-col gap-6">
         <OrderingSwitch
           value={ordering.schedule.ordering}

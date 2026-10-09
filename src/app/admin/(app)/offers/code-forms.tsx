@@ -239,9 +239,6 @@ export function CodeForm({ code = blank, onDone }: { code?: CodeValues; onDone?:
         )}
         {deleteError && <p className="w-full text-[13px] text-bad">{deleteError}</p>}
       </div>
-      <p className="hint mt-0 sm:col-span-2">
-        Times are Beirut time. Discounts apply to food, not delivery.
-      </p>
     </form>
   );
 }

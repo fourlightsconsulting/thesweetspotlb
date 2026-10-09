@@ -44,10 +44,6 @@ function VisitPicker() {
         <input name="visit" required maxLength={64} className="field" autoComplete="off" />
       </label>
       <button className="btn btn-primary">Show</button>
-      <p className="w-full text-[13px] text-muted">
-        Open a visit from the Problems tab, or paste its id. Visits are kept as long as website
-        analytics is.
-      </p>
     </form>
   );
 }
