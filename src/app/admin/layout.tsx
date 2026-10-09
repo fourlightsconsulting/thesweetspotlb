@@ -14,7 +14,12 @@ export const viewport: Viewport = { themeColor: "#fff8ee" };
 
 export default function AdminRootLayout({ children }: LayoutProps<"/admin">) {
   return (
-    <html lang="en" className={`${googleSans.variable} ${arabicText.variable} h-full antialiased`}>
+    // Browser extensions add attributes to <html> before React loads.
+    <html
+      lang="en"
+      className={`${googleSans.variable} ${arabicText.variable} h-full antialiased`}
+      suppressHydrationWarning
+    >
       <body className="min-h-full">{children}</body>
     </html>
   );

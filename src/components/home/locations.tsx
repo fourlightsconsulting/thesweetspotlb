@@ -16,16 +16,26 @@ type Props = {
   orderNow: string;
   /** Each branch's week, from the database. */
   hours: { tripoli: Schedule; kaslik: Schedule };
+  /** h1 where it's the page itself (the contact page); h2 on the home page. */
+  heading?: "h1" | "h2";
+  className?: string;
 };
 
-export function Locations({ lang, t, orderNow, hours }: Props) {
+export function Locations({
+  lang,
+  t,
+  orderNow,
+  hours,
+  heading: Heading = "h2",
+  className = "pt-section pb-section-lg",
+}: Props) {
   const tripoliRows = weekHours(hours.tripoli, lang, t);
   const kaslikRows = weekHours(hours.kaslik, lang, t);
 
   return (
-    <section id="locations" className="pt-section pb-section-lg">
+    <section id="locations" className={className}>
       <Reveal className="shell grid items-start gap-[clamp(36px,4cqw,64px)] desk:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-        <h2 className="title-section">{t.title}</h2>
+        <Heading className="title-section">{t.title}</Heading>
 
         {/* The two branches: stacked with a divider on phones, side by side with a
             thin vertical rule from 640px. */}

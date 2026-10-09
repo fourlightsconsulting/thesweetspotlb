@@ -43,7 +43,7 @@ function MeltedCone() {
 // contact pages exist, their links land here too.
 export default function GlobalNotFound() {
   return (
-    <html lang="en" className={`${fontVariables} h-full antialiased`}>
+    <html lang="en" className={`${fontVariables} h-full antialiased`} suppressHydrationWarning>
       <body className="page flex min-h-full flex-col">
         <NotFoundTracking />
         <div aria-hidden="true" className="awning" />

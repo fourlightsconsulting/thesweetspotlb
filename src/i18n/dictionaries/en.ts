@@ -105,6 +105,21 @@ const en = {
     directions: "Get directions",
     orderToters: "Order on Toters",
   },
+  contact: {
+    metaTitle: "Contact & locations",
+    metaDescription:
+      "Opening hours and directions for The Sweet Spot in Tripoli, delivery in Kaslik through Toters, and how to reach us on WhatsApp, by phone or on Instagram.",
+    tag: "Get in touch",
+    title: "Questions? Big order?",
+    description:
+      "Birthdays, office treats, a box for the whole family: message us and we’ll sort it out.",
+    whatsapp: "WhatsApp",
+    whatsappNote: "The quickest way to reach us",
+    call: "Call us",
+    callNote: "During opening hours",
+    instagram: "Instagram",
+    instagramNote: "Specials and new flavours first",
+  },
   order: {
     metaTitle: "Order online",
     metaDescription:
