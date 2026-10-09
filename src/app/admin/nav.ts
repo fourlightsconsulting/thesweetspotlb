@@ -20,6 +20,7 @@ export type NavIcon =
   | "offers"
   | "site"
   | "store"
+  | "connections"
   | "team"
   | "account";
 
@@ -33,6 +34,7 @@ export const navItems: NavItem[] = [
   { href: "/admin/offers", label: "Offers", icon: "offers", minimum: "manager" },
   { href: "/admin/site", label: "Site", icon: "site", minimum: "manager" },
   { href: "/admin/store", label: "Store", icon: "store", minimum: "manager" },
+  { href: "/admin/connections", label: "Connections", icon: "connections", minimum: "manager" },
   { href: "/admin/team", label: "Team", icon: "team", minimum: "owner" },
 ];
 

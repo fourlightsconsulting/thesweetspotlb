@@ -50,6 +50,9 @@ export const dateOf = (iso: string | Date) => fullDate.format(new Date(iso));
 /** The Beirut calendar date, YYYY-MM-DD. */
 export const beirutDate = (date = new Date()) => isoDay.format(date);
 
+/** The Beirut date `days` ago, YYYY-MM-DD. */
+export const daysAgo = (days: number) => beirutDate(new Date(Date.now() - days * 86_400_000));
+
 /** "just now", "4 min", "1 h 5 min": time since a moment, for queues. */
 export function ago(iso: string | Date, now = new Date()) {
   const minutes = Math.max(0, Math.floor((now.getTime() - new Date(iso).getTime()) / 60_000));

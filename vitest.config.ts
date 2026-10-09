@@ -11,5 +11,9 @@ export default defineConfig({
       "server-only": path("./src/test/server-only.ts"),
     },
   },
-  test: { include: ["src/**/*.test.ts"], environment: "node" },
+  test: {
+    // The scheduled jobs' parsing is plain TypeScript, tested here too.
+    include: ["src/**/*.test.ts", "supabase/functions/**/*.test.ts"],
+    environment: "node",
+  },
 });

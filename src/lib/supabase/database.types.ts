@@ -8,6 +8,96 @@ export type Database = {
   };
   public: {
     Tables: {
+      ad_performance: {
+        Row: {
+          account_id: string;
+          ad_id: string;
+          ad_name: string;
+          add_to_cart: number | null;
+          adset_id: string;
+          adset_name: string;
+          campaign_id: string;
+          campaign_name: string;
+          clicks: number | null;
+          created_by: string | null;
+          day: string;
+          id: number;
+          imported_at: string;
+          impressions: number | null;
+          initiate_checkout: number | null;
+          landing_page_views: number | null;
+          link_clicks: number | null;
+          messaging_started: number | null;
+          note: string;
+          placement: string;
+          platform: string;
+          profile_visits: number | null;
+          publisher: string;
+          purchase_value_cents: number | null;
+          purchases: number | null;
+          spend_cents: number;
+          video_views: number | null;
+        };
+        Insert: {
+          account_id?: string;
+          ad_id?: string;
+          ad_name?: string;
+          add_to_cart?: number | null;
+          adset_id?: string;
+          adset_name?: string;
+          campaign_id?: string;
+          campaign_name?: string;
+          clicks?: number | null;
+          created_by?: string | null;
+          day: string;
+          id?: never;
+          imported_at?: string;
+          impressions?: number | null;
+          initiate_checkout?: number | null;
+          landing_page_views?: number | null;
+          link_clicks?: number | null;
+          messaging_started?: number | null;
+          note?: string;
+          placement?: string;
+          platform: string;
+          profile_visits?: number | null;
+          publisher?: string;
+          purchase_value_cents?: number | null;
+          purchases?: number | null;
+          spend_cents?: number;
+          video_views?: number | null;
+        };
+        Update: {
+          account_id?: string;
+          ad_id?: string;
+          ad_name?: string;
+          add_to_cart?: number | null;
+          adset_id?: string;
+          adset_name?: string;
+          campaign_id?: string;
+          campaign_name?: string;
+          clicks?: number | null;
+          created_by?: string | null;
+          day?: string;
+          id?: never;
+          imported_at?: string;
+          impressions?: number | null;
+          initiate_checkout?: number | null;
+          landing_page_views?: number | null;
+          link_clicks?: number | null;
+          messaging_started?: number | null;
+          note?: string;
+          placement?: string;
+          platform?: string;
+          profile_visits?: number | null;
+          publisher?: string;
+          purchase_value_cents?: number | null;
+          purchases?: number | null;
+          spend_cents?: number;
+          video_views?: number | null;
+        };
+        Relationships: [];
+      };
       analytics_events: {
         Row: {
           bot: boolean;
@@ -477,6 +567,81 @@ export type Database = {
           usage_limit?: number | null;
           usage_limit_per_customer?: number | null;
           value?: number;
+        };
+        Relationships: [];
+      };
+      insight_rows: {
+        Row: {
+          day: string;
+          dim1: string;
+          dim2: string;
+          dim3: string;
+          imported_at: string;
+          metrics: Json;
+          report: string;
+          source: string;
+        };
+        Insert: {
+          day: string;
+          dim1?: string;
+          dim2?: string;
+          dim3?: string;
+          imported_at?: string;
+          metrics?: Json;
+          report: string;
+          source: string;
+        };
+        Update: {
+          day?: string;
+          dim1?: string;
+          dim2?: string;
+          dim3?: string;
+          imported_at?: string;
+          metrics?: Json;
+          report?: string;
+          source?: string;
+        };
+        Relationships: [];
+      };
+      job_runs: {
+        Row: {
+          error: string | null;
+          finished_at: string | null;
+          id: number;
+          job: string;
+          outcome: string;
+          pg_net_id: number | null;
+          queued_at: string;
+          request: Json;
+          requested_by: string | null;
+          response: Json | null;
+          status_code: number | null;
+        };
+        Insert: {
+          error?: string | null;
+          finished_at?: string | null;
+          id?: never;
+          job: string;
+          outcome?: string;
+          pg_net_id?: number | null;
+          queued_at?: string;
+          request?: Json;
+          requested_by?: string | null;
+          response?: Json | null;
+          status_code?: number | null;
+        };
+        Update: {
+          error?: string | null;
+          finished_at?: string | null;
+          id?: never;
+          job?: string;
+          outcome?: string;
+          pg_net_id?: number | null;
+          queued_at?: string;
+          request?: Json;
+          requested_by?: string | null;
+          response?: Json | null;
+          status_code?: number | null;
         };
         Relationships: [];
       };
@@ -1164,11 +1329,38 @@ export type Database = {
         Args: { minimum?: Database["public"]["Enums"]["staff_role"] };
         Returns: boolean;
       };
+      job_secret_ok: { Args: { p_secret: string }; Returns: boolean };
+      merge_insight_rows: {
+        Args: { p_rows: Json; p_source: string };
+        Returns: number;
+      };
       order_status_rank: {
         Args: { s: Database["public"]["Enums"]["order_status"] };
         Returns: number;
       };
       purge_event_pii: { Args: never; Returns: number };
+      reconcile_jobs: { Args: never; Returns: number };
+      replace_ad_performance: {
+        Args: {
+          p_account_id: string;
+          p_platform: string;
+          p_rows: Json;
+          p_since: string;
+          p_until: string;
+        };
+        Returns: Json;
+      };
+      replace_insight_rows: {
+        Args: {
+          p_report: string;
+          p_rows: Json;
+          p_since: string;
+          p_source: string;
+          p_until: string;
+        };
+        Returns: Json;
+      };
+      run_job: { Args: { p_body?: Json; p_job: string }; Returns: number };
       staff_directory: {
         Args: never;
         Returns: {

@@ -221,18 +221,11 @@ export async function placeOrder(
       await reportOrderPlaced(
         {
           id: data.order_id,
-          ref: data.public_token,
           lang: input.lang,
-          name,
-          phone,
           fulfilment: input.mode,
           total: data.total_cents,
           foodValue: totals.subtotal - totals.discount,
-          items: priced.map(({ item, line, unit }) => ({
-            id: item.id,
-            quantity: line.qty,
-            price: unit,
-          })),
+          items: priced.reduce((n, p) => n + p.line.qty, 0),
         },
         input.tracking ?? null,
         request,
