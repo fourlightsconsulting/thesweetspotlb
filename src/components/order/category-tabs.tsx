@@ -13,6 +13,7 @@ const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").match
 /** Sticky category pills under the header. The pill of the section in view stays highlighted. */
 export function CategoryTabs({ categories, lang, label }: Props) {
   const barRef = useRef<HTMLElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState<string | undefined>(categories[0]?.id);
 
   // Anchor jumps (#crepes from the home page) clear the header and this bar.
@@ -57,14 +58,24 @@ export function CategoryTabs({ categories, lang, label }: Props) {
     };
   }, [categories]);
 
-  // Keep the active pill in view inside the scrolling bar.
+  // Keep the active pill in view inside the scrolling bar. Only the bar
+  // scrolls, sideways: scrollIntoView would also start a smooth scroll of the
+  // page, which cuts off the visitor's own scrolling each time a new section
+  // comes into view (and the glide after tapping a pill).
   useEffect(() => {
-    const tab = barRef.current?.querySelector<HTMLElement>(`[data-tab="${active}"]`);
-    tab?.scrollIntoView({
-      block: "nearest",
-      inline: "nearest",
-      behavior: reducedMotion() ? "auto" : "smooth",
-    });
+    const list = listRef.current;
+    const tab = list?.querySelector<HTMLElement>(`[data-tab="${active}"]`);
+    if (!list || !tab) return;
+    const room = 16;
+    const bar = list.getBoundingClientRect();
+    const pill = tab.getBoundingClientRect();
+    const by =
+      pill.left < bar.left + room
+        ? pill.left - bar.left - room
+        : pill.right > bar.right - room
+          ? pill.right - bar.right + room
+          : 0;
+    if (by) list.scrollBy({ left: by, behavior: reducedMotion() ? "auto" : "smooth" });
   }, [active]);
 
   return (
@@ -73,7 +84,7 @@ export function CategoryTabs({ categories, lang, label }: Props) {
       aria-label={label}
       className="sticky top-[var(--header-h,74px)] z-30 border-b border-chocolate/8 bg-vanilla/94 backdrop-blur-md"
     >
-      <ul className="shell flex [scrollbar-width:none] gap-2 overflow-x-auto py-2.5">
+      <ul ref={listRef} className="shell flex [scrollbar-width:none] gap-2 overflow-x-auto py-2.5">
         {categories.map((category) => (
           <li key={category.id} className="flex-none">
             <a
