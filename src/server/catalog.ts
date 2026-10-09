@@ -114,11 +114,16 @@ async function loadBranches(): Promise<Branch[]> {
   });
 }
 
-async function loadSiteSettings(): Promise<SiteSettings> {
+/**
+ * The public settings rows as stored. The cache keeps the rows, not the
+ * parsed settings, so a new setting (or a changed default) applies at once
+ * instead of waiting for a cached copy from older code to expire.
+ */
+async function loadSiteSettingRows(): Promise<{ key: string; value: unknown }[]> {
   const db = publicClient()!;
   const { data, error } = await db.from("site_settings").select("key, value").eq("is_public", true);
   if (error) throw new Error(`Loading the site settings failed: ${error.message}`);
-  return parseSiteSettings(data ?? []);
+  return data ?? [];
 }
 
 const cachedMenu = unstable_cache(loadMenu, ["menu"], { tags: [catalogTags.menu] });
@@ -127,7 +132,7 @@ const cachedBranches = unstable_cache(loadBranches, ["branches"], {
   // Closures are dated, so the schedule refreshes every few hours even without edits.
   revalidate: 6 * 3600,
 });
-const cachedSiteSettings = unstable_cache(loadSiteSettings, ["site-settings"], {
+const cachedSiteSettingRows = unstable_cache(loadSiteSettingRows, ["site-setting-rows"], {
   tags: [catalogTags.settings],
 });
 
@@ -148,5 +153,5 @@ export async function getOrderingBranch(): Promise<Branch> {
 }
 
 /** The home ticker, the welcome popup and other admin-edited content. */
-export const getSiteSettings = (): Promise<SiteSettings> =>
-  configured() ? cachedSiteSettings() : Promise.resolve(parseSiteSettings([]));
+export const getSiteSettings = async (): Promise<SiteSettings> =>
+  parseSiteSettings(configured() ? await cachedSiteSettingRows() : []);
