@@ -167,6 +167,14 @@ describe("health overview", () => {
     expect(cards.database.status).toBe("good");
   });
 
+  it("leaves out paid WhatsApp alerts until they're set up", () => {
+    const off = { ...setup, whatsapp: false };
+    expect(healthCards(overview, off, now).map((c) => c.key)).not.toContain("alerts");
+    expect(setupRows(overview, off).map((r) => r.name)).not.toContain(
+      "WhatsApp alerts for new orders",
+    );
+  });
+
   it("lists what's connected", () => {
     const rows = Object.fromEntries(setupRows(overview, setup).map((r) => [r.name, r]));
     expect(rows["Meta ads import"].done).toBe(true);

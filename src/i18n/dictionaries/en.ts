@@ -223,6 +223,8 @@ const en = {
     placing: "Placing your order…",
     privacy: "We use your details for this order, and to measure our ads.",
     privacyLink: "Privacy",
+    whatsappNote:
+      "After you place it, you’ll send your order to us on WhatsApp, already written out.",
     errors: {
       name: "Add your name",
       phone: "Add a number we can call",
@@ -268,6 +270,18 @@ const en = {
     notFoundTitle: "We couldn’t find that order.",
     notFoundBody: "Orders show here on the device they were placed from.",
     demo: "Test order: online ordering isn’t connected to the shop yet.",
+  },
+  /** The order, written out for the customer to send to the shop on WhatsApp. */
+  whatsappOrder: {
+    title: "Last step: send it to us on WhatsApp",
+    body: "Your order is written out for you. Just tap send, and we’ll confirm it there.",
+    button: "Send order on WhatsApp",
+    greeting: "Hi The Sweet Spot! Here’s my order {number} from the website.",
+    delivery: "Delivery to {address}",
+    pickup: "Pickup from the shop",
+    note: "Note: {note}",
+    payCod: "cash on delivery",
+    payPickup: "pay at pickup",
   },
   popup: {
     close: "Close",

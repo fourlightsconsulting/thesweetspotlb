@@ -608,6 +608,7 @@ function CheckoutForm({
             </div>
           </Step>
 
+          <p className="font-ui text-[15px] leading-[1.5] font-semibold">{t.whatsappNote}</p>
           <p className="font-ui text-[13px] leading-[1.5] text-cacao">
             {t.privacy}{" "}
             <Link

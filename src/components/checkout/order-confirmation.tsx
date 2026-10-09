@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Heart } from "@/components/doodles";
+import { SocialIcon } from "@/components/icons";
 import { CartTotals } from "@/components/order/cart-summary";
 import { ClockIcon } from "@/components/order/item-sheet";
 import { site } from "@/data/site";
@@ -11,6 +12,7 @@ import { fill } from "@/i18n/format";
 import { routes } from "@/i18n/routes";
 import { clockAfter } from "@/lib/hours";
 import { formatPrice } from "@/lib/money";
+import { orderMessage, whatsappMessageUrl } from "@/lib/order-message";
 import { usePlacedOrder } from "@/lib/order-history";
 import { formatPhoneLocal } from "@/lib/phone";
 
@@ -19,9 +21,12 @@ type Props = {
   orderRef: string;
   t: Dictionary["confirmation"];
   order: Dictionary["order"];
+  whatsapp: Dictionary["whatsappOrder"];
+  /** The shop's WhatsApp number (E.164); without one there's no WhatsApp step. */
+  shopPhone: string | null;
 };
 
-export function OrderConfirmation({ lang, orderRef, t, order: o }: Props) {
+export function OrderConfirmation({ lang, orderRef, t, order: o, whatsapp, shopPhone }: Props) {
   const placed = usePlacedOrder(orderRef);
 
   if (placed === undefined) return <div className="min-h-[60svh]" />;
@@ -74,6 +79,25 @@ export function OrderConfirmation({ lang, orderRef, t, order: o }: Props) {
             </p>
           )}
         </section>
+
+        {/* The shop learns of the order from this message (no paid alerts). */}
+        {shopPhone && (
+          <section className="flex flex-col items-start gap-3 rounded-[24px] border-[2.5px] border-chocolate bg-whipped p-[clamp(20px,3cqw,32px)] shadow-[5px_6px_0_var(--color-chocolate)]">
+            <h2 className="font-display text-[clamp(22px,2cqw,28px)] leading-[1.15] font-black">
+              {whatsapp.title}
+            </h2>
+            <p className="font-body text-[17px] leading-normal text-cacao">{whatsapp.body}</p>
+            <a
+              href={whatsappMessageUrl(shopPhone, orderMessage(placed, lang, whatsapp, o))}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-primary btn-lg mt-1 w-full gap-2.5 sm:w-auto"
+            >
+              <SocialIcon network="whatsapp" className="size-6 [--icon-stroke:2px]" />
+              {whatsapp.button}
+            </a>
+          </section>
+        )}
 
         <ol aria-label={t.progress} className="grid grid-cols-3 gap-2">
           {steps.map((step, i) => (

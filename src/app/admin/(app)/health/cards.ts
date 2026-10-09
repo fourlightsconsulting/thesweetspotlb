@@ -27,7 +27,12 @@ export type Card = {
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
+/** The cards; WhatsApp alerts only when they're set up (they're paid and optional). */
 export function healthCards(d: HealthOverview, setup: Setup, now = Date.now()): Card[] {
+  return allCards(d, setup, now).filter((card) => card.key !== "alerts" || setup.whatsapp);
+}
+
+function allCards(d: HealthOverview, setup: Setup, now: number): Card[] {
   const phones = d.alert_settings?.phones?.length ?? 0;
   const alertsOn = d.alert_settings?.enabled !== false;
   const usual = usualPerHour(d.events.week);
@@ -145,8 +150,18 @@ const jobState = (d: HealthOverview, job: string, needs: string): Omit<SetupRow,
   return { done: false, text: `Failing: ${run.last_error ?? "no details"}` };
 };
 
-/** Every connection the site can have, and whether it's in place. */
+/**
+ * Every connection the site uses, and whether it's in place. Paid WhatsApp
+ * alerts are listed only once set up: orders reach the shop through the
+ * customer's own WhatsApp message otherwise.
+ */
 export function setupRows(d: HealthOverview, setup: Setup): SetupRow[] {
+  return allSetupRows(d, setup).filter(
+    (row) => row.name !== "WhatsApp alerts for new orders" || setup.whatsapp,
+  );
+}
+
+function allSetupRows(d: HealthOverview, setup: Setup): SetupRow[] {
   const phones = d.alert_settings?.phones?.length ?? 0;
   return [
     {

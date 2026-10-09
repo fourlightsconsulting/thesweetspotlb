@@ -38,11 +38,16 @@ export default async function StorePage() {
     db.from("site_settings").select("value").eq("key", "order_alerts").maybeSingle(),
     getOrderingBranch(),
   ]);
-  const { data: notifications } = await db
-    .from("notifications")
-    .select("id, recipient, status, created_at, sent_at, last_error, orders(number)")
-    .order("created_at", { ascending: false })
-    .limit(8);
+  // Paid WhatsApp alerts show only once their settings exist; until then the
+  // customer sends each order to the shop's WhatsApp from the confirmation page.
+  const alertsConnected = whatsappConfig() !== null;
+  const { data: notifications } = alertsConnected
+    ? await db
+        .from("notifications")
+        .select("id, recipient, status, created_at, sent_at, last_error, orders(number)")
+        .order("created_at", { ascending: false })
+        .limit(8)
+    : { data: [] };
   for (const result of [branches, hours, closures, zones]) {
     if (result.error) throw new Error(`Loading the store failed: ${result.error.message}`);
   }
@@ -63,7 +68,7 @@ export default async function StorePage() {
     <>
       <PageHeader
         title="Store"
-        description="Ordering, hours, delivery and alerts. Changes show on the website straight away."
+        description={`Ordering, hours${alertsConnected ? ", delivery and alerts" : " and delivery"}. Changes show on the website straight away.`}
       />
       <div className="flex flex-col gap-6">
         <OrderingSwitch
@@ -80,19 +85,21 @@ export default async function StorePage() {
               pickup={[main.pickup_eta_min, main.pickup_eta_max]}
               delivery={[main.delivery_eta_min, main.delivery_eta_max]}
             />
-            <AlertsForm
-              enabled={alertValue.enabled ?? true}
-              phones={(alertValue.phones ?? []).map(phone)}
-              connected={whatsappConfig() !== null}
-              recent={(notifications ?? []).map((n) => ({
-                id: n.id,
-                order: n.orders ? orderLabel(n.orders.number) : "—",
-                recipient: phone(n.recipient),
-                status: n.status,
-                at: when(n.sent_at ?? n.created_at),
-                error: n.last_error,
-              }))}
-            />
+            {alertsConnected && (
+              <AlertsForm
+                enabled={alertValue.enabled ?? true}
+                phones={(alertValue.phones ?? []).map(phone)}
+                connected
+                recent={(notifications ?? []).map((n) => ({
+                  id: n.id,
+                  order: n.orders ? orderLabel(n.orders.number) : "—",
+                  recipient: phone(n.recipient),
+                  status: n.status,
+                  at: when(n.sent_at ?? n.created_at),
+                  error: n.last_error,
+                }))}
+              />
+            )}
           </div>
         )}
 
