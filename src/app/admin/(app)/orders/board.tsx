@@ -392,6 +392,7 @@ function OrderCard({ order, now, onOpen, onMoved }: CardProps) {
           >
             {orderLabel(order.number)}
           </button>
+          {order.is_test && <span className="pill ms-2">Test</span>}
           <p className="truncate text-[13px] text-muted">
             {order.customer_name} · {phone(order.customer_phone)}
           </p>

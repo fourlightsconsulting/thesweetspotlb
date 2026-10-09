@@ -4,7 +4,7 @@ import type { QueryData, SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
 export const orderSelect =
-  "id, number, status, fulfilment, payment_method, payment_status, customer_id, customer_name, customer_phone, delivery_zone_name_en, address_street, address_floor, delivery_note, subtotal_cents, discount_cents, delivery_fee_cents, total_cents, quoted_total_cents, discount_code, eta_min_minutes, eta_max_minutes, cancel_reason, placed_at, preparing_at, ready_at, completed_at, cancelled_at, order_items(id, position, product_slug, name_en, quantity, unit_price_cents, line_total_cents, note, order_item_options(id, group_key, group_name_en, option_name_en, price_cents))";
+  "id, number, is_test, status, fulfilment, payment_method, payment_status, customer_id, customer_name, customer_phone, delivery_zone_name_en, address_street, address_floor, delivery_note, subtotal_cents, discount_cents, delivery_fee_cents, total_cents, quoted_total_cents, discount_code, eta_min_minutes, eta_max_minutes, cancel_reason, placed_at, preparing_at, ready_at, completed_at, cancelled_at, order_items(id, position, product_slug, name_en, quantity, unit_price_cents, line_total_cents, note, order_item_options(id, group_key, group_name_en, option_name_en, price_cents))";
 
 export const orderQuery = (db: SupabaseClient<Database>) => db.from("orders").select(orderSelect);
 

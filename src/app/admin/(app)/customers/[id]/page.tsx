@@ -5,13 +5,13 @@ import { dateOf, money, orderLabel, phone, when, whatsappLink } from "@/componen
 import { Icon } from "@/components/admin/icons";
 import { PageHeader } from "@/components/admin/page-header";
 import { adminClient } from "@/lib/supabase/server";
-import { requireStaff } from "@/server/admin/session";
+import { atLeast, requireStaff } from "@/server/admin/session";
 import { statusLabel } from "../../orders/data";
 
 export const metadata: Metadata = { title: "Customer" };
 
 export default async function CustomerPage({ params }: PageProps<"/admin/customers/[id]">) {
-  await requireStaff();
+  const staff = await requireStaff();
   const { id } = await params;
   if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
 
@@ -34,6 +34,18 @@ export default async function CustomerPage({ params }: PageProps<"/admin/custome
   ]);
   const c = summary.data;
   if (!c) notFound();
+
+  // How they found us: the visit credited with their first order (managers).
+  const firstOrder = (orders.data ?? []).filter((o) => o.status !== "cancelled").at(-1);
+  const found =
+    firstOrder && atLeast(staff.role, "manager")
+      ? ((await db.rpc("order_source", { p_order: firstOrder.id })).data as {
+          channel: string;
+          source: string;
+          campaign: string | null;
+          rule: string;
+        } | null)
+      : null;
 
   // Favourites: the items they order most.
   const counts = new Map<string, number>();
@@ -169,7 +181,15 @@ export default async function CustomerPage({ params }: PageProps<"/admin/custome
           </section>
           <section className="card p-4">
             <h2 className="mb-1 text-base font-bold">How they found us</h2>
-            <p className="text-muted">Shows once website tracking is on.</p>
+            {found ? (
+              <p>
+                {found.channel}
+                {found.rule !== "direct" && <span className="text-muted"> · {found.source}</span>}
+                {found.campaign && <span className="text-muted"> · {found.campaign}</span>}
+              </p>
+            ) : (
+              <p className="text-muted">Not known: their first order has no tracked visit.</p>
+            )}
           </section>
         </div>
       </div>

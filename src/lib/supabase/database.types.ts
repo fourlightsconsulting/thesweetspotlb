@@ -947,6 +947,7 @@ export type Database = {
           fulfilment: Database["public"]["Enums"]["fulfilment"];
           id: string;
           idempotency_key: string;
+          is_test: boolean;
           locale: Database["public"]["Enums"]["locale"];
           meta_relayed_at: string | null;
           number: number;
@@ -992,6 +993,7 @@ export type Database = {
           fulfilment: Database["public"]["Enums"]["fulfilment"];
           id?: string;
           idempotency_key: string;
+          is_test?: boolean;
           locale?: Database["public"]["Enums"]["locale"];
           meta_relayed_at?: string | null;
           number?: number;
@@ -1037,6 +1039,7 @@ export type Database = {
           fulfilment?: Database["public"]["Enums"]["fulfilment"];
           id?: string;
           idempotency_key?: string;
+          is_test?: boolean;
           locale?: Database["public"]["Enums"]["locale"];
           meta_relayed_at?: string | null;
           number?: number;
@@ -1298,6 +1301,7 @@ export type Database = {
           table_name: string;
         }[];
       };
+      beirut_start: { Args: { p_day: string }; Returns: string };
       branch_is_open: {
         Args: { p_at?: string; p_branch: string };
         Returns: boolean;
@@ -1316,6 +1320,15 @@ export type Database = {
           total_cents: number;
         }[];
       };
+      dashboard_marketing: {
+        Args: { p_from: string; p_to: string };
+        Returns: Json;
+      };
+      dashboard_orders: {
+        Args: { p_from: string; p_to: string };
+        Returns: Json;
+      };
+      dashboard_web: { Args: { p_from: string; p_to: string }; Returns: Json };
       database_usage: {
         Args: never;
         Returns: {
@@ -1334,12 +1347,31 @@ export type Database = {
         Args: { p_rows: Json; p_source: string };
         Returns: number;
       };
+      order_attribution: {
+        Args: { p_from: string; p_to: string };
+        Returns: {
+          campaign: string;
+          channel: string;
+          content: string;
+          food_cents: number;
+          medium: string;
+          order_id: string;
+          placed_at: string;
+          rule: string;
+          source: string;
+          term: string;
+          total_cents: number;
+          visit_id: string;
+        }[];
+      };
+      order_source: { Args: { p_order: string }; Returns: Json };
       order_status_rank: {
         Args: { s: Database["public"]["Enums"]["order_status"] };
         Returns: number;
       };
       purge_event_pii: { Args: never; Returns: number };
       reconcile_jobs: { Args: never; Returns: number };
+      referrer_name: { Args: { p_referrer: string }; Returns: string };
       replace_ad_performance: {
         Args: {
           p_account_id: string;
@@ -1371,6 +1403,43 @@ export type Database = {
           last_sign_in_at: string;
           role: Database["public"]["Enums"]["staff_role"];
           user_id: string;
+        }[];
+      };
+      traffic_channel: {
+        Args: {
+          p_fbclid: string;
+          p_gclid: string;
+          p_medium: string;
+          p_referrer_name: string;
+          p_source: string;
+        };
+        Returns: string;
+      };
+      visit_summaries: {
+        Args: { p_since: string; p_until: string };
+        Returns: {
+          campaign: string;
+          carts: number;
+          channel: string;
+          checkouts: number;
+          content: string;
+          country: string;
+          device: string;
+          events: number;
+          exit_page: string;
+          item_views: number;
+          landing_page: string;
+          locale: string;
+          medium: string;
+          ordered: boolean;
+          page_views: number;
+          paid: boolean;
+          source: string;
+          started_at: string;
+          term: string;
+          touch_at: string;
+          visit_id: string;
+          visitor_id: string;
         }[];
       };
     };

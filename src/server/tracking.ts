@@ -10,7 +10,7 @@ import { metaCapiConfigured, type MetaServerEvent, sendMetaEvents } from "./meta
 // the sweep that sends Meta whatever couldn't go at the time.
 //
 // orders.meta_relayed_at is set once an order is dealt with for Meta: its
-// Purchase sent, or deliberately not (a staff test order).
+// Purchase sent, or deliberately not (a staff test order, also is_test).
 
 type Db = SupabaseClient<Database>;
 
@@ -78,7 +78,12 @@ export async function reportOrderPlaced(
     });
   }
 
-  if (request.internal) await markOrders(db, [order.id]);
+  // A staff test order: out of the numbers, and never reported to Meta.
+  if (request.internal)
+    await db
+      .from("orders")
+      .update({ is_test: true, meta_relayed_at: new Date().toISOString() })
+      .eq("id", order.id);
   else if (metaCapiConfigured()) await relayOrders(db, [order.id]);
 }
 

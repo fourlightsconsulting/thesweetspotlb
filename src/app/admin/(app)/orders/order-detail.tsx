@@ -34,7 +34,12 @@ export function StatusPill({ order }: { order: Order }) {
         : order.status === "completed"
           ? ""
           : "bg-accent-soft text-accent";
-  return <span className={`pill ${tone}`}>{statusLabel(order)}</span>;
+  return (
+    <>
+      <span className={`pill ${tone}`}>{statusLabel(order)}</span>
+      {order.is_test && <span className="pill">Test order</span>}
+    </>
+  );
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
