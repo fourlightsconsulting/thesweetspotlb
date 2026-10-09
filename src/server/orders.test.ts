@@ -51,7 +51,7 @@ describe("placeOrder", () => {
     });
     expect(result.order.phone).toBe("+96171234567");
     expect(result.order.number).toMatch(/^TSS-\d{4}$/);
-    expect(result.order.lines[0].options.en).toBe("Nutella · Strawberries");
+    expect(result.order.lines[0].options.en).toEqual(["Nutella", "Strawberries"]);
     expect(result.order.demo).toBe(true);
   });
 

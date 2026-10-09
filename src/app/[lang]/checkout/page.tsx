@@ -29,8 +29,11 @@ export default async function Checkout({ params }: PageProps<"/[lang]/checkout">
       lang={lang}
       t={t.checkout}
       order={t.order}
+      confirmation={t.confirmation}
+      whatsapp={t.whatsappOrder}
       menu={menu}
       branch={{ schedule, eta, zones }}
+      shopPhone={branch.phone}
     />
   );
 }

@@ -51,9 +51,12 @@ function allCards(d: HealthOverview, setup: Setup, now: number): Card[] {
         setup.ordersSave
           ? `${plural(d.orders.today, "order")} today${d.orders.tests_today ? ` (and ${plural(d.orders.tests_today, "test order")})` : ""}`
           : "Orders can’t save until SUPABASE_SECRET_KEY is set.",
-        d.orders.waiting
-          ? `${plural(d.orders.waiting, "order")} waiting over 10 minutes, the oldest for ${ago(d.orders.oldest_waiting!, new Date(now))}`
-          : "Nothing waiting too long.",
+        // Only while orders have steps again (they're completed once placed for now).
+        ...(d.orders.waiting
+          ? [
+              `${plural(d.orders.waiting, "order")} waiting over 10 minutes, the oldest for ${ago(d.orders.oldest_waiting!, new Date(now))}`,
+            ]
+          : []),
         d.orders.last_order
           ? `Last order ${when(d.orders.last_order, new Date(now))}`
           : "No orders in the last 30 days.",

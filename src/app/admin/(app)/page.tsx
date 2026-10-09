@@ -86,9 +86,8 @@ export default async function AdminHome({ searchParams }: PageProps<"/admin">) {
   const db = await adminClient();
   const since = startOfBeirutDay();
 
-  const [today, waiting, branch] = await Promise.all([
+  const [today, branch] = await Promise.all([
     db.from("orders").select("total_cents, status").gte("placed_at", since).eq("is_test", false),
-    db.from("orders").select("id", { count: "exact", head: true }).eq("status", "received"),
     getOrderingBranch(),
   ]);
   const orders = (today.data ?? []).filter((o) => o.status !== "cancelled");
@@ -97,11 +96,6 @@ export default async function AdminHome({ searchParams }: PageProps<"/admin">) {
   const tiles = [
     { label: "Orders today", value: String(orders.length) },
     { label: "Sales today", value: `$${(revenue / 100).toFixed(2)}` },
-    {
-      label: "Waiting to start",
-      value: String(waiting.count ?? 0),
-      tone: (waiting.count ?? 0) > 0 ? "text-wait" : "",
-    },
   ];
 
   const params = await searchParams;
@@ -111,11 +105,11 @@ export default async function AdminHome({ searchParams }: PageProps<"/admin">) {
   return (
     <>
       <PageHeader title={`Hi, ${staff.name.split(" ")[0]}`} />
-      <div className="grid grid-cols-2 gap-3 wide:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3">
         {tiles.map((tile) => (
           <div key={tile.label} className="card p-4">
             <p className="text-[13px] text-muted">{tile.label}</p>
-            <p className={`mt-1 text-2xl leading-8 font-bold tabular-nums ${tile.tone ?? ""}`}>
+            <p className="mt-1 text-2xl leading-8 font-bold tabular-nums">
               {tile.value}
             </p>
           </div>

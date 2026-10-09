@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import type { Order } from "../data";
 import { OrderActions } from "../order-detail";
 
-/** The order's buttons on its own page, which reloads after each move. */
+/** Cancelling on the order's own page, which reloads after it. */
 export function RefreshingActions({ order }: { order: Order }) {
   const router = useRouter();
-  return <OrderActions key={order.status} order={order} onMoved={() => router.refresh()} />;
+  if (order.status === "cancelled") return null;
+  return <OrderActions order={order} onCancelled={() => router.refresh()} />;
 }

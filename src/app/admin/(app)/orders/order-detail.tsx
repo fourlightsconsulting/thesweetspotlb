@@ -4,16 +4,8 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { money, orderLabel, phone, timeOf, when, whatsappLink } from "@/components/admin/format";
 import { Icon } from "@/components/admin/icons";
-import { advanceOrder, cancelOrder } from "./actions";
-import {
-  cancelReasons,
-  describeOptions,
-  dueAt,
-  nextStep,
-  type Order,
-  type OrderStatus,
-  statusLabel,
-} from "./data";
+import { cancelOrder } from "./actions";
+import { cancelReasons, describeOptions, dueAt, type Order, statusLabel } from "./data";
 
 const paymentLabel = (order: Order) =>
   `${order.payment_method === "cash_on_delivery" ? "Cash on delivery" : "Pay at pickup"} · ${
@@ -56,12 +48,6 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 /** Everything about one order, for the drawer and the order page. */
 export function OrderDetail({ order }: { order: Order }) {
   const shownTotal = order.quoted_total_cents;
-  const steps: [string, string | null][] = [
-    ["Placed", order.placed_at],
-    ["Started", order.preparing_at],
-    [order.fulfilment === "delivery" ? "Sent out" : "Ready", order.ready_at],
-    [order.fulfilment === "delivery" ? "Delivered" : "Picked up", order.completed_at],
-  ];
 
   return (
     <div>
@@ -152,52 +138,41 @@ export function OrderDetail({ order }: { order: Order }) {
         )}
       </Section>
 
-      <Section title="Progress">
-        <ol className="flex flex-col gap-1 text-[13px]">
-          {steps.map(([label, at]) => (
-            <li key={label} className="flex justify-between">
-              <span className={at ? "" : "text-muted"}>{label}</span>
-              <span className="text-muted tabular-nums">{at ? when(at) : "—"}</span>
-            </li>
-          ))}
-          {order.cancelled_at && (
-            <li className="flex justify-between text-bad">
-              <span>Cancelled{order.cancel_reason ? `: ${order.cancel_reason}` : ""}</span>
-              <span className="tabular-nums">{when(order.cancelled_at)}</span>
-            </li>
-          )}
-        </ol>
-      </Section>
+      {order.cancelled_at && (
+        <Section title="Cancelled">
+          <p className="flex justify-between gap-3 text-[13px] text-bad">
+            <span>{order.cancel_reason}</span>
+            <span className="tabular-nums">{when(order.cancelled_at)}</span>
+          </p>
+        </Section>
+      )}
     </div>
   );
 }
 
 type ActionsProps = {
   order: Order;
-  /** Called once the database accepted the move (the board updates at once). */
-  onMoved?: (status: OrderStatus, reason?: string) => void;
+  /** Called once the database accepted it (the board updates at once). */
+  onCancelled?: (reason: string) => void;
 };
 
-/** The next-step button and cancelling, with a reason. */
-export function OrderActions({ order, onMoved }: ActionsProps) {
+/** Cancelling, with a reason: the one thing left to do with a placed order. */
+export function OrderActions({ order, onCancelled }: ActionsProps) {
   const [saving, startSaving] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
   const [reason, setReason] = useState(cancelReasons[0]);
   const [other, setOther] = useState("");
-  const step = nextStep(order);
-  if (!step) return null;
-
-  const run = (action: () => Promise<{ error: string | null }>, then: () => void) => {
-    setError(null);
-    startSaving(async () => {
-      const result = await action();
-      if (result.error) setError(result.error);
-      else then();
-    });
-  };
 
   const finalReason = reason === "other" ? other : reason;
+  const cancel = () => {
+    setError(null);
+    startSaving(async () => {
+      const result = await cancelOrder(order.id, finalReason);
+      if (result.error) setError(result.error);
+      else onCancelled?.(finalReason);
+    });
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -237,12 +212,7 @@ export function OrderActions({ order, onMoved }: ActionsProps) {
               type="button"
               className="btn btn-danger flex-1"
               disabled={!finalReason.trim()}
-              onClick={() =>
-                run(
-                  () => cancelOrder(order.id, finalReason),
-                  () => onMoved?.("cancelled", finalReason),
-                )
-              }
+              onClick={cancel}
             >
               {saving ? "Cancelling…" : "Cancel the order"}
             </button>
@@ -252,29 +222,13 @@ export function OrderActions({ order, onMoved }: ActionsProps) {
           </div>
         </fieldset>
       ) : (
-        <div className="flex gap-2">
-          <button
-            type="button"
-            disabled={saving}
-            className="btn btn-primary min-h-11 flex-1 text-[15px]"
-            onClick={() =>
-              run(
-                () => advanceOrder(order.id, step.to),
-                () => onMoved?.(step.to),
-              )
-            }
-          >
-            {saving ? "Saving…" : step.label}
-          </button>
-          <button
-            type="button"
-            disabled={saving}
-            className="btn btn-secondary min-h-11"
-            onClick={() => setCancelling(true)}
-          >
-            Cancel…
-          </button>
-        </div>
+        <button
+          type="button"
+          className="btn btn-secondary min-h-11 self-start"
+          onClick={() => setCancelling(true)}
+        >
+          Cancel order…
+        </button>
       )}
     </div>
   );

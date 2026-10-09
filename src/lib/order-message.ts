@@ -5,10 +5,11 @@ import type { PlacedOrder } from "./checkout";
 import { formatPrice } from "./money";
 import { formatPhoneLocal } from "./phone";
 
-// The order as a WhatsApp message the customer sends to the shop from the
-// confirmation page: the shop gets every order in the WhatsApp it already
-// has open, without paid business alerts. In the customer's language, with
-// the order number in bold (*…*) so staff can find it on the Orders board.
+// The order as a WhatsApp message the customer sends to the shop as soon as
+// they place it: the shop gets every order in the WhatsApp it already has
+// open, without paid business alerts. In the customer's language, one detail
+// per line, each item's choices as a list ("- "), and the order number in
+// bold (*…*) so staff can find it in the admin.
 
 type Labels = Pick<Dictionary["order"], "subtotal" | "deliveryFee" | "discount" | "total">;
 
@@ -19,14 +20,25 @@ export function orderMessage(
   labels: Labels,
 ) {
   const money = (cents: number) => formatPrice(cents, lang);
-  const { totals } = order;
-  const delivery = order.mode === "delivery";
-  const comma = lang === "ar" ? "، " : ", ";
+  const { address, totals } = order;
+  // Arabic text would reorder the number's groups; an isolate keeps it as typed.
+  const phone = `+961 ${formatPhoneLocal(order.phone)}`;
+
+  const customer = [
+    `${t.name}: ${order.name}`,
+    `${t.phone}: ${lang === "ar" ? `⁦${phone}⁩` : phone}`,
+    address
+      ? `${t.address}: ${[address.zone[lang], address.street, address.floor]
+          .filter(Boolean)
+          .join(lang === "ar" ? "، " : ", ")}`
+      : t.pickup,
+    ...(address?.note ? [`${t.driverNote}: ${address.note}`] : []),
+  ];
 
   const items = order.lines.flatMap((line) => [
     `${line.qty} × ${line.name[lang]}`,
-    ...(line.options[lang] ? [`   ${line.options[lang]}`] : []),
-    ...(line.note ? [`   ${fill(t.note, { note: line.note })}`] : []),
+    ...line.options[lang].map((option) => `- ${option}`),
+    ...(line.note ? [`- ${fill(t.note, { note: line.note })}`] : []),
   ]);
 
   const sums = [
@@ -37,26 +49,17 @@ export function orderMessage(
         ]
       : []),
     ...(totals.deliveryFee > 0 ? [`${labels.deliveryFee}: ${money(totals.deliveryFee)}`] : []),
-    `*${labels.total}: ${money(totals.total)}*${comma}${delivery ? t.payCod : t.payPickup}`,
+    `*${labels.total}: ${money(totals.total)}*`,
   ];
-
-  const where = order.address
-    ? fill(t.delivery, {
-        address: [order.address.zone[lang], order.address.street, order.address.floor]
-          .filter(Boolean)
-          .join(comma),
-      })
-    : t.pickup;
 
   return [
     fill(t.greeting, { number: `*${order.number}*` }),
     "",
+    ...customer,
+    "",
     ...items,
     "",
     ...sums,
-    "",
-    where,
-    `${order.name} · +961 ${formatPhoneLocal(order.phone)}`,
   ].join("\n");
 }
 

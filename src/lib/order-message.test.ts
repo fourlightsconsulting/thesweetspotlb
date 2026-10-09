@@ -7,51 +7,55 @@ import { orderMessage, whatsappMessageUrl } from "./order-message";
 const order: PlacedOrder = {
   ref: "4f0c2a3e-1111-4222-8333-944455556666",
   number: "TSS-1042",
-  placedAt: "2026-10-09T18:00:00Z",
   mode: "delivery",
   name: "Rana",
   phone: "+96170123456",
-  address: { zone: { en: "Mina", ar: "الميناء" }, street: "Port street", floor: "3rd floor" },
+  address: {
+    zone: { en: "Mina", ar: "الميناء" },
+    street: "Port street",
+    floor: "3rd floor",
+    note: "Ring twice",
+  },
   lines: [
     {
       name: { en: "Nutella Crêpe", ar: "كريب نوتيلا" },
-      options: { en: "Strawberries", ar: "فريز" },
+      options: { en: ["Strawberries", "Banana"], ar: ["فريز", "موز"] },
       note: "No nuts",
       qty: 2,
-      total: 1300,
     },
     {
       name: { en: "Oreo Milkshake", ar: "ميلك شيك أوريو" },
-      options: { en: "", ar: "" },
+      options: { en: [], ar: [] },
       note: "",
       qty: 1,
-      total: 500,
     },
   ],
   totals: { subtotal: 1800, discount: 360, deliveryFee: 200, total: 1640 },
   promoCode: "SWEET20",
-  eta: [30, 45],
   demo: false,
 };
 
 describe("orderMessage", () => {
-  it("writes the whole order for the shop", () => {
+  it("writes the whole order for the shop, one detail per line", () => {
     expect(orderMessage(order, "en", en.whatsappOrder, en.order)).toBe(
       [
         "Hi The Sweet Spot! Here’s my order *TSS-1042* from the website.",
         "",
+        "Name: Rana",
+        "Phone: +961 70 123 456",
+        "Delivery address: Mina, Port street, 3rd floor",
+        "Note for the driver: Ring twice",
+        "",
         "2 × Nutella Crêpe",
-        "   Strawberries",
-        "   Note: No nuts",
+        "- Strawberries",
+        "- Banana",
+        "- Note: No nuts",
         "1 × Oreo Milkshake",
         "",
         "Subtotal: $18.00",
         "Discount (SWEET20): −$3.60",
         "Delivery fee: $2.00",
-        "*Total: $16.40*, cash on delivery",
-        "",
-        "Delivery to Mina, Port street, 3rd floor",
-        "Rana · +961 70 123 456",
+        "*Total: $16.40*",
       ].join("\n"),
     );
   });
@@ -65,18 +69,20 @@ describe("orderMessage", () => {
       totals: { subtotal: 1800, discount: 0, deliveryFee: 0, total: 1800 },
     };
     const text = orderMessage(pickup, "en", en.whatsappOrder, en.order);
-    expect(text).toContain("*Total: $18.00*, pay at pickup");
-    expect(text).toContain("Pickup from the shop");
+    expect(text).toContain("Phone: +961 70 123 456\nPickup from the shop\n\n2 × Nutella Crêpe");
+    expect(text.endsWith("*Total: $18.00*")).toBe(true);
     expect(text).not.toContain("Discount");
     expect(text).not.toContain("Delivery fee");
+    expect(text).not.toContain("driver");
   });
 
-  it("writes Arabic orders in Arabic", () => {
+  it("writes Arabic orders in Arabic, the phone number left to right", () => {
     const text = orderMessage(order, "ar", ar.whatsappOrder, ar.order);
     expect(text.split("\n")[0]).toBe("مرحبا ذا سويت سبوت! هيدا طلبي *TSS-1042* من الموقع.");
-    expect(text).toContain("2 × كريب نوتيلا");
-    expect(text).toContain("، الدفع كاش عند التوصيل");
-    expect(text).toContain("توصيل لـ الميناء، Port street، 3rd floor");
+    expect(text).toContain("الرقم: ⁦+961 70 123 456⁩");
+    expect(text).toContain("عنوان التوصيل: الميناء، Port street، 3rd floor");
+    expect(text).toContain("2 × كريب نوتيلا\n- فريز\n- موز");
+    expect(text).not.toContain("الدفع");
   });
 
   it("opens WhatsApp with the message typed in", () => {

@@ -194,12 +194,11 @@ export function unitPrice(item: MenuItem, menu: MenuLookup, selections: Selectio
 }
 
 /**
- * The short line under an item in the order ("Chocolate · Banana · Hazelnut
- * crunch"): every add-on, plus single choices that differ from the default.
- * Bundles list each pick with its own: "Nutella Crêpe (Strawberries) · Oreo
- * Milkshake".
+ * An item's choices as the order lists them: every add-on, plus single
+ * choices that differ from the default. Bundles list each pick with its own:
+ * "Nutella Crêpe (Strawberries)".
  */
-export function describeSelections(
+export function selectionParts(
   item: MenuItem,
   menu: MenuLookup,
   selections: Selections,
@@ -222,8 +221,16 @@ export function describeSelections(
         : option.name[lang],
     );
   }
-  return parts.join(" · ");
+  return parts;
 }
+
+/** The short line under an item in the order: "Chocolate · Banana · Hazelnut crunch". */
+export const describeSelections = (
+  item: MenuItem,
+  menu: MenuLookup,
+  selections: Selections,
+  lang: Locale,
+) => selectionParts(item, menu, selections, lang).join(" · ");
 
 export type LineInput = { itemId: string; qty: number; selections: Selections };
 

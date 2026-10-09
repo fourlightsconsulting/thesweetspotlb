@@ -120,11 +120,6 @@ export function formatClock(minutes: number, lang: Locale) {
   return `${time} ${hour < 12 ? "am" : "pm"}`;
 }
 
-/** The Beirut clock time `minutesFromNow` after `date`, formatted for display. */
-export function clockAfter(date: Date, minutesFromNow: number, lang: Locale) {
-  return formatClock(beirutTime(date).minutes + minutesFromNow, lang);
-}
-
 /**
  * Opening-hours copy: "12 pm" in English; in Arabic the hour with its part
  * of the day ("12 ظهراً", "1 فجراً"), as the shop writes it.

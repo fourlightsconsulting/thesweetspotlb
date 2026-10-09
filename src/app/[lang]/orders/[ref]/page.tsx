@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { OrderConfirmation } from "@/components/checkout/order-confirmation";
 import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
-import { getOrderingBranch } from "@/server/catalog";
 
 // Order refs are made at checkout, so this page renders on request.
 export const dynamicParams = true;
@@ -17,19 +16,10 @@ export async function generateMetadata({
   return { title: confirmation.metaTitle, robots: { index: false } };
 }
 
-export default async function OrderStatus({ params }: PageProps<"/[lang]/orders/[ref]">) {
+export default async function OrderPlacedPage({ params }: PageProps<"/[lang]/orders/[ref]">) {
   const { lang, ref } = await params;
   if (!hasLocale(lang) || !/^[0-9a-f-]{36}$/.test(ref)) notFound();
-  const [t, branch] = await Promise.all([getDictionary(lang), getOrderingBranch()]);
+  const t = await getDictionary(lang);
 
-  return (
-    <OrderConfirmation
-      lang={lang}
-      orderRef={ref}
-      t={t.confirmation}
-      order={t.order}
-      whatsapp={t.whatsappOrder}
-      shopPhone={branch.phone}
-    />
-  );
+  return <OrderConfirmation lang={lang} orderRef={ref} t={t.confirmation} />;
 }

@@ -114,7 +114,6 @@ type TotalsProps = {
   totals: Totals;
   lang: Locale;
   t: Dictionary["order"];
-  /** Delivery fee shown as "from $X" while the area isn't chosen yet. */
 };
 
 export function CartTotals({ totals, lang, t }: TotalsProps) {

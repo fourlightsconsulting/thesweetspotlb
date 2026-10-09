@@ -1,4 +1,4 @@
-// Shapes shared by the checkout form, the server action and the confirmation page.
+// Shapes shared by the checkout form, the server action and the thanks page.
 import type { Localized } from "@/data/menu";
 import type { Fulfilment } from "@/data/ordering";
 import type { Locale } from "@/i18n/config";
@@ -38,19 +38,18 @@ export type PlaceOrderInput = {
   } | null;
 };
 
+/** What the customer sends the shop on WhatsApp, and the thanks card shows. */
 export type PlacedOrder = {
   ref: string;
   number: string;
-  placedAt: string;
   mode: Fulfilment;
   name: string;
   phone: string;
-  address: { zone: Localized; street: string; floor: string } | null;
-  lines: { name: Localized; options: Localized; note: string; qty: number; total: number }[];
+  address: { zone: Localized; street: string; floor: string; note: string } | null;
+  /** Each line's choices, one per entry. */
+  lines: { name: Localized; options: Record<Locale, string[]>; note: string; qty: number }[];
   totals: Totals;
   promoCode: string | null;
-  /** Minutes from `placedAt`: [from, to]. */
-  eta: [number, number];
   /** True while orders aren't connected to the shop yet (development). */
   demo: boolean;
 };

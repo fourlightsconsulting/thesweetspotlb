@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   type FormEvent,
   type ReactNode,
@@ -11,6 +10,7 @@ import {
   useTransition,
 } from "react";
 import { checkPromoAction, placeOrderAction } from "@/app/[lang]/checkout/actions";
+import { SocialIcon } from "@/components/icons";
 import { CartLines, CartTotals, trackItems, usePricedCart } from "@/components/order/cart-summary";
 import { ClockIcon } from "@/components/order/item-sheet";
 import { ClosedNote, etaLabel, opensLabel } from "@/components/order/order-view";
@@ -32,14 +32,20 @@ import {
 } from "@/lib/checkout";
 import { formatPrice } from "@/lib/money";
 import { saveOrder } from "@/lib/order-history";
+import { orderMessage, whatsappMessageUrl } from "@/lib/order-message";
 import { orderTotals, type PromoRule } from "@/lib/pricing";
+import { OrderPlaced } from "./order-confirmation";
 
 type Props = {
   lang: Locale;
   t: Dictionary["checkout"];
   order: Dictionary["order"];
+  confirmation: Dictionary["confirmation"];
+  whatsapp: Dictionary["whatsappOrder"];
   menu: Menu;
   branch: OrderingInfo;
+  /** The shop's WhatsApp (E.164), where each order is sent. */
+  shopPhone: string | null;
 };
 
 const SAVED_KEY = "tss.customer.v1";
@@ -98,6 +104,18 @@ export function CheckoutView(props: Props) {
   );
 }
 
+/**
+ * Opens the shop's chat with the order typed in. Phones hand wa.me links to
+ * the WhatsApp app and keep this tab on the thanks card; computers get
+ * WhatsApp Web in a tab of its own, or in this one if the browser blocks that.
+ */
+function openWhatsApp(url: string) {
+  const computer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const tab = computer ? window.open(url, "_blank") : null;
+  if (tab) tab.opener = null;
+  else window.location.assign(url);
+}
+
 /** One key per checkout attempt, kept for retries until the order goes through. */
 function idempotencyKey() {
   try {
@@ -113,11 +131,13 @@ function CheckoutForm({
   lang,
   t,
   order,
+  confirmation,
+  whatsapp,
   menu,
   branch,
+  shopPhone,
   initialFields,
 }: Props & { initialFields: CheckoutFields }) {
-  const router = useRouter();
   const { cart, lines, subtotal, count } = usePricedCart(menu);
   const status = useOrderingStatus(branch.schedule);
   const [fields, setFields] = useState<CheckoutFields>(initialFields);
@@ -130,7 +150,7 @@ function CheckoutForm({
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [placing, startPlacing] = useTransition();
   const [checkingPromo, startCheckingPromo] = useTransition();
-  const [placed, setPlaced] = useState(false);
+  const [placed, setPlaced] = useState<PlacedOrder | null>(null);
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const mode = cart.mode;
@@ -266,7 +286,6 @@ function CheckoutForm({
   };
 
   const finish = (placedOrder: PlacedOrder) => {
-    setPlaced(true);
     saveOrder(placedOrder);
     // The driver note is for this order only.
     write(localStorage, SAVED_KEY, remember ? { ...fields, driverNote: "" } : null);
@@ -281,10 +300,18 @@ function CheckoutForm({
       ...(placedOrder.promoCode ? { coupon: placedOrder.promoCode } : {}),
     });
     cartActions.clear();
-    router.replace(routes(lang).orderStatus(placedOrder.ref));
+    // The thanks card takes the form's place, at the order's own address so
+    // Back and reload find it; then WhatsApp opens with the order.
+    window.history.replaceState(null, "", routes(lang).orderStatus(placedOrder.ref));
+    setPlaced(placedOrder);
+    window.scrollTo({ top: 0 });
+    if (shopPhone)
+      openWhatsApp(whatsappMessageUrl(shopPhone, orderMessage(placedOrder, lang, whatsapp, order)));
   };
 
-  if (!placed && lines.length === 0) {
+  if (placed) return <OrderPlaced lang={lang} t={confirmation} order={placed} />;
+
+  if (lines.length === 0) {
     return (
       <div className="shell flex flex-col items-start gap-4 pt-[clamp(28px,3.4cqw,52px)] pb-section">
         <BackLink lang={lang} label={t.back} />
@@ -298,7 +325,7 @@ function CheckoutForm({
   }
 
   const placeLabel = `${placing ? t.placing : t.place} · ${formatPrice(totals.total, lang)}`;
-  const disabled = placing || placed || closed;
+  const disabled = placing || closed;
   const eta = etaLabel(mode, order, branch.eta);
 
   const summary = (
@@ -435,7 +462,7 @@ function CheckoutForm({
                     onChange={(e) => update("phone", e.target.value)}
                     maxLength={24}
                     aria-invalid={Boolean(errors.phone)}
-                    aria-describedby={`phone-hint${errors.phone ? " phone-error" : ""}`}
+                    aria-describedby={errors.phone ? "phone-error" : undefined}
                     className="min-w-0 flex-1 bg-transparent px-3.5 font-ui text-base placeholder:text-cacao/55 focus:outline-none"
                   />
                 </div>
@@ -468,7 +495,6 @@ function CheckoutForm({
                           className="sr-only"
                         />
                         {z.name[lang]}
-                        <span className="opacity-75">· {formatPrice(z.fee, lang)}</span>
                       </label>
                     ))}
                   </div>
@@ -607,13 +633,23 @@ function CheckoutForm({
             {t.summary}
           </h2>
           {summary}
-          <PlaceButton label={placeLabel} disabled={disabled} placing={placing} />
+          <PlaceButton
+            label={placeLabel}
+            disabled={disabled}
+            placing={placing}
+            whatsapp={Boolean(shopPhone)}
+          />
         </aside>
       </div>
 
       {/* Phones: the button stays in reach at the bottom of the screen. */}
       <div className="fixed inset-x-0 bottom-0 z-30 border-t border-chocolate/10 bg-vanilla/95 px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))] backdrop-blur-md desk:hidden">
-        <PlaceButton label={placeLabel} disabled={disabled} placing={placing} />
+        <PlaceButton
+          label={placeLabel}
+          disabled={disabled}
+          placing={placing}
+          whatsapp={Boolean(shopPhone)}
+        />
       </div>
     </form>
   );
@@ -707,27 +743,32 @@ function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps
   );
 }
 
+/** Placing the order also opens WhatsApp to send it, hence its icon. */
 function PlaceButton({
   label,
   disabled,
   placing,
+  whatsapp,
 }: {
   label: string;
   disabled: boolean;
   placing: boolean;
+  whatsapp: boolean;
 }) {
   return (
     <button
       type="submit"
       disabled={disabled}
       aria-busy={placing || undefined}
-      className="btn btn-primary btn-lg w-full disabled:cursor-not-allowed disabled:opacity-60"
+      className="btn btn-primary btn-lg w-full gap-2.5 disabled:cursor-not-allowed disabled:opacity-60"
     >
-      {placing && (
+      {placing ? (
         <span
           aria-hidden="true"
           className="size-5 animate-spin rounded-full border-[2.5px] border-vanilla/40 border-t-vanilla"
         />
+      ) : (
+        whatsapp && <SocialIcon network="whatsapp" className="size-6 [--icon-stroke:2px]" />
       )}
       {label}
     </button>

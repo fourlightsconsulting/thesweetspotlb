@@ -281,7 +281,6 @@ describe("dashboards render", () => {
     expect(overview).toContain("1 order waiting");
     const ordersHtml = render(createElement(OrdersReport, { data: orders, before: emptyOrders }));
     expect(ordersHtml).toContain("Lotus Crêpe");
-    expect(ordersHtml).toContain("14 min");
     const marketingHtml = render(
       createElement(MarketingReport, { data: marketing, before: emptyMarketing }),
     );

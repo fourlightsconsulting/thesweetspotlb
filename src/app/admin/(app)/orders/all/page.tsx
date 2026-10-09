@@ -4,7 +4,7 @@ import { money, orderLabel, phone, startOfBeirutDay, when } from "@/components/a
 import { PageHeader } from "@/components/admin/page-header";
 import { adminClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/server/admin/session";
-import { type OrderStatus, openStatuses, statusLabel } from "../data";
+import { type OrderStatus, statusLabel } from "../data";
 
 export const metadata: Metadata = { title: "All orders" };
 
@@ -12,7 +12,6 @@ const PAGE_SIZE = 50;
 
 const statusChoices: { value: string; label: string }[] = [
   { value: "", label: "Any status" },
-  { value: "open", label: "Still open" },
   { value: "completed", label: "Completed" },
   { value: "cancelled", label: "Cancelled" },
 ];
@@ -54,8 +53,7 @@ export default async function AllOrdersPage({ searchParams }: PageProps<"/admin/
       query = query.like("customer_phone", `%${digits.replace(/^(00961|961|0)/, "")}%`);
     else query = query.ilike("customer_name", `%${q.replace(/[%_,()]/g, " ")}%`);
   }
-  if (status === "open") query = query.in("status", openStatuses);
-  else if (status) query = query.eq("status", status as OrderStatus);
+  if (status) query = query.eq("status", status as OrderStatus);
   if (from) query = query.gte("placed_at", startOfBeirutDay(from));
   if (to) query = query.lt("placed_at", startOfBeirutDay(dayAfter(to)));
 
@@ -174,7 +172,7 @@ export default async function AllOrdersPage({ searchParams }: PageProps<"/admin/
                   <td className="text-end tabular-nums">{money(order.total_cents)}</td>
                   <td>
                     <span
-                      className={`pill ${order.status === "cancelled" ? "bg-bad-soft text-bad" : order.status === "received" ? "bg-wait-soft text-wait" : ""}`}
+                      className={`pill ${order.status === "cancelled" ? "bg-bad-soft text-bad" : ""}`}
                     >
                       {statusLabel(order)}
                     </span>

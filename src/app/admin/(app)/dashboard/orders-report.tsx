@@ -13,10 +13,9 @@ import { money } from "@/components/admin/format";
 import { dayLabel } from "./period";
 import type { OrdersData } from "./types";
 
-const minutes = (n: number | null) => (n == null ? "—" : `${Math.round(n)} min`);
 const ratio = (part: number, whole: number) => (whole > 0 ? part / whole : 0);
 
-/** Orders: how many, when, how fast, what's in them. */
+/** Orders: how many, when, what's in them. */
 export function OrdersReport({ data, before }: { data: OrdersData; before: OrdersData }) {
   const t = data.totals;
   const b = before.totals;
@@ -80,29 +79,8 @@ export function OrdersReport({ data, before }: { data: OrdersData; before: Order
         <Heatmap cells={data.heatmap} unit="orders" />
       </Panel>
 
-      <div className="grid gap-6 wide:grid-cols-3">
-        <Panel title="Speed">
-          <dl className="grid grid-cols-2 gap-3 text-[13px]">
-            {(
-              [
-                ["Until started", data.timings.to_start],
-                ["Making it", data.timings.to_ready],
-                ["Pickup, start to end", data.timings.pickup_total],
-                ["Delivery, start to end", data.timings.delivery_total],
-              ] as const
-            ).map(([label, value]) => (
-              <div key={label}>
-                <dt className="text-muted">{label}</dt>
-                <dd className="text-lg font-bold tabular-nums">{minutes(value)}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="mt-3 text-[13px] text-muted">
-            {data.timings.timed
-              ? `${percent(data.timings.late, data.timings.timed)} finished after the time promised.`
-              : "Times show once orders are completed."}
-          </p>
-        </Panel>
+      {/* No "Speed" panel while orders count as completed once placed: there are no times to show. */}
+      <div className="grid gap-6 wide:grid-cols-2">
         <Panel title="Pickup or delivery">
           <Bars
             rows={data.fulfilment.map((f) => ({

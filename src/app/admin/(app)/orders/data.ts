@@ -12,16 +12,15 @@ export type Order = QueryData<ReturnType<typeof orderQuery>>[number];
 export type OrderLine = Order["order_items"][number];
 export type OrderStatus = Database["public"]["Enums"]["order_status"];
 
-/** Orders still being worked on. */
-export const openStatuses: OrderStatus[] = ["received", "preparing", "ready", "out_for_delivery"];
-
-/** The board: every open order, plus everything placed since `since` (today). */
+/** The board: everything placed since `since` (today), newest first. */
 export const boardQuery = (db: SupabaseClient<Database>, since: string) =>
   orderQuery(db)
-    .or(`status.in.(${openStatuses.join(",")}),placed_at.gte.${since}`)
-    .order("placed_at")
+    .gte("placed_at", since)
+    .order("placed_at", { ascending: false })
     .order("position", { referencedTable: "order_items" });
 
+// Orders are completed once placed for now (see the orders_complete_when_placed
+// migration); the other steps return when the shop tracks orders.
 export const statusLabel = (order: Pick<Order, "status" | "fulfilment">) => {
   switch (order.status) {
     case "received":
@@ -33,31 +32,11 @@ export const statusLabel = (order: Pick<Order, "status" | "fulfilment">) => {
     case "out_for_delivery":
       return "Out for delivery";
     case "completed":
-      return order.fulfilment === "delivery" ? "Delivered" : "Picked up";
+      return "Completed";
     case "cancelled":
       return "Cancelled";
   }
 };
-
-/** The one button that moves an order along, or null once it's done. */
-export function nextStep(
-  order: Pick<Order, "status" | "fulfilment">,
-): { to: OrderStatus; label: string } | null {
-  switch (order.status) {
-    case "received":
-      return { to: "preparing", label: "Start preparing" };
-    case "preparing":
-      return order.fulfilment === "delivery"
-        ? { to: "out_for_delivery", label: "Send out" }
-        : { to: "ready", label: "Ready for pickup" };
-    case "ready":
-      return { to: "completed", label: "Picked up" };
-    case "out_for_delivery":
-      return { to: "completed", label: "Delivered" };
-    default:
-      return null;
-  }
-}
 
 /**
  * A line's choices as one short string. Bundle lines group each pick with

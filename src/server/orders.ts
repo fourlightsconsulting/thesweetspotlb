@@ -14,10 +14,10 @@ import { storeStatus } from "@/lib/hours";
 import { normalisePhone } from "@/lib/phone";
 import {
   chosenOptions,
-  describeSelections,
   orderTotals,
   priceLines,
   type Selections,
+  selectionParts,
 } from "@/lib/pricing";
 import { serviceClient } from "@/lib/supabase/service";
 import { getMenu, getOrderingBranch, ORDERING_BRANCH } from "./catalog";
@@ -106,8 +106,7 @@ export async function placeOrder(
   if (Object.keys(fieldErrors).length > 0)
     return { ok: false, code: "invalid", fields: fieldErrors };
 
-  const now = new Date();
-  const status = storeStatus(branch.schedule, now);
+  const status = storeStatus(branch.schedule);
   if (!status.open) return { ok: false, code: "closed", reopens: status.reopens };
 
   const { priced, invalid, subtotal } = priceLines(input.lines, menu);
@@ -125,19 +124,22 @@ export async function placeOrder(
   const totals = orderTotals(subtotal, delivery?.fee ?? 0, promo);
   const name = input.fields.name.trim();
   const address = delivery
-    ? { zone: delivery.name, street: input.fields.street.trim(), floor: input.fields.floor.trim() }
+    ? {
+        zone: delivery.name,
+        street: input.fields.street.trim(),
+        floor: input.fields.floor.trim(),
+        note: input.fields.driverNote.trim(),
+      }
     : null;
-  const lines = priced.map(({ line, item, total }) => ({
+  const lines = priced.map(({ line, item }) => ({
     name: item.name,
     options: {
-      en: describeSelections(item, menu, line.selections, "en"),
-      ar: describeSelections(item, menu, line.selections, "ar"),
+      en: selectionParts(item, menu, line.selections, "en"),
+      ar: selectionParts(item, menu, line.selections, "ar"),
     },
     note: line.note.trim(),
     qty: line.qty,
-    total,
   }));
-  const eta = branch.eta[input.mode];
 
   const db = serviceClient();
   if (!db) {
@@ -148,7 +150,6 @@ export async function placeOrder(
       order: {
         ref: crypto.randomUUID(),
         number: `TSS-${1000 + Math.floor(Math.random() * 9000)}`,
-        placedAt: now.toISOString(),
         mode: input.mode,
         name,
         phone,
@@ -156,7 +157,6 @@ export async function placeOrder(
         lines,
         totals,
         promoCode: promo?.code ?? null,
-        eta,
         demo: true,
       },
     };
@@ -176,7 +176,7 @@ export async function placeOrder(
               zone: { slug: delivery.id, name_en: delivery.name.en, name_ar: delivery.name.ar },
               street: address!.street,
               floor: address!.floor,
-              delivery_note: input.fields.driverNote.trim(),
+              delivery_note: address!.note,
             }
           : {}),
         ...(promo ? { discount_code: promo.code } : {}),
@@ -237,7 +237,6 @@ export async function placeOrder(
     order: {
       ref: data.public_token,
       number: `TSS-${data.order_number}`,
-      placedAt: now.toISOString(),
       mode: input.mode,
       name,
       phone,
@@ -245,7 +244,6 @@ export async function placeOrder(
       lines,
       totals,
       promoCode: promo?.code ?? null,
-      eta,
       demo: false,
     },
   };
