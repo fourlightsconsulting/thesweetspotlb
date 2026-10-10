@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { browserName, crawlerReason, deviceType, osName } from "./classify";
 import { isBrowserEvent, metaName, purchaseEventId } from "./events";
 import { cleanParams, cleanUrl } from "./sanitize";
@@ -62,5 +62,21 @@ describe("sanitising", () => {
     expect(
       cleanParams({ code: "SWEET20", phone: "71", nested: { a: 1 }, ok: true, n: 3, bad: NaN }),
     ).toEqual({ code: "SWEET20", ok: true, n: 3 });
+  });
+});
+
+describe("ad tags", () => {
+  it("stay off in the team's own browsers", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("NEXT_PUBLIC_META_PIXEL_ID", "2646961599099575");
+    vi.resetModules();
+    const { metaOn, ga4On } = await import("./config");
+    vi.stubGlobal("document", { cookie: "_fbp=fb.1.1.1" });
+    expect(metaOn()).toBe(true);
+    expect(ga4On()).toBe(false);
+    vi.stubGlobal("document", { cookie: "_fbp=fb.1.1.1; tss_staff=1" });
+    expect(metaOn()).toBe(false);
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
   });
 });
