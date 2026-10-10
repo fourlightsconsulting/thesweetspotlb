@@ -6,6 +6,7 @@ import { adminClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
 import { needsAttention } from "@/server/admin/health";
 import { requireStaff } from "@/server/admin/session";
+import { ConnectionsTab } from "./connections";
 import { type Bucket, bucketLabels } from "./labels";
 import { HealthOverviewTab, websiteSetup } from "./overview";
 import { type ProblemRange, problemRanges, ProblemsTab } from "./problems";
@@ -18,6 +19,7 @@ const tabs = [
   { key: "overview", label: "Overview" },
   { key: "problems", label: "Problems" },
   { key: "visit", label: "Visit trail" },
+  { key: "connections", label: "Connections" },
 ] as const;
 
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
@@ -47,6 +49,8 @@ export default async function HealthPage({ searchParams }: PageProps<"/admin/hea
     );
   } else if (tab === "visit") {
     body = <VisitTab db={db} visit={one(params.visit)?.slice(0, 64) || null} />;
+  } else if (tab === "connections") {
+    body = <ConnectionsTab />;
   } else {
     // Fill in job runs that finished since the scheduler last looked.
     await serviceClient()?.rpc("reconcile_jobs");

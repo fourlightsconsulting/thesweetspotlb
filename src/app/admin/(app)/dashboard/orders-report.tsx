@@ -16,46 +16,47 @@ import type { OrdersData } from "./types";
 const ratio = (part: number, whole: number) => (whole > 0 ? part / whole : 0);
 
 /** Orders: how many, when, what's in them. */
-export function OrdersReport({ data, before }: { data: OrdersData; before: OrdersData }) {
+/** `before` is the period just before, or null when not comparing. */
+export function OrdersReport({ data, before }: { data: OrdersData; before: OrdersData | null }) {
   const t = data.totals;
-  const b = before.totals;
+  const b = before?.totals;
   const delivery = data.fulfilment.find((f) => f.name === "delivery")?.orders ?? 0;
-  const deliveryBefore = before.fulfilment.find((f) => f.name === "delivery")?.orders ?? 0;
+  const deliveryBefore = before?.fulfilment.find((f) => f.name === "delivery")?.orders ?? 0;
 
   return (
     <div className="flex flex-col gap-6">
       <KpiGrid>
-        <Kpi label="Orders" value={count(t.orders)} now={t.orders} before={b.orders} />
+        <Kpi label="Orders" value={count(t.orders)} now={t.orders} before={b?.orders} />
         <Kpi
           label="Sales"
           value={money(t.sales_cents)}
           now={t.sales_cents}
-          before={b.sales_cents}
+          before={b?.sales_cents}
         />
         <Kpi
           label="Average order"
           value={money(Math.round(ratio(t.sales_cents, t.orders)))}
           now={ratio(t.sales_cents, t.orders)}
-          before={ratio(b.sales_cents, b.orders)}
+          before={b && ratio(b.sales_cents, b.orders)}
         />
         <Kpi
           label="Cancelled"
           value={percent(t.cancelled, t.placed)}
           now={ratio(t.cancelled, t.placed)}
-          before={ratio(b.cancelled, b.placed)}
+          before={b && ratio(b.cancelled, b.placed)}
           upIsGood={false}
         />
         <Kpi
           label="Delivery"
           value={percent(delivery, t.orders)}
           now={ratio(delivery, t.orders)}
-          before={ratio(deliveryBefore, b.orders)}
+          before={b && ratio(deliveryBefore, b.orders)}
         />
         <Kpi
           label="Items per order"
           value={t.orders ? (t.items / t.orders).toFixed(1) : "—"}
           now={ratio(t.items, t.orders)}
-          before={ratio(b.items, b.orders)}
+          before={b && ratio(b.items, b.orders)}
         />
       </KpiGrid>
 
@@ -64,12 +65,16 @@ export function OrdersReport({ data, before }: { data: OrdersData; before: Order
           labels={data.daily.map((d) => dayLabel(d.day))}
           series={[
             { name: "Orders", values: data.daily.map((d) => d.orders) },
-            {
-              name: "Before",
-              values: before.daily.map((d) => d.orders),
-              tone: "muted",
-              dashed: true,
-            },
+            ...(before
+              ? [
+                  {
+                    name: "Before",
+                    values: before.daily.map((d) => d.orders),
+                    tone: "muted" as const,
+                    dashed: true,
+                  },
+                ]
+              : []),
             { name: "Cancelled", values: data.daily.map((d) => d.cancelled), tone: "bad" },
           ]}
         />

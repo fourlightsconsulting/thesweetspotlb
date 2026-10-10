@@ -8,9 +8,10 @@ import type { MarketingData, OrdersData, WebData } from "./types";
 type Props = {
   period: Period;
   orders: OrdersData;
-  ordersBefore: OrdersData;
+  /** The period just before, or null when not comparing. */
+  ordersBefore: OrdersData | null;
   web: WebData;
-  webBefore: WebData;
+  webBefore: WebData | null;
   marketing: MarketingData;
   attention: Attention;
 };
@@ -28,11 +29,9 @@ export function Overview({
   attention,
 }: Props) {
   const t = orders.totals;
-  const b = ordersBefore.totals;
+  const b = ordersBefore?.totals;
   const average = ratio(t.sales_cents, t.orders);
-  const averageBefore = ratio(b.sales_cents, b.orders);
   const repeat = ratio(t.customers - t.new_customers, t.customers);
-  const repeatBefore = ratio(b.customers - b.new_customers, b.customers);
 
   return (
     <div className="flex flex-col gap-6">
@@ -43,33 +42,33 @@ export function Overview({
           label="Sales"
           value={money(t.sales_cents)}
           now={t.sales_cents}
-          before={b.sales_cents}
+          before={b?.sales_cents}
           help="Orders not cancelled, delivery fees included."
         />
-        <Kpi label="Orders" value={String(t.orders)} now={t.orders} before={b.orders} />
+        <Kpi label="Orders" value={String(t.orders)} now={t.orders} before={b?.orders} />
         <Kpi
           label="Average order"
           value={money(Math.round(average))}
           now={average}
-          before={averageBefore}
+          before={b && ratio(b.sales_cents, b.orders)}
         />
         <Kpi
           label="Visits that ordered"
           value={percent(web.totals.orders, web.totals.visits, 1)}
           now={ratio(web.totals.orders, web.totals.visits)}
-          before={ratio(webBefore.totals.orders, webBefore.totals.visits)}
+          before={webBefore ? ratio(webBefore.totals.orders, webBefore.totals.visits) : undefined}
         />
         <Kpi
           label="New customers"
           value={String(t.new_customers)}
           now={t.new_customers}
-          before={b.new_customers}
+          before={b?.new_customers}
         />
         <Kpi
           label="Came back"
           value={percent(t.customers - t.new_customers, t.customers)}
           now={repeat}
-          before={repeatBefore}
+          before={b && ratio(b.customers - b.new_customers, b.customers)}
           help="Customers in the period who had ordered before."
         />
       </KpiGrid>
@@ -80,12 +79,16 @@ export function Overview({
           format={(n) => money(Math.round(n))}
           series={[
             { name: period.label, values: orders.daily.map((d) => d.sales_cents) },
-            {
-              name: "Before",
-              values: ordersBefore.daily.map((d) => d.sales_cents),
-              tone: "muted",
-              dashed: true,
-            },
+            ...(ordersBefore
+              ? [
+                  {
+                    name: "Before",
+                    values: ordersBefore.daily.map((d) => d.sales_cents),
+                    tone: "muted" as const,
+                    dashed: true,
+                  },
+                ]
+              : []),
           ]}
         />
       </Panel>

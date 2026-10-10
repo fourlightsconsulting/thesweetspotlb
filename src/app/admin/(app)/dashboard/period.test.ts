@@ -4,14 +4,19 @@ import { eachDay, readPeriod } from "./period";
 const today = "2026-10-09";
 
 describe("dashboard periods", () => {
-  it("defaults to the last 7 days, compared with the 7 before", () => {
+  it("defaults to the last 30 days, compared with the 30 before", () => {
     expect(readPeriod({}, today)).toMatchObject({
-      from: "2026-10-03",
+      from: "2026-09-10",
       to: "2026-10-09",
-      preset: "7d",
-      days: 7,
-      previous: { from: "2026-09-26", to: "2026-10-02" },
+      preset: "30d",
+      days: 30,
+      previous: { from: "2026-08-11", to: "2026-09-09" },
     });
+    expect(readPeriod({ period: "7d" }, today)).toMatchObject({ from: "2026-10-03", days: 7 });
+  });
+
+  it("knows the year so far", () => {
+    expect(readPeriod({ period: "ytd" }, today)).toMatchObject({ from: "2026-01-01", to: today });
   });
 
   it("knows months, including last month", () => {
@@ -29,7 +34,7 @@ describe("dashboard periods", () => {
     ).toMatchObject({ from: "2026-10-01", to: today, preset: "custom", label: "1 Oct – 9 Oct" });
     expect(
       readPeriod({ period: "custom", from: "2026-10-05", to: "2026-10-01" }, today).preset,
-    ).toBe("7d");
+    ).toBe("30d");
   });
 
   it("lists every day", () => {

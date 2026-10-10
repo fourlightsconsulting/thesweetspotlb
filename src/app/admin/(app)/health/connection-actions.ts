@@ -30,7 +30,7 @@ export async function runJob(
   const db = await adminClient();
   const { error } = await db.rpc("run_job", { p_job: name, p_body: body });
   if (error) return { error: "It didn’t start. Try again." };
-  revalidatePath("/admin/connections");
+  revalidatePath("/admin/health");
   return { error: null };
 }
 
@@ -64,7 +64,7 @@ export async function addSpend(_prev: FormState, form: FormData): Promise<FormSt
     created_by: staff.userId,
   });
   if (error) return failed();
-  revalidatePath("/admin/connections");
+  revalidatePath("/admin/health");
   return saved();
 }
 
@@ -77,6 +77,6 @@ export async function removeSpend(id: number): Promise<{ error: string | null }>
     .eq("id", z.number().int().positive().parse(id))
     .eq("platform", "manual");
   if (error) return { error: "That didn’t save. Try again." };
-  revalidatePath("/admin/connections");
+  revalidatePath("/admin/health");
   return { error: null };
 }

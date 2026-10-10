@@ -110,7 +110,7 @@ export function HealthOverviewTab({
             ])}
           />
           <Link
-            href="/admin/connections"
+            href="/admin/health?tab=connections"
             className="mt-3 inline-block text-[13px] font-semibold text-accent"
           >
             Connections →

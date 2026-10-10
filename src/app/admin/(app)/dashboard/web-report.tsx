@@ -39,47 +39,48 @@ export function WebReport({
   itemNames,
 }: {
   data: WebData;
-  before: WebData;
+  /** The period just before, or null when not comparing. */
+  before: WebData | null;
   itemNames: Record<string, string>;
 }) {
   const t = data.totals;
-  const b = before.totals;
+  const b = before?.totals;
   const abandonment = ratio(t.checkouts - t.orders, t.checkouts);
 
   return (
     <div className="flex flex-col gap-6">
       <KpiGrid>
-        <Kpi label="Visits" value={count(t.visits)} now={t.visits} before={b.visits} />
+        <Kpi label="Visits" value={count(t.visits)} now={t.visits} before={b?.visits} />
         <Kpi
           label="New visitors"
           value={percent(t.new_visitors, t.visitors)}
           now={ratio(t.new_visitors, t.visitors)}
-          before={ratio(b.new_visitors, b.visitors)}
+          before={b && ratio(b.new_visitors, b.visitors)}
         />
         <Kpi
           label="Engaged visits"
           value={percent(t.engaged, t.visits)}
           now={ratio(t.engaged, t.visits)}
-          before={ratio(b.engaged, b.visits)}
+          before={b && ratio(b.engaged, b.visits)}
           help="Saw two pages or more, or did something (opened an item, tapped a link)."
         />
         <Kpi
           label="Added to order"
           value={percent(t.carts, t.visits, 1)}
           now={ratio(t.carts, t.visits)}
-          before={ratio(b.carts, b.visits)}
+          before={b && ratio(b.carts, b.visits)}
         />
         <Kpi
           label="Visits that ordered"
           value={percent(t.orders, t.visits, 1)}
           now={ratio(t.orders, t.visits)}
-          before={ratio(b.orders, b.visits)}
+          before={b && ratio(b.orders, b.visits)}
         />
         <Kpi
           label="Left checkout"
           value={t.checkouts ? percent(t.checkouts - t.orders, t.checkouts) : "—"}
           now={abandonment}
-          before={ratio(b.checkouts - b.orders, b.checkouts)}
+          before={b && ratio(b.checkouts - b.orders, b.checkouts)}
           upIsGood={false}
           help="Went to checkout but didn’t order."
         />
@@ -90,12 +91,16 @@ export function WebReport({
           labels={data.daily.map((d) => dayLabel(d.day))}
           series={[
             { name: "Visits", values: data.daily.map((d) => d.visits) },
-            {
-              name: "Before",
-              values: before.daily.map((d) => d.visits),
-              tone: "muted",
-              dashed: true,
-            },
+            ...(before
+              ? [
+                  {
+                    name: "Before",
+                    values: before.daily.map((d) => d.visits),
+                    tone: "muted" as const,
+                    dashed: true,
+                  },
+                ]
+              : []),
             { name: "Ordered", values: data.daily.map((d) => d.orders), tone: "wait" },
           ]}
         />

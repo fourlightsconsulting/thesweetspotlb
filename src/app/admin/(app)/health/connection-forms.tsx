@@ -4,7 +4,7 @@ import { useActionState, useState, useTransition } from "react";
 import { FormStatus, idle, useSubmit } from "@/components/admin/form";
 import { Help } from "@/components/admin/help";
 import { Icon } from "@/components/admin/icons";
-import { addSpend, removeSpend, runJob } from "./actions";
+import { addSpend, removeSpend, runJob } from "./connection-actions";
 
 /** "Run now", and a date range for fetching the past. */
 export function JobControls({ job, canBackfill }: { job: string; canBackfill: boolean }) {

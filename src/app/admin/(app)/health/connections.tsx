@@ -1,13 +1,11 @@
-import type { Metadata } from "next";
 import { beirutDate, daysAgo, money, when } from "@/components/admin/format";
 import { Help } from "@/components/admin/help";
-import { PageHeader } from "@/components/admin/page-header";
 import { adminClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
-import { requireStaff } from "@/server/admin/session";
 import { JobControls, SpendCard } from "./connection-forms";
 
-export const metadata: Metadata = { title: "Connections" };
+// Health's Connections tab: the imports and the retries job, run by hand or
+// for past dates, and ad spend no platform reports.
 
 type Run = {
   id: number;
@@ -84,8 +82,7 @@ function summary(run: Run) {
   return parts.join(" · ") || "Nothing to do";
 }
 
-export default async function ConnectionsPage() {
-  await requireStaff("manager");
+export async function ConnectionsTab() {
   // Fill in runs that finished since the scheduler last looked.
   await serviceClient()?.rpc("reconcile_jobs");
   const db = await adminClient();
@@ -107,7 +104,6 @@ export default async function ConnectionsPage() {
 
   return (
     <>
-      <PageHeader title="Connections" />
       <div className="grid gap-4 wide:grid-cols-2">
         {jobs.map((job) => {
           const latest = list.find((r) => r.job === job.key);

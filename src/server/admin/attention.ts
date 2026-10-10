@@ -73,7 +73,7 @@ export function attentionItems(c: AttentionCounts, ctx: AttentionContext): Atten
   for (const job of c.jobs_failed)
     items.push({
       text: `The ${jobNames[job] ?? job} failed last time`,
-      href: "/admin/connections",
+      href: "/admin/health?tab=connections",
       tone: "wait",
     });
   if (c.relay_orders && ctx.metaCapi)

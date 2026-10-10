@@ -23,13 +23,12 @@ export type NavIcon =
   | "site"
   | "store"
   | "ads"
-  | "connections"
   | "health"
   | "team"
   | "account";
 
 export const navItems: NavItem[] = [
-  { href: "/admin", label: "Home", icon: "home", minimum: "staff" },
+  { href: "/admin", label: "Home", icon: "home", minimum: "manager" },
   { href: "/admin/orders", label: "Orders", icon: "orders", minimum: "staff" },
   { href: "/admin/customers", label: "Customers", icon: "customers", minimum: "staff" },
   { href: "/admin/menu", label: "Menu", icon: "dishes", minimum: "staff" },
@@ -39,7 +38,6 @@ export const navItems: NavItem[] = [
   { href: "/admin/site", label: "Site", icon: "site", minimum: "manager" },
   { href: "/admin/store", label: "Store", icon: "store", minimum: "manager" },
   { href: "/admin/ads", label: "Ad tools", icon: "ads", minimum: "manager" },
-  { href: "/admin/connections", label: "Connections", icon: "connections", minimum: "manager" },
   { href: "/admin/health", label: "Health", icon: "health", minimum: "manager" },
   { href: "/admin/team", label: "Team", icon: "team", minimum: "owner" },
 ];

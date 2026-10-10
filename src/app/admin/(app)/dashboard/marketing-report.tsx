@@ -67,10 +67,19 @@ function SocialCard({
 }
 
 /** Ads, sources, social and search: what marketing costs and what it brings. */
-export function MarketingReport({ data, before }: { data: MarketingData; before: MarketingData }) {
+/** `before` is the period just before, or null when not comparing. */
+export function MarketingReport({
+  data,
+  before,
+}: {
+  data: MarketingData;
+  before: MarketingData | null;
+}) {
   const adSpend = data.spend.meta_cents + data.spend.google_cents;
-  const adSpendBefore = before.spend.meta_cents + before.spend.google_cents;
   const c = data.credit;
+  const b = before
+    ? { adSpend: before.spend.meta_cents + before.spend.google_cents, ...before.credit }
+    : undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,33 +88,33 @@ export function MarketingReport({ data, before }: { data: MarketingData; before:
           label="Ad spend"
           value={money(adSpend)}
           now={adSpend}
-          before={adSpendBefore}
+          before={b?.adSpend}
           upIsGood={false}
         />
         <Kpi
           label="Orders from ads"
           value={count(c.ad_orders)}
           now={c.ad_orders}
-          before={before.credit.ad_orders}
+          before={b?.ad_orders}
         />
         <Kpi
           label="Cost per order"
           value={perOrder(adSpend, c.ad_orders)}
           now={ratio(adSpend, c.ad_orders)}
-          before={ratio(adSpendBefore, before.credit.ad_orders)}
+          before={b && ratio(b.adSpend, b.ad_orders)}
           upIsGood={false}
         />
         <Kpi
           label="Sales from ads"
           value={money(c.ad_sales_cents)}
           now={c.ad_sales_cents}
-          before={before.credit.ad_sales_cents}
+          before={b?.ad_sales_cents}
         />
         <Kpi
           label="Back per $1"
           value={adSpend ? `$${(c.ad_food_cents / adSpend).toFixed(2)}` : "—"}
           now={ratio(c.ad_food_cents, adSpend)}
-          before={ratio(before.credit.ad_food_cents, adSpendBefore)}
+          before={b && ratio(b.ad_food_cents, b.adSpend)}
           help="Food sold to ad visitors (without delivery fees) for each dollar spent on ads."
         />
         <Kpi

@@ -10,7 +10,14 @@ export const presets = [
   { key: "month", label: "This month" },
   { key: "last-month", label: "Last month" },
   { key: "90d", label: "Last 90 days" },
+  { key: "ytd", label: "Year to date" },
 ] as const;
+
+export const DEFAULT_PRESET = "30d";
+
+/** Whether to compare with the period before ("vs previous"); on unless switched off. */
+export const readCompare = (params: Record<string, string | string[] | undefined>) =>
+  params.compare !== "off";
 
 export type Period = {
   from: string;
@@ -49,7 +56,7 @@ export function readPeriod(
   params: Record<string, string | string[] | undefined>,
   today = beirutDate(),
 ): Period {
-  const preset = typeof params.period === "string" ? params.period : "7d";
+  const preset = typeof params.period === "string" ? params.period : DEFAULT_PRESET;
   const from = typeof params.from === "string" && ISO.test(params.from) ? params.from : null;
   const to = typeof params.to === "string" && ISO.test(params.to) ? params.to : null;
 
@@ -67,8 +74,8 @@ export function readPeriod(
       case "yesterday":
         range = { from: addDays(today, -1), to: addDays(today, -1) };
         break;
-      case "30d":
-        range = { from: addDays(today, -29), to: today };
+      case "7d":
+        range = { from: addDays(today, -6), to: today };
         break;
       case "90d":
         range = { from: addDays(today, -89), to: today };
@@ -79,9 +86,12 @@ export function readPeriod(
       case "last-month":
         range = { from: `${lastMonthEnd.slice(0, 7)}-01`, to: lastMonthEnd };
         break;
+      case "ytd":
+        range = { from: `${today.slice(0, 4)}-01-01`, to: today };
+        break;
       default:
-        key = "7d";
-        range = { from: addDays(today, -6), to: today };
+        key = DEFAULT_PRESET;
+        range = { from: addDays(today, -29), to: today };
     }
   }
 
