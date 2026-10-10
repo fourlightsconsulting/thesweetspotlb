@@ -1,5 +1,4 @@
-// What the order screens read, and the order's steps. Shared by the server
-// (first load) and the browser (live updates through the staff session).
+// What the order page reads, and how an order's status and choices read.
 import type { QueryData, SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -11,13 +10,6 @@ export const orderQuery = (db: SupabaseClient<Database>) => db.from("orders").se
 export type Order = QueryData<ReturnType<typeof orderQuery>>[number];
 export type OrderLine = Order["order_items"][number];
 export type OrderStatus = Database["public"]["Enums"]["order_status"];
-
-/** The board: everything placed since `since` (today), newest first. */
-export const boardQuery = (db: SupabaseClient<Database>, since: string) =>
-  orderQuery(db)
-    .gte("placed_at", since)
-    .order("placed_at", { ascending: false })
-    .order("position", { referencedTable: "order_items" });
 
 // Orders are completed once placed for now (see the orders_complete_when_placed
 // migration); the other steps return when the shop tracks orders.

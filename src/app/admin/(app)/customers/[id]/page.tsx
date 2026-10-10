@@ -6,7 +6,6 @@ import { Icon } from "@/components/admin/icons";
 import { PageHeader } from "@/components/admin/page-header";
 import { adminClient } from "@/lib/supabase/server";
 import { atLeast, requireStaff } from "@/server/admin/session";
-import { statusLabel } from "../../orders/data";
 
 export const metadata: Metadata = { title: "Customer" };
 
@@ -139,12 +138,10 @@ export default async function CustomerPage({ params }: PageProps<"/admin/custome
                     {o.fulfilment === "delivery" ? "Delivery" : "Pickup"}
                   </span>
                   {o.discount_code && <span className="pill">{o.discount_code}</span>}
-                  <span
-                    className={`pill ms-auto ${o.status === "cancelled" ? "bg-bad-soft text-bad" : ""}`}
-                  >
-                    {statusLabel(o)}
-                  </span>
-                  <span className="tabular-nums">{money(o.total_cents)}</span>
+                  {o.status === "cancelled" && (
+                    <span className="pill bg-bad-soft text-bad">Cancelled</span>
+                  )}
+                  <span className="ms-auto tabular-nums">{money(o.total_cents)}</span>
                 </li>
               ))}
             </ul>

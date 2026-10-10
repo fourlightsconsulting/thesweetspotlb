@@ -147,6 +147,14 @@
     }
   }
 
+  /* One height for every single-line field. Safari sizes dropdowns and date
+     boxes its own way, which left their labels out of line in filter bars. */
+  input.field:not([type="checkbox"], [type="radio"], [type="file"]),
+  select.field {
+    height: 38px;
+    line-height: 20px;
+  }
+
   .label {
     display: block;
     margin-bottom: 6px;

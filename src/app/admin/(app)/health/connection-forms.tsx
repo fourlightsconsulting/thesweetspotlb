@@ -50,7 +50,7 @@ export function JobControls({ job, canBackfill }: { job: string; canBackfill: bo
               type="date"
               value={since}
               onChange={(e) => setSince(e.target.value)}
-              className="field min-h-[34px] py-1"
+              className="field h-[34px] min-h-[34px] py-1"
             />
           </label>
           <label className="text-[13px]">
@@ -59,7 +59,7 @@ export function JobControls({ job, canBackfill }: { job: string; canBackfill: bo
               type="date"
               value={until}
               onChange={(e) => setUntil(e.target.value)}
-              className="field min-h-[34px] py-1"
+              className="field h-[34px] min-h-[34px] py-1"
             />
           </label>
           <button

@@ -11,6 +11,9 @@ export const metadata: Metadata = { title: "Customers" };
 
 const PAGE_SIZE = 50;
 
+/** The list's columns, shared by the header and every row. */
+const columns = "grid grid-cols-[minmax(200px,2.5fr)_70px_90px_110px_110px] gap-4";
+
 export default async function CustomersPage({ searchParams }: PageProps<"/admin/customers">) {
   const staff = await requireStaff();
   const params = await searchParams;
@@ -85,42 +88,44 @@ export default async function CustomersPage({ searchParams }: PageProps<"/admin/
 
       {data.length > 0 && (
         <div className="card overflow-x-auto">
-          <table className="w-full min-w-[680px]">
-            <thead className="border-b border-line text-[12px] text-muted">
-              <tr className="[&>th]:px-4 [&>th]:py-2.5 [&>th]:text-start [&>th]:font-semibold">
-                <th>Customer</th>
-                <th className="text-end">Orders</th>
-                <th className="text-end">Spent</th>
-                <th>First order</th>
-                <th>Last order</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
+          <div className="min-w-[680px]">
+            <div
+              className={`${columns} border-b border-line px-4 py-2.5 text-[12px] font-semibold text-muted`}
+            >
+              <span>Customer</span>
+              <span className="text-end">Orders</span>
+              <span className="text-end">Spent</span>
+              <span>First order</span>
+              <span>Last order</span>
+            </div>
+            <ul className="divide-y divide-line">
               {data.map((c) => (
-                <tr key={c.id} className="relative hover:bg-tint [&>td]:px-4 [&>td]:py-3">
-                  <td>
-                    <Link
-                      href={`/admin/customers/${c.id}`}
-                      className="font-semibold after:absolute after:inset-0"
-                    >
-                      {c.name || "No name"}
-                    </Link>
-                    <span className="block text-[13px] text-muted">
-                      {phone(c.phone ?? "")}
-                      {c.preferred_locale === "ar" && " · Arabic"}
-                      {c.marketing_opt_in_at && " · ✓ messages"}
+                <li key={c.id}>
+                  <Link
+                    href={`/admin/customers/${c.id}`}
+                    className={`${columns} items-start px-4 py-3 hover:bg-tint`}
+                  >
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold">{c.name || "No name"}</span>
+                      <span className="block text-[13px] text-muted">
+                        {phone(c.phone ?? "")}
+                        {c.preferred_locale === "ar" && " · Arabic"}
+                        {c.marketing_opt_in_at && " · ✓ messages"}
+                      </span>
                     </span>
-                  </td>
-                  <td className="text-end tabular-nums">{c.orders}</td>
-                  <td className="text-end tabular-nums">{money(Number(c.spent_cents))}</td>
-                  <td className="text-muted">
-                    {c.first_order_at ? dateOf(c.first_order_at) : "—"}
-                  </td>
-                  <td className="text-muted">{c.last_order_at ? dateOf(c.last_order_at) : "—"}</td>
-                </tr>
+                    <span className="text-end tabular-nums">{c.orders}</span>
+                    <span className="text-end tabular-nums">{money(Number(c.spent_cents))}</span>
+                    <span className="text-muted">
+                      {c.first_order_at ? dateOf(c.first_order_at) : "—"}
+                    </span>
+                    <span className="text-muted">
+                      {c.last_order_at ? dateOf(c.last_order_at) : "—"}
+                    </span>
+                  </Link>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+          </div>
         </div>
       )}
 

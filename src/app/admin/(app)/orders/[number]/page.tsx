@@ -53,7 +53,7 @@ export default async function OrderPage({ params }: PageProps<"/admin/orders/[nu
           </span>
         }
         actions={
-          <Link href="/admin/orders/all" className="btn btn-secondary">
+          <Link href="/admin/orders" className="btn btn-secondary">
             All orders
           </Link>
         }

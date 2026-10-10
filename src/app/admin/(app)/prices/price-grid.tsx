@@ -114,7 +114,7 @@ export function PriceGrid({ sections }: { sections: PriceSection[] }) {
           <select
             value={step}
             onChange={(e) => setStep(Number(e.target.value))}
-            className="field min-h-[34px] w-auto py-1"
+            className="field h-[34px] min-h-[34px] w-auto py-1"
           >
             <option value={1}>the cent</option>
             <option value={25}>$0.25</option>
@@ -190,7 +190,7 @@ export function PriceGrid({ sections }: { sections: PriceSection[] }) {
                             if (Number.isFinite(cents) && cents >= 0) setPrice(row, cents);
                           }}
                           aria-label={`Price of ${row.name}`}
-                          className="field min-h-[34px] py-1 ps-6 text-end tabular-nums"
+                          className="field h-[34px] min-h-[34px] py-1 ps-6 text-end tabular-nums"
                         />
                       </div>
                     </li>

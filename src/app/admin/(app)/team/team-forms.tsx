@@ -147,7 +147,7 @@ export function MemberRow({ member, isMe }: { member: Member; isMe: boolean }) {
             value={member.role}
             disabled={isMe || saving}
             onChange={(e) => save({ role: e.target.value })}
-            className="field min-h-[30px] w-auto py-1 text-[13px]"
+            className="field h-[30px] min-h-[30px] w-auto py-1 text-[13px]"
           >
             {Object.entries(roleLabels).map(([value, label]) => (
               <option key={value} value={value}>

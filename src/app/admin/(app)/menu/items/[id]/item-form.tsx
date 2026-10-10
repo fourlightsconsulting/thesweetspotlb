@@ -124,7 +124,7 @@ export function ItemForm({ item, categories, groups }: Props) {
                     <select
                       value={a.defaults[0] ?? ""}
                       onChange={(e) => update(index, e.target.value ? [e.target.value] : [])}
-                      className="field min-h-[30px] w-auto py-1 text-[13px]"
+                      className="field h-[30px] min-h-[30px] w-auto py-1 text-[13px]"
                     >
                       <option value="">
                         {group.min > 0 ? "None: the customer picks" : "None"}

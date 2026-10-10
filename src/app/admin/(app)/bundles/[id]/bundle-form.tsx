@@ -309,7 +309,7 @@ function SlotEditor({
                         })
                       }
                       aria-label={`Extra for ${item?.name ?? "this item"}`}
-                      className="field min-h-[34px] py-1 ps-8"
+                      className="field h-[34px] min-h-[34px] py-1 ps-8"
                     />
                   </div>
                   <button
