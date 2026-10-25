@@ -22,11 +22,14 @@ export function WeeklySpecial({ lang, t, item }: Props) {
   const price = formatPrice(item.price, lang);
 
   return (
-    <section id="special" className="relative overflow-x-clip bg-cotton-candy text-chocolate">
+    <section
+      id="special"
+      className="wave-top relative overflow-x-clip bg-cotton-candy text-ink [--wave:var(--color-cotton-candy)]"
+    >
       <Reveal className="mx-auto grid max-w-[1440px] desk:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] desk:items-center desk:px-[clamp(20px,5cqw,72px)] desk:py-section">
         <div className="relative z-3 flex flex-col items-start gap-3.5 px-5 pb-section desk:gap-[clamp(18px,1.8cqw,26px)] desk:p-0">
           <span className="eyebrow">{t.tag}</span>
-          <h2 className="font-display text-[min(16.5cqw,96px)] leading-[0.88] font-black tracking-[-0.04em] text-balance desk:text-[clamp(64px,9cqw,136px)]">
+          <h2 className="font-display text-[min(16.5cqw,96px)] leading-[0.88] font-black tracking-[-0.04em] text-balance text-blueberry desk:text-[clamp(64px,9cqw,136px)]">
             {t.title}
           </h2>
           <p className="mt-1 max-w-[36ch] font-body text-[17px] leading-normal font-medium text-pretty desk:mt-2 desk:max-w-[30ch] desk:text-[clamp(17px,1.35cqw,20px)]">
@@ -54,7 +57,7 @@ export function WeeklySpecial({ lang, t, item }: Props) {
             <Link
               href={href}
               aria-label={`${t.limited} ${price}`}
-              className="absolute -start-[14%] bottom-[4%] flex size-[92px] -rotate-12 flex-col items-center justify-center gap-px rounded-full border-[2.5px] border-chocolate bg-toffee text-chocolate shadow-[3px_3px_0_var(--color-chocolate)] transition-transform duration-300 ease-soft hover:scale-105 hover:rotate-4 desk:-start-[7%] desk:bottom-[6%] desk:size-[clamp(104px,9cqw,132px)] desk:gap-0.5 desk:shadow-[3px_4px_0_var(--color-chocolate)]"
+              className="absolute -start-[14%] bottom-[4%] flex size-[92px] -rotate-12 flex-col items-center justify-center gap-px rounded-full border-[2.5px] border-blueberry bg-raspberry text-ink shadow-[3px_3px_0_var(--color-blueberry)] transition-transform duration-300 ease-soft hover:scale-105 hover:rotate-4 desk:-start-[7%] desk:bottom-[6%] desk:size-[clamp(104px,9cqw,132px)] desk:gap-0.5 desk:shadow-[3px_4px_0_var(--color-blueberry)]"
             >
               <span className="font-ui text-[10px] leading-3 font-bold tracking-[0.05em] uppercase desk:text-[11px] desk:leading-[14px] desk:tracking-[0.06em]">
                 {t.limited}
@@ -70,7 +73,7 @@ export function WeeklySpecial({ lang, t, item }: Props) {
               aria-hidden="true"
               className="absolute -end-[2%] top-full hidden items-start gap-0.5 desk:flex"
             >
-              <ArrowUpLeft className="h-[46px] w-[50px] stroke-chocolate rtl:-scale-x-100" />
+              <ArrowUpLeft className="h-[46px] w-[50px] stroke-blueberry rtl:-scale-x-100" />
               <span className="mt-6 max-w-[13ch] -rotate-3 font-script text-[22px] leading-[1.25]">
                 {t.note}
               </span>

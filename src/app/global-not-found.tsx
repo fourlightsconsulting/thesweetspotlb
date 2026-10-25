@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import logo from "@/assets/images/logo-blueberry.png";
+import logo from "@/assets/images/logo-sky.svg";
 import { NotFoundTracking } from "@/components/site-tracking";
 import { fontVariables } from "./fonts";
 import "./globals.css";
@@ -16,7 +16,7 @@ function MeltedCone() {
     <svg
       aria-hidden="true"
       viewBox="0 0 64 48"
-      className="w-[clamp(150px,16cqw,210px)] overflow-visible stroke-chocolate stroke-[2.4] [stroke-linecap:round] [stroke-linejoin:round]"
+      className="w-[clamp(150px,16cqw,210px)] overflow-visible stroke-blueberry stroke-[2.4] [stroke-linecap:round] [stroke-linejoin:round]"
     >
       <path
         className="fill-strawberry-cream"
@@ -27,7 +27,7 @@ function MeltedCone() {
         d="M18 36 C 17 28, 22 23, 29 23 C 36 23, 41 28, 40 35 C 33 37.5, 24 37.5, 18 36 Z"
       />
       <path
-        className="fill-toffee"
+        className="fill-raspberry"
         d="M37 26 L59 15 C 59.6 14.8, 59.9 15.3, 59.5 15.8 L41.5 33 Z"
       />
       <path className="fill-none" d="M45.5 21.7 L48.5 25.7 M51.1 18.9 L52.9 21.3" />
@@ -44,7 +44,7 @@ function MeltedCone() {
 export default function GlobalNotFound() {
   return (
     <html lang="en" className={`${fontVariables} h-full antialiased`} suppressHydrationWarning>
-      <body className="page flex min-h-full flex-col">
+      <body className="page flex min-h-full flex-col bg-strawberry-cream">
         <NotFoundTracking />
         <div aria-hidden="true" className="awning" />
         <main className="flex flex-1 flex-col items-center justify-center gap-6 px-5 py-section-sm text-center">
@@ -60,15 +60,15 @@ export default function GlobalNotFound() {
           <MeltedCone />
           <div className="flex flex-col items-center gap-3">
             <h1 className="title-section">This page melted.</h1>
-            <p className="font-body text-lg leading-normal font-medium text-cacao">
+            <p className="font-body text-lg leading-normal font-medium text-ink-soft">
               It may have moved, or it isn’t ready yet.
             </p>
           </div>
           <div lang="ar" dir="rtl" className="flex flex-col items-center gap-1">
-            <p className="font-(family-name:--font-ar-display) text-[clamp(28px,3cqw,40px)] leading-[1.3] font-extrabold">
+            <p className="font-(family-name:--font-plex-ar) text-[clamp(28px,3cqw,40px)] leading-[1.3] font-extrabold">
               هالصفحة دابت.
             </p>
-            <p className="font-(family-name:--font-ar-text) text-base leading-normal text-cacao">
+            <p className="font-(family-name:--font-plex-ar) text-base leading-normal text-ink-soft">
               يمكن انتقلت، أو بعدها مش جاهزة.
             </p>
           </div>
@@ -79,7 +79,7 @@ export default function GlobalNotFound() {
             <Link
               href="/ar"
               lang="ar"
-              className="btn btn-secondary font-(family-name:--font-ar-text)"
+              className="btn btn-secondary font-(family-name:--font-plex-ar)"
             >
               الصفحة الرئيسية
             </Link>

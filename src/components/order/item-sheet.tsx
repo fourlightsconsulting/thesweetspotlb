@@ -203,7 +203,7 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
           />
           <span
             aria-hidden="true"
-            className="absolute top-2 left-1/2 h-1.5 w-11 -translate-x-1/2 rounded-full bg-vanilla/85 desk:hidden"
+            className="absolute top-2 left-1/2 h-1.5 w-11 -translate-x-1/2 rounded-full bg-paper/85 desk:hidden"
           />
           <button
             type="button"
@@ -230,13 +230,13 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
             {item.name[lang]}
           </h2>
           {item.description[lang] && (
-            <p className="font-body text-base leading-normal text-pretty text-cacao">
+            <p className="font-body text-base leading-normal text-pretty text-ink-soft">
               {item.description[lang]}
             </p>
           )}
           <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 font-ui text-[15px]">
             <span className="font-bold">{formatPrice(item.price, lang)}</span>
-            <span className="inline-flex items-center gap-1.5 text-cacao">
+            <span className="inline-flex items-center gap-1.5 text-ink-soft">
               <ClockIcon />
               {etaLabel}
             </span>
@@ -289,7 +289,7 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
           />
         ))}
 
-        <label className="flex flex-col gap-2 border-t border-dashed border-chocolate/20 px-6 pt-5 pb-6">
+        <label className="flex flex-col gap-2 border-t border-dashed border-blueberry/20 px-6 pt-5 pb-6">
           <span className="font-display text-lg leading-tight font-bold">{t.notes}</span>
           <textarea
             value={note}
@@ -297,15 +297,15 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
             maxLength={ordering.noteMaxLength}
             rows={3}
             placeholder={t.notesPlaceholder}
-            className="w-full resize-none rounded-[14px] border-[1.5px] border-chocolate/20 bg-whipped px-4 py-3 font-ui text-[15px] leading-normal placeholder:text-cacao/60 focus:border-blueberry focus:ring-3 focus:ring-blueberry/15 focus:outline-none"
+            className="w-full resize-none rounded-[14px] border-[1.5px] border-blueberry/20 bg-whipped px-4 py-3 font-ui text-[15px] leading-normal placeholder:text-ink-soft/60 focus:border-blueberry focus:ring-3 focus:ring-blueberry/15 focus:outline-none"
           />
-          <span className="self-end font-ui text-xs text-cacao">
+          <span className="self-end font-ui text-xs text-ink-soft">
             {note.length}/{ordering.noteMaxLength}
           </span>
         </label>
       </div>
 
-      <div className="flex items-center gap-3 border-t border-chocolate/10 bg-vanilla px-5 pt-3 pb-[max(14px,env(safe-area-inset-bottom))]">
+      <div className="flex items-center gap-3 border-t border-blueberry/10 bg-paper px-5 pt-3 pb-[max(14px,env(safe-area-inset-bottom))]">
         <QtyStepper
           value={qty}
           onChange={setQty}
@@ -363,7 +363,7 @@ function OptionFieldset({
     <fieldset
       id={`group-${fieldKey}`}
       aria-describedby={`rule-${fieldKey}`}
-      className="scroll-mt-4 border-t border-dashed border-chocolate/20 px-6 pt-5 pb-6"
+      className="scroll-mt-4 border-t border-dashed border-blueberry/20 px-6 pt-5 pb-6"
     >
       <legend className="float-start mb-3 flex w-full items-center justify-between gap-3">
         <span className="font-display text-lg leading-tight font-bold">
@@ -371,7 +371,7 @@ function OptionFieldset({
         </span>
         <span
           id={`rule-${fieldKey}`}
-          className={`flex-none rounded-full px-2.5 py-1 font-ui text-xs leading-4 font-bold ${missing ? "bg-raspberry text-whipped" : required ? "bg-blueberry text-vanilla" : "bg-strawberry-milk text-cacao"}`}
+          className={`flex-none rounded-full px-2.5 py-1 font-ui text-xs leading-4 font-bold ${missing ? "bg-raspberry text-ink" : required ? "bg-blueberry text-paper" : "bg-strawberry-milk text-ink-soft"}`}
         >
           {rule}
         </span>
@@ -397,7 +397,7 @@ function OptionFieldset({
           return (
             <label
               key={option.id}
-              className="group/opt relative flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-chocolate/12 bg-whipped px-4 py-2.5 transition-colors has-checked:border-blueberry has-checked:bg-strawberry-milk has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel has-disabled:cursor-not-allowed has-disabled:opacity-45"
+              className="group/opt relative flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-blueberry/12 bg-whipped px-4 py-2.5 transition-colors has-checked:border-blueberry has-checked:bg-strawberry-milk has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry has-disabled:cursor-not-allowed has-disabled:opacity-45"
             >
               <input
                 type={single && required ? "radio" : "checkbox"}
@@ -410,7 +410,7 @@ function OptionFieldset({
               />
               <span
                 aria-hidden="true"
-                className={`flex size-[22px] flex-none items-center justify-center border-2 border-chocolate/45 transition-colors group-has-checked/opt:border-blueberry group-has-checked/opt:bg-blueberry ${single && required ? "rounded-full" : "rounded-[7px]"}`}
+                className={`flex size-[22px] flex-none items-center justify-center border-2 border-blueberry/45 transition-colors group-has-checked/opt:border-blueberry group-has-checked/opt:bg-blueberry ${single && required ? "rounded-full" : "rounded-[7px]"}`}
               >
                 {single && required ? (
                   <span className="size-2 scale-0 rounded-full bg-whipped transition-transform group-has-checked/opt:scale-100" />
@@ -426,14 +426,16 @@ function OptionFieldset({
               <span className="flex-1 font-ui text-[15px] leading-5 font-medium">
                 {option.name[lang]}
               </span>
-              <span className="font-ui text-sm font-semibold text-cacao">
+              <span className="font-ui text-sm font-semibold text-ink-soft">
                 {formatAddOn(option.price, lang)}
               </span>
             </label>
           );
         })}
       </div>
-      {full && !unlimited && <p className="mt-2 font-ui text-[13px] text-cacao">{t.maxReached}</p>}
+      {full && !unlimited && (
+        <p className="mt-2 font-ui text-[13px] text-ink-soft">{t.maxReached}</p>
+      )}
     </fieldset>
   );
 }
@@ -461,13 +463,13 @@ function SlotFieldset({ slot, menu, chosen, missing, onPick, lang, t }: SlotProp
     <fieldset
       id={`group-${slot.id}`}
       aria-describedby={`rule-${slot.id}`}
-      className="scroll-mt-4 border-t border-dashed border-chocolate/20 px-6 pt-5 pb-6"
+      className="scroll-mt-4 border-t border-dashed border-blueberry/20 px-6 pt-5 pb-6"
     >
       <legend className="float-start mb-3 flex w-full items-center justify-between gap-3">
         <span className="font-display text-lg leading-tight font-bold">{slot.name[lang]}</span>
         <span
           id={`rule-${slot.id}`}
-          className={`flex-none rounded-full px-2.5 py-1 font-ui text-xs leading-4 font-bold ${missing ? "bg-raspberry text-whipped" : fixed ? "bg-strawberry-milk text-cacao" : "bg-blueberry text-vanilla"}`}
+          className={`flex-none rounded-full px-2.5 py-1 font-ui text-xs leading-4 font-bold ${missing ? "bg-raspberry text-ink" : fixed ? "bg-strawberry-milk text-ink-soft" : "bg-blueberry text-paper"}`}
         >
           {fixed ? t.included : `${t.required} · ${t.pickOne}`}
         </span>
@@ -495,7 +497,7 @@ function SlotFieldset({ slot, menu, chosen, missing, onPick, lang, t }: SlotProp
               <span className="flex-1 font-ui text-[15px] leading-5 font-medium">
                 {item.name[lang]}
               </span>
-              <span className="font-ui text-sm font-semibold text-cacao">
+              <span className="font-ui text-sm font-semibold text-ink-soft">
                 {soldOut ? t.soldOut : formatAddOn(price, lang)}
               </span>
             </>
@@ -504,7 +506,7 @@ function SlotFieldset({ slot, menu, chosen, missing, onPick, lang, t }: SlotProp
             return (
               <div
                 key={item.id}
-                className="flex min-h-[52px] items-center gap-3 rounded-[14px] border-[1.5px] border-chocolate/12 bg-whipped px-3 py-2"
+                className="flex min-h-[52px] items-center gap-3 rounded-[14px] border-[1.5px] border-blueberry/12 bg-whipped px-3 py-2"
               >
                 {content}
               </div>
@@ -512,7 +514,7 @@ function SlotFieldset({ slot, menu, chosen, missing, onPick, lang, t }: SlotProp
           return (
             <label
               key={item.id}
-              className="group/opt relative flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-chocolate/12 bg-whipped px-3 py-2 transition-colors has-checked:border-blueberry has-checked:bg-strawberry-milk has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel has-disabled:cursor-not-allowed has-disabled:opacity-45"
+              className="group/opt relative flex min-h-[52px] cursor-pointer items-center gap-3 rounded-[14px] border-[1.5px] border-blueberry/12 bg-whipped px-3 py-2 transition-colors has-checked:border-blueberry has-checked:bg-strawberry-milk has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry has-disabled:cursor-not-allowed has-disabled:opacity-45"
             >
               <input
                 type="radio"
@@ -525,7 +527,7 @@ function SlotFieldset({ slot, menu, chosen, missing, onPick, lang, t }: SlotProp
               />
               <span
                 aria-hidden="true"
-                className="flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-chocolate/45 transition-colors group-has-checked/opt:border-blueberry group-has-checked/opt:bg-blueberry"
+                className="flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-blueberry/45 transition-colors group-has-checked/opt:border-blueberry group-has-checked/opt:bg-blueberry"
               >
                 <span className="size-2 scale-0 rounded-full bg-whipped transition-transform group-has-checked/opt:scale-100" />
               </span>

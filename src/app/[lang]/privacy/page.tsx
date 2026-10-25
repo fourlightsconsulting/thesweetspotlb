@@ -27,7 +27,7 @@ export default async function Privacy({ params }: PageProps<"/[lang]/privacy">) 
       <div className="flex max-w-[760px] flex-col gap-8">
         <header className="flex flex-col gap-3">
           <h1 className="title-section">{t.title}</h1>
-          <p className="font-ui text-sm text-cacao">{t.updated}</p>
+          <p className="font-ui text-sm text-ink-soft">{t.updated}</p>
           <p className="font-body text-lg leading-relaxed text-pretty">{t.intro}</p>
         </header>
         {t.sections.map((section) => (

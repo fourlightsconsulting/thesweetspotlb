@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import logoPink from "@/assets/images/logo-pink.png";
+import logo from "@/assets/images/logo-sky.svg";
 import { MenuIcon, menuIconNames } from "@/components/icons";
 import { type SocialLink, SocialLinks } from "@/components/social-links";
 import type { Locale } from "@/i18n/config";
@@ -23,10 +23,10 @@ export function SiteFooter({ lang, dict, hours, social }: Props) {
   ];
 
   return (
-    <footer className="scallop-top relative bg-blueberry text-vanilla [--scallop:var(--color-blueberry)]">
+    <footer className="scallop-top relative bg-blueberry text-paper [--scallop:var(--color-blueberry)]">
       <div className="mx-auto grid max-w-[1440px] grid-cols-[repeat(auto-fit,minmax(min(100%,240px),1fr))] items-start gap-9 px-[clamp(20px,5cqw,72px)] pt-section-sm pb-8">
         <div className="flex flex-col items-start gap-4">
-          <Image src={logoPink} alt="The Sweet Spot" sizes="150px" className="h-auto w-[150px]" />
+          <Image src={logo} alt="The Sweet Spot" sizes="150px" className="h-auto w-[150px]" />
           <span className="font-script text-[28px] leading-[1.35] text-strawberry-cream">
             {footer.tagline}
           </span>
@@ -52,7 +52,7 @@ export function SiteFooter({ lang, dict, hours, social }: Props) {
         <div className="flex flex-col gap-2.5 font-ui text-[15px] leading-[22px]">
           <span className="font-semibold">{loc.tripoli}</span>
           {hours.map((line) => (
-            <span key={line} className="text-vanilla/85">
+            <span key={line} className="text-paper/85">
               {line}
             </span>
           ))}
@@ -65,11 +65,11 @@ export function SiteFooter({ lang, dict, hours, social }: Props) {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-3 border-t border-vanilla/16 px-[clamp(20px,5cqw,72px)] pt-[18px] pb-7 font-ui text-[13px] text-vanilla/82">
+      <div className="mx-auto flex max-w-[1440px] flex-wrap justify-between gap-3 border-t border-paper/16 px-[clamp(20px,5cqw,72px)] pt-[18px] pb-7 font-ui text-[13px] text-paper/82">
         <span>{footer.rights}</span>
         <Link
           href={r.privacy}
-          className="font-semibold text-strawberry-cream underline decoration-strawberry-cream/50 underline-offset-4 transition-colors hover:text-vanilla"
+          className="font-semibold text-strawberry-cream underline decoration-strawberry-cream/50 underline-offset-4 transition-colors hover:text-paper"
         >
           {dict.privacy.title}
         </Link>

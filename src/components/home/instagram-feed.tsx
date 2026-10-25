@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRef, useState } from "react";
-import logo from "@/assets/images/logo-blueberry.png";
+import logo from "@/assets/images/logo-sky.svg";
 import type { InstagramPost } from "@/data/social";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
@@ -25,14 +25,14 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
   const close = () => dialogRef.current?.close();
 
   return (
-    <div className="mt-[clamp(24px,3cqw,40px)] rounded-[28px] bg-whipped p-5 shadow-[0_1px_2px_rgba(53,37,34,.08),0_24px_48px_-28px_rgba(53,37,34,.45)] desk:p-8">
+    <div className="mt-[clamp(24px,3cqw,40px)] rounded-[28px] bg-whipped p-5 shadow-[0_1px_2px_rgba(26,86,167,.08),0_24px_48px_-28px_rgba(26,86,167,.45)] desk:p-8">
       <div className="flex flex-wrap items-center gap-x-5 gap-y-4">
         <Avatar className="size-[76px] desk:size-24" />
         <div className="min-w-0 flex-1">
           <p className="font-ui text-[17px] leading-6 font-bold">
             <bdi dir="ltr">@{handle}</bdi>
           </p>
-          <p className="mt-1 font-ui text-sm leading-[1.5] text-cacao">
+          <p className="mt-1 font-ui text-sm leading-[1.5] text-ink-soft">
             {t.bio.map((line) => (
               <span key={line} className="block">
                 {line}
@@ -59,7 +59,7 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
             onClick={() => open(i)}
             aria-haspopup="dialog"
             aria-label={`${item.isReel ? t.reel : t.post} ${i + 1}`}
-            className="group relative aspect-[3/4] snap-start overflow-hidden rounded-xl bg-strawberry-milk focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-caramel"
+            className="group relative aspect-[3/4] snap-start overflow-hidden rounded-xl bg-strawberry-milk focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-raspberry"
           >
             <Image
               src={item.image}
@@ -70,7 +70,7 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
               style={{ objectPosition: item.focus }}
             />
             {item.isReel && (
-              <span className="absolute start-2 bottom-2 flex size-7 items-center justify-center rounded-full bg-chocolate/45 text-vanilla">
+              <span className="absolute start-2 bottom-2 flex size-7 items-center justify-center rounded-full bg-ink/45 text-paper">
                 <PlayIcon className="ms-0.5 size-3.5" />
               </span>
             )}
@@ -85,10 +85,10 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
         onClick={(e) => {
           if (e.target === e.currentTarget) close(); // click on the backdrop
         }}
-        className="m-auto w-[min(92vw,420px)] overflow-visible border-0 bg-transparent p-0 backdrop:bg-chocolate/75 backdrop:backdrop-blur-sm"
+        className="m-auto w-[min(92vw,420px)] overflow-visible border-0 bg-transparent p-0 backdrop:bg-ink/75 backdrop:backdrop-blur-sm"
       >
         {post && (
-          <div className="overflow-hidden rounded-2xl bg-chocolate text-vanilla">
+          <div className="overflow-hidden rounded-2xl bg-ink text-paper">
             <div
               className={`relative max-h-[calc(100svh-150px)] w-full ${post.isReel ? "aspect-[9/16]" : "aspect-[4/5]"}`}
             >
@@ -98,7 +98,7 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
                   autoPlay
                   controls
                   playsInline
-                  className="size-full bg-chocolate object-cover"
+                  className="size-full bg-ink object-cover"
                 />
               ) : (
                 <Image
@@ -134,7 +134,7 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
                 href={post.permalink ?? profileUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="font-ui text-sm font-bold whitespace-nowrap text-strawberry-cream underline decoration-caramel decoration-2 underline-offset-4"
+                className="font-ui text-sm font-bold whitespace-nowrap text-strawberry-cream underline decoration-raspberry decoration-2 underline-offset-4"
               >
                 {t.viewOnInstagram}
               </a>
@@ -150,9 +150,9 @@ export function InstagramFeed({ posts, t, handle, profileUrl }: Props) {
 function Avatar({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`inline-flex shrink-0 rounded-full bg-[conic-gradient(from_200deg,var(--color-raspberry),var(--color-toffee),var(--color-strawberry-cream),var(--color-raspberry))] p-[3px] ${className}`}
+      className={`inline-flex shrink-0 rounded-full bg-[conic-gradient(from_200deg,var(--color-raspberry),var(--color-raspberry),var(--color-strawberry-cream),var(--color-raspberry))] p-[3px] ${className}`}
     >
-      <span className="flex size-full items-center justify-center rounded-full border-2 border-whipped bg-vanilla">
+      <span className="flex size-full items-center justify-center rounded-full border-2 border-whipped bg-strawberry-cream">
         <Image src={logo} alt="" sizes="96px" className="h-auto w-[74%]" />
       </span>
     </span>

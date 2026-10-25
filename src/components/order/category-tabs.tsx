@@ -82,7 +82,7 @@ export function CategoryTabs({ categories, lang, label }: Props) {
     <nav
       ref={barRef}
       aria-label={label}
-      className="sticky top-[var(--header-h,74px)] z-30 border-b border-chocolate/8 bg-vanilla/94 backdrop-blur-md"
+      className="sticky top-[var(--header-h,74px)] z-30 border-b border-blueberry/8 bg-paper/94 backdrop-blur-md"
     >
       <ul ref={listRef} className="shell flex [scrollbar-width:none] gap-2 overflow-x-auto py-2.5">
         {categories.map((category) => (
@@ -100,7 +100,7 @@ export function CategoryTabs({ categories, lang, label }: Props) {
                 });
                 history.replaceState(history.state, "", `#${category.id}`);
               }}
-              className="flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-chocolate/15 bg-whipped ps-1.5 pe-4 font-ui text-[15px] font-semibold whitespace-nowrap transition-colors duration-200 hover:border-chocolate/40 aria-[current=true]:border-blueberry aria-[current=true]:bg-blueberry aria-[current=true]:text-vanilla"
+              className="flex min-h-11 items-center gap-2 rounded-full border-[1.5px] border-blueberry/15 bg-whipped ps-1.5 pe-4 font-ui text-[15px] font-semibold whitespace-nowrap transition-colors duration-200 hover:border-blueberry/40 aria-[current=true]:border-blueberry aria-[current=true]:bg-blueberry aria-[current=true]:text-paper"
             >
               {category.image ? (
                 <Image

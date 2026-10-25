@@ -5,11 +5,11 @@ import { Reveal } from "@/components/reveal";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
 const polaroid =
-  "absolute m-0 rounded-[2px] bg-whipped shadow-[0_1px_2px_rgba(53,37,34,.12),0_22px_36px_-22px_rgba(53,37,34,.55)] desk:shadow-[0_1px_2px_rgba(53,37,34,.12),0_26px_44px_-26px_rgba(53,37,34,.55)]";
-const tape = "absolute h-6 bg-vanilla/78 desk:h-7";
+  "absolute m-0 rounded-[2px] bg-whipped shadow-[0_1px_2px_rgba(26,86,167,.12),0_22px_36px_-22px_rgba(26,86,167,.55)] desk:shadow-[0_1px_2px_rgba(26,86,167,.12),0_26px_44px_-26px_rgba(26,86,167,.55)]";
+const tape = "absolute h-6 bg-paper/78 desk:h-7";
 // Stand-in frames until the real behind-the-scenes photos arrive.
 const placeholder =
-  "flex w-full items-center justify-center bg-strawberry-milk p-3 text-center font-mono text-[10px] leading-normal text-cacao [direction:ltr] desk:p-4 desk:text-[11px]";
+  "flex w-full items-center justify-center bg-strawberry-milk p-3 text-center font-mono text-[10px] leading-normal text-ink-soft [direction:ltr] desk:p-4 desk:text-[11px]";
 
 type Props = { t: Dictionary["story"] };
 

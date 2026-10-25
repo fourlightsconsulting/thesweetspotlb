@@ -28,14 +28,19 @@ export const pacifico = Pacifico({
   variable: "--font-pacifico",
 });
 
-// Arabic-only subsets: Latin characters fall through to the next font in each
-// stack, so prices and brand names keep Fraunces / Google Sans in Arabic mode.
-// No metric-adjusted fallback, or it would claim the Latin range first.
+// The website's Arabic face: IBM Plex Sans Arabic, calm and easy to read for
+// every age. Self-hosted Arabic-only subsets (Google's own files), so Latin
+// characters (prices, brand names) fall through to Fraunces / Google Sans; no
+// metric-adjusted fallback, or it would claim the Latin range first.
 // (next/font needs literal option values, hence the repeated unicode-range.)
-export const arabicDisplay = localFont({
-  src: "../fonts/baloo-bhaijaan-2-arabic.woff2",
-  weight: "400 800",
-  variable: "--font-ar-display",
+export const arabic = localFont({
+  src: [
+    { path: "../fonts/ibm-plex-sans-arabic-400-arabic.woff2", weight: "400" },
+    { path: "../fonts/ibm-plex-sans-arabic-500-arabic.woff2", weight: "500" },
+    { path: "../fonts/ibm-plex-sans-arabic-600-arabic.woff2", weight: "600" },
+    { path: "../fonts/ibm-plex-sans-arabic-700-arabic.woff2", weight: "700" },
+  ],
+  variable: "--font-plex-ar",
   preload: false,
   adjustFontFallback: false,
   declarations: [
@@ -46,6 +51,7 @@ export const arabicDisplay = localFont({
   ],
 });
 
+// The admin's Arabic (Readex Pro), Arabic-only subset as above.
 export const arabicText = localFont({
   src: "../fonts/readex-pro-arabic.woff2",
   weight: "160 700",
@@ -60,6 +66,6 @@ export const arabicText = localFont({
   ],
 });
 
-export const fontVariables = [fraunces, googleSans, pacifico, arabicDisplay, arabicText]
+export const fontVariables = [fraunces, googleSans, pacifico, arabic]
   .map((font) => font.variable)
   .join(" ");

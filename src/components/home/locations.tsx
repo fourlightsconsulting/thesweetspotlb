@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { OpenStatus } from "@/components/open-status";
 import { Reveal } from "@/components/reveal";
+import { StrawberrySticker } from "@/components/stickers";
 import { site } from "@/data/site";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 import { type Schedule, weekHours } from "@/lib/hours";
 
-const hoursRow = "flex justify-between gap-3 border-t border-dashed border-chocolate/30 py-3";
+const hoursRow = "flex justify-between gap-3 border-t border-dashed border-blueberry/30 py-3";
 
 type Props = {
   lang: Locale;
@@ -22,9 +23,15 @@ export function Locations({ lang, t, orderNow, hours }: Props) {
   const rows = weekHours(hours, lang, t);
 
   return (
-    <section id="locations" className="pt-section pb-section-lg">
+    <section
+      id="locations"
+      className="wave-top bg-strawberry-cream pt-section pb-section-lg [--wave:var(--color-strawberry-cream)]"
+    >
       <Reveal className="shell grid items-start gap-[clamp(36px,4cqw,64px)] desk:grid-cols-2">
-        <h2 className="title-section">{t.title}</h2>
+        <div>
+          <h2 className="title-section">{t.title}</h2>
+          <StrawberrySticker className="mt-[clamp(28px,4cqw,56px)] hidden w-[clamp(120px,12cqw,170px)] -rotate-6 [--badge:var(--color-cotton-candy)] desk:block" />
+        </div>
 
         <div className="flex w-full max-w-[520px] flex-col gap-3.5 font-ui text-[15px] leading-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -33,8 +40,8 @@ export function Locations({ lang, t, orderNow, hours }: Props) {
             </h3>
             <OpenStatus schedule={hours} openLabel={t.openNow} closedLabel={t.closedNow} />
           </div>
-          <span className="text-cacao">{t.tripoliNote}</span>
-          <div className="flex flex-col border-b border-dashed border-chocolate/30">
+          <span className="text-ink-soft">{t.tripoliNote}</span>
+          <div className="flex flex-col border-b border-dashed border-blueberry/30">
             {rows.map((row) => (
               <div key={row.days} className={hoursRow}>
                 <span>{row.days}</span>

@@ -9,7 +9,7 @@ import { Reviews } from "@/components/home/reviews";
 import { Ticker } from "@/components/home/ticker";
 import { WeeklySpecial } from "@/components/home/weekly-special";
 import { WEEKLY_SPECIAL_ID } from "@/data/menu";
-import { instagramPosts, sampleReviews } from "@/data/social";
+import { googleRating, instagramPosts, sampleReviews } from "@/data/social";
 import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getBranches, getMenu, getSiteSettings, ORDERING_BRANCH } from "@/server/catalog";
@@ -36,8 +36,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       {special && <WeeklySpecial lang={lang} t={t.special} item={special} />}
       <Boxes lang={lang} t={t.boxes} items={menu.items} />
       <DessertMoment lang={lang} t={t.dessert} />
-      <Reviews reviews={sampleReviews} t={t.reviews} rtl={lang === "ar"} />
-      <Instagram posts={instagramPosts} t={t.instagram} />
+      <Reviews lang={lang} reviews={sampleReviews} rating={googleRating} t={t.reviews} />
+      <Instagram lang={lang} posts={instagramPosts} t={t.instagram} />
       <Locations
         lang={lang}
         t={t.locations}

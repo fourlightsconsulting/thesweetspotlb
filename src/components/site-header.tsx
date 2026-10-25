@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import logo from "@/assets/images/logo-blueberry.png";
+import logo from "@/assets/images/logo-sky.svg";
 import { type SocialLink, SocialLinks } from "@/components/social-links";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -69,7 +69,7 @@ export function SiteHeader({ lang, nav, menu }: Props) {
       lang={otherLang}
       hrefLang={otherLang}
       onClick={closeDrawer}
-      className="inline-flex min-h-11 items-center rounded-full border-[1.5px] border-chocolate/20 px-3.5 font-ui text-sm font-semibold transition-colors duration-200 hover:border-strawberry-cream hover:bg-strawberry-cream"
+      className="inline-flex min-h-11 items-center rounded-full border-[1.5px] border-blueberry/25 px-3.5 font-ui text-sm font-semibold text-blueberry transition-colors duration-200 hover:border-blueberry"
     >
       {nav.langSwitch}
     </Link>
@@ -79,7 +79,7 @@ export function SiteHeader({ lang, nav, menu }: Props) {
     <header
       ref={headerRef}
       data-scrolled={scrolled || undefined}
-      className="group/header sticky top-0 z-40 border-b border-chocolate/8 bg-vanilla transition-shadow duration-300 data-scrolled:shadow-[0_10px_24px_-20px_rgba(53,37,34,.6)]"
+      className="group/header sticky top-0 z-40 border-b border-blueberry/12 bg-strawberry-cream transition-shadow duration-300 data-scrolled:shadow-[0_10px_24px_-20px_rgba(26,86,167,.6)]"
     >
       <div className="mx-auto flex max-w-[1440px] items-center gap-[clamp(10px,2.2cqw,36px)] px-[clamp(16px,4.5cqw,72px)] py-1.5">
         <Link
@@ -96,13 +96,13 @@ export function SiteHeader({ lang, nav, menu }: Props) {
           />
         </Link>
 
-        <nav className="hidden gap-[clamp(18px,2cqw,32px)] font-ui text-[15px] leading-5 font-medium desk:flex">
+        <nav className="hidden gap-[clamp(18px,2cqw,32px)] font-ui text-[15px] leading-5 font-medium text-blueberry desk:flex">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               aria-current={pathname === link.href ? "page" : undefined}
-              className="py-2 underline decoration-transparent decoration-2 underline-offset-8 transition-[text-decoration-color] duration-200 hover:decoration-caramel aria-[current=page]:decoration-caramel"
+              className="py-2 underline decoration-transparent decoration-2 underline-offset-8 transition-[text-decoration-color] duration-200 hover:decoration-raspberry aria-[current=page]:decoration-raspberry"
             >
               {link.label}
             </Link>
@@ -138,7 +138,7 @@ export function SiteHeader({ lang, nav, menu }: Props) {
           aria-haspopup="dialog"
           aria-controls="site-menu"
           aria-label={nav.openMenu}
-          className="inline-flex size-11 items-center justify-center rounded-xl border-[1.5px] border-chocolate/20 desk:hidden"
+          className="inline-flex size-11 items-center justify-center rounded-xl border-[1.5px] border-blueberry/25 text-blueberry desk:hidden"
         >
           <svg
             aria-hidden="true"
@@ -191,7 +191,7 @@ export function SiteHeader({ lang, nav, menu }: Props) {
                 href={link.href}
                 onClick={closeDrawer}
                 aria-current={pathname === link.href ? "page" : undefined}
-                className="group flex items-center justify-between border-b border-dashed border-chocolate/20 py-4 font-display text-[30px] leading-[1.1] font-black tracking-[-0.02em] aria-[current=page]:text-blueberry"
+                className="group flex items-center justify-between border-b border-dashed border-blueberry/20 py-4 font-display text-[30px] leading-[1.1] font-black tracking-[-0.02em] aria-[current=page]:text-blueberry"
               >
                 {link.label}
                 <span
@@ -211,14 +211,14 @@ export function SiteHeader({ lang, nav, menu }: Props) {
             <div className="font-ui text-sm leading-[1.6]">
               <p className="font-semibold">{menu.branch}</p>
               {menu.hours.map((line) => (
-                <p key={line} className="text-cacao">
+                <p key={line} className="text-ink-soft">
                   {line}
                 </p>
               ))}
               <div className="mt-3">
                 <SocialLinks
                   links={menu.social}
-                  className="border-chocolate/20 text-blueberry hover:border-blueberry hover:bg-blueberry hover:text-vanilla"
+                  className="border-blueberry/20 text-blueberry hover:border-blueberry hover:bg-blueberry hover:text-paper"
                 />
               </div>
             </div>

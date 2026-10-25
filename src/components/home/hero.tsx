@@ -1,107 +1,104 @@
-import { getImageProps } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
-import heroMobilePoster from "@/assets/images/hero-mobile-poster.jpg";
-import photoIcecream from "@/assets/images/photo-icecream.png";
-import photoProfiteroles from "@/assets/images/photo-profiteroles.png";
-import photoWaffle from "@/assets/images/photo-waffle.png";
-import { ArrowToButton } from "@/components/doodles";
-import { HeroVideo } from "@/components/home/hero-video";
+import front from "@/assets/images/hero-waffles-front.png";
+import photo from "@/assets/images/hero-waffles.jpg";
+import { ArrowUpLeft } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
-import { heroVideo } from "@/data/site";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 
-// Desktop: crossfading stills (18s loop, slow zoom) until a landscape clip
-// arrives. Phones: the video's poster frame, then the video itself.
-const reel = [
-  { src: photoWaffle, origin: "35% 60%" },
-  { src: photoIcecream, origin: "65% 40%" },
-  { src: photoProfiteroles, origin: "50% 55%" },
-];
-
-// Phones get a 1px blank in place of the desktop-only stills, so they are never fetched.
-const BLANK = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
-const DESKTOP = "(width >= 51.25rem)";
-
-const imageProps = (src: typeof photoWaffle, priority = false) =>
-  getImageProps({
-    src,
-    alt: "",
-    fill: true,
-    sizes: "100vw",
-    ...(priority ? ({ loading: "eager", fetchPriority: "high" } as const) : {}),
-  }).props;
-
 type Props = { lang: Locale; t: Dictionary["hero"]; orderNow: string };
 
 /**
- * Phones: a 4:5 video box with only the order button on it; the ticker below
- * overlaps its bottom edge with its scallops. The H1 is kept for search and
- * screen readers but hidden visually. Desktop: full-height stills with the
- * headline and button overlaid.
+ * Waffles getting a chocolate pour, on a dusty pink wall and a pink table. The
+ * photo sits at the inline end and its two pinks carry on in CSS behind the
+ * words (hero-pinks). The headline sits between the photo and its front layer
+ * (hand, jug, pour), so the pour passes in front of the words. Phones slide the
+ * photo (--dx) so the jug clears the headline; Arabic mirrors the scene.
  */
 export function Hero({ lang, t, orderNow }: Props) {
-  const poster = imageProps(heroMobilePoster, true);
+  const ar = lang === "ar";
+  const { lead, first, join, last } = t.title;
 
   return (
-    <section className="relative desk:h-[min(calc(100svh-110px),820px)] desk:min-h-[520px]">
-      <div className="relative h-[min(125cqw,70svh)] min-h-[360px] overflow-hidden bg-blueberry desk:absolute desk:inset-0 desk:h-auto desk:min-h-0">
-        <div className="reel absolute inset-0">
-          {reel.map((photo, i) => {
-            const desktop = imageProps(photo.src);
-            // The first slot doubles as the phone poster; the rest are desktop-only.
-            const fallback = i === 0 ? poster : { ...desktop, src: BLANK, srcSet: undefined };
-            return (
-              <picture key={photo.origin}>
-                <source media={DESKTOP} srcSet={desktop.srcSet} sizes={desktop.sizes} />
-                <img
-                  {...fallback}
-                  alt=""
-                  className="object-cover"
-                  style={{
-                    ...fallback.style,
-                    transformOrigin: photo.origin,
-                    animationDelay: `${i * 6 - 1}s`,
-                  }}
-                />
-              </picture>
-            );
-          })}
+    <section className="relative h-[clamp(500px,150vw,600px)] overflow-hidden [--dx:14.8%] hero-pinks desk:h-[min(calc(100svh-110px),760px)] desk:min-h-[520px] desk:[--dx:0%]">
+      <Image
+        src={photo}
+        alt=""
+        loading="eager"
+        fetchPriority="high"
+        sizes="(min-width: 820px) 1200px, 940px"
+        className="hero-layer z-1 w-auto hero-mirror [mask-image:linear-gradient(to_right,transparent_3%,#000_14%)]"
+      />
+
+      <div className="absolute inset-0 z-2 mx-auto grid max-w-[1440px] grid-rows-[60%_40%] px-5 desk:px-[clamp(20px,5cqw,72px)]">
+        {/* Phones: words at the top of the wall. Desktop: just above the table. */}
+        <div className="self-start pt-[54px] desk:self-end desk:pt-0 desk:pb-[2.4%]">
+          <h1
+            className={`rise mb-[0.4em] font-script ${ar ? "text-[clamp(46px,12.5vw,66px)] leading-[1.15] font-bold desk:text-[clamp(80px,8.6vw,150px)] desk:leading-[1.1]" : "text-[clamp(40px,11.2vw,60px)] leading-[0.95] font-normal desk:text-[clamp(84px,10vw,168px)]"}`}
+          >
+            {/* One lockup: a small word tucked into the top corner of the
+                first big word, a small blue one after it, and the second big
+                word starting further out and tucked up underneath. */}
+            <span className={`relative block text-paper ${lead ? "ps-[0.5em]" : ""}`}>
+              {lead && (
+                <>
+                  <small className="absolute start-[0.05em] top-[0.22em] text-[0.42em]">
+                    {lead}
+                  </small>{" "}
+                </>
+              )}
+              {first}
+              {join && (
+                <>
+                  {" "}
+                  <small className="ms-[0.2em] text-[0.42em] text-blueberry">{join}</small>
+                </>
+              )}
+            </span>{" "}
+            <span className={`block text-blueberry ${ar ? "-mt-[0.1em]" : "-mt-[0.26em]"}`}>
+              {last}
+            </span>
+          </h1>
+          <p
+            className={`rise text-ink [animation-delay:120ms] ${ar ? "font-ui text-[clamp(15px,4.2vw,18px)] font-medium desk:text-[clamp(20px,2.1vw,30px)]" : "font-display text-[clamp(13px,3.7vw,16px)] leading-[1.3] font-semibold tracking-[0.06em] uppercase desk:text-[clamp(17px,1.7vw,25px)]"}`}
+          >
+            {t.tagline}
+          </p>
         </div>
-        {heroVideo && <HeroVideo {...heroVideo} />}
-        <div className="absolute inset-0 hidden hero-scrim desk:block" />
-        <div aria-hidden="true" className="absolute inset-x-0 top-0 z-3 awning" />
-      </div>
 
-      <div className="absolute inset-0 z-2 mx-auto flex max-w-[1440px] flex-col items-center justify-end px-5 pb-8 text-vanilla desk:items-start desk:gap-[clamp(16px,1.8cqw,26px)] desk:px-[clamp(20px,5cqw,72px)] desk:pt-[72px] desk:pb-[clamp(24px,5cqw,88px)]">
-        <h1 className="rise sr-only font-display font-black tracking-[-0.03em] desk:not-sr-only desk:text-[clamp(54px,7.6cqw,124px)] desk:leading-[0.92] desk:text-shadow-[0_2px_28px_rgba(53,37,34,.35)]">
-          <span className="block">{t.line1}</span> <span className="block">{t.line2}</span>{" "}
-          <span className="block text-strawberry-cream">{t.line3}</span>
-        </h1>
-        <p className="rise hidden max-w-[32ch] font-body text-[clamp(18px,1.6cqw,22px)] leading-[1.45] font-medium text-pretty [animation-delay:120ms] desk:block">
-          {t.lead}
-        </p>
-
-        {/* Phones: just the button, sitting above the ticker's scallops */}
-        <Link href={routes(lang).order} className="btn btn-light px-7 desk:hidden">
-          {orderNow} <span aria-hidden="true">{forwardArrow(lang)}</span>
-        </Link>
-
-        {/* Desktop: button with a hand-written note pointing back at it */}
-        <Reveal className="mt-1 hidden items-center gap-1 [--draw-delay:.7s] desk:flex">
-          <Link href={routes(lang).order} className="btn btn-light btn-xl">
+        {/* The button stands on the table. */}
+        <div className="self-end pb-10 desk:self-start desk:pt-[3.6%] desk:pb-0">
+          <Link href={routes(lang).order} className="btn btn-primary btn-xl">
             {orderNow} <span aria-hidden="true">{forwardArrow(lang)}</span>
           </Link>
-          <ArrowToButton className="ms-3 -mt-10 h-11 w-[72px] stroke-vanilla rtl:-scale-x-100" />
+        </div>
+      </div>
+
+      <Image
+        src={front}
+        alt=""
+        loading="eager"
+        sizes="(min-width: 820px) 1200px, 940px"
+        className="pointer-events-none hero-layer z-3 w-auto hero-mirror"
+      />
+
+      {/* Desktop: a hand-written note under the plate, pointing up at it. It
+          rides on a photo-sized layer, so it stays under the plate at every
+          width. (Phones keep the button there instead.) */}
+      <div aria-hidden="true" className="pointer-events-none hero-layer z-3 hidden desk:block">
+        <Reveal className="absolute start-[57%] top-[85.5%] flex items-start text-raspberry [--draw-delay:.7s]">
           <span
-            aria-hidden="true"
-            className="-mt-16 -rotate-5 font-script text-2xl leading-[1.2] whitespace-nowrap text-shadow-[0_1px_14px_rgba(53,37,34,.5)]"
+            className={`mt-2.5 -rotate-4 font-script whitespace-nowrap ${ar ? "text-[clamp(18px,1.6vw,22px)] font-semibold" : "text-[clamp(20px,1.8vw,26px)] leading-[1.2]"}`}
           >
             {t.note}
           </span>
+          <ArrowUpLeft className="ms-0.5 -mt-7.5 h-[45px] w-[50px] stroke-current rtl:-scale-x-100" />
         </Reveal>
       </div>
+
+      <div aria-hidden="true" className="absolute inset-x-0 top-0 z-4 awning" />
     </section>
   );
 }

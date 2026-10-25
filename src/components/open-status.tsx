@@ -24,9 +24,9 @@ export function OpenStatus({ schedule, openLabel, closedLabel }: Props) {
 
   return (
     <span
-      className={`relative inline-flex items-center gap-2 px-2.5 py-1.5 text-sm font-bold ${open ? "text-blueberry" : "text-cacao"}`}
+      className={`relative inline-flex items-center gap-2 px-2.5 py-1.5 text-sm font-bold ${open ? "text-blueberry" : "text-ink-soft"}`}
     >
-      <span className={`size-2 rounded-full ${open ? "bg-blueberry" : "bg-cacao/50"}`} />
+      <span className={`size-2 rounded-full ${open ? "bg-blueberry" : "bg-ink-soft/50"}`} />
       {open ? openLabel : closedLabel}
       {open && (
         <Circle className="absolute -start-2.5 -top-2 h-[calc(100%+16px)] w-[calc(100%+20px)]" />

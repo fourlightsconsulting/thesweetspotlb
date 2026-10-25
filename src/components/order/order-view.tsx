@@ -135,7 +135,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div className="flex flex-col gap-2">
             <h1 className="title-section">{t.title}</h1>
-            <p className="flex items-center gap-2 font-ui text-[15px] leading-5 text-cacao">
+            <p className="flex items-center gap-2 font-ui text-[15px] leading-5 text-ink-soft">
               <PinIcon />
               {t.branch} · {eta}
             </p>
@@ -144,7 +144,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
         </div>
 
         {closed && status ? (
-          <div className="flex items-start gap-3 rounded-[18px] border-[1.5px] border-chocolate/12 bg-whipped px-4 py-3.5">
+          <div className="flex items-start gap-3 rounded-[18px] border-[1.5px] border-blueberry/12 bg-whipped px-4 py-3.5">
             <span className="mt-0.5">
               <ClockIcon />
             </span>
@@ -152,9 +152,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
           </div>
         ) : (
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[18px] bg-strawberry-milk px-4 py-3 font-ui text-sm leading-5 font-medium">
-            <span className="rounded-full bg-cherry px-2.5 py-1 text-xs leading-4 font-bold text-whipped">
-              {t.dealTag}
-            </span>
+            <span className="tag tag-deal">{t.dealTag}</span>
             {t.dealLine}
           </p>
         )}
@@ -180,7 +178,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
         <aside
           id="your-order"
           aria-labelledby="your-order-title"
-          className="sticky top-[calc(var(--header-h,74px)+var(--sticky-extra,66px)+16px)] hidden max-h-[calc(100svh-var(--header-h,74px)-var(--sticky-extra,66px)-32px)] flex-col gap-5 rounded-[24px] border-[1.5px] border-chocolate/10 bg-whipped p-6 desk:flex"
+          className="sticky top-[calc(var(--header-h,74px)+var(--sticky-extra,66px)+16px)] hidden max-h-[calc(100svh-var(--header-h,74px)-var(--sticky-extra,66px)-32px)] flex-col gap-5 rounded-[24px] border-[1.5px] border-blueberry/10 bg-whipped p-6 desk:flex"
         >
           <div className="flex items-center justify-between gap-3">
             <h2
@@ -209,7 +207,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
 
       {/* Phones: a floating bar opens the order as a bottom sheet. */}
       {count > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-30 bg-linear-to-t from-vanilla via-vanilla/90 to-vanilla/0 px-4 pt-6 pb-[max(14px,env(safe-area-inset-bottom))] desk:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 bg-linear-to-t from-paper via-paper/90 to-paper/0 px-4 pt-6 pb-[max(14px,env(safe-area-inset-bottom))] desk:hidden">
           <button
             type="button"
             onClick={openCartSheet}
@@ -217,7 +215,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
             className="btn btn-primary btn-lg w-full justify-between"
           >
             <span className="flex items-center gap-2.5">
-              <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-vanilla px-2 text-sm text-blueberry">
+              <span className="flex h-7 min-w-7 items-center justify-center rounded-full bg-paper px-2 text-sm text-blueberry">
                 {count}
               </span>
               {t.viewOrder}
@@ -235,7 +233,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
           if (e.target === e.currentTarget) cartSheetRef.current?.close();
         }}
       >
-        <div className="flex items-center justify-between gap-3 border-b border-chocolate/10 px-5 pt-4 pb-3">
+        <div className="flex items-center justify-between gap-3 border-b border-blueberry/10 px-5 pt-4 pb-3">
           <div className="flex items-center gap-3">
             <h2
               id="cart-sheet-title"
@@ -270,7 +268,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
           )}
         </div>
         {lines.length > 0 && (
-          <div className="flex flex-col gap-4 border-t border-chocolate/10 px-5 pt-1 pb-[max(16px,env(safe-area-inset-bottom))]">
+          <div className="flex flex-col gap-4 border-t border-blueberry/10 px-5 pt-1 pb-[max(16px,env(safe-area-inset-bottom))]">
             <CartTotals totals={totals} lang={lang} t={t} />
             {checkout}
           </div>
@@ -294,7 +292,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
         {toast && (
           <span
             key={toast.id}
-            className="flex items-center gap-2 rounded-full bg-chocolate px-5 py-3 font-ui text-[15px] font-semibold text-vanilla shadow-[0_12px_28px_-12px_rgba(53,37,34,.6)]"
+            className="flex items-center gap-2 rounded-full bg-ink px-5 py-3 font-ui text-[15px] font-semibold text-paper shadow-[0_12px_28px_-12px_rgba(26,86,167,.6)]"
           >
             <svg
               aria-hidden="true"
@@ -313,12 +311,12 @@ export function OrderView({ lang, t, menu, branch }: Props) {
 
 function ModeToggle({ mode, t }: { mode: Fulfilment; t: Dictionary["order"] }) {
   return (
-    <fieldset className="inline-flex gap-1 rounded-[16px] border-[1.5px] border-chocolate/12 bg-whipped p-1">
+    <fieldset className="inline-flex gap-1 rounded-[16px] border-[1.5px] border-blueberry/12 bg-whipped p-1">
       <legend className="sr-only">{t.howLabel}</legend>
       {(["pickup", "delivery"] as const).map((value) => (
         <label
           key={value}
-          className="relative flex min-h-11 cursor-pointer items-center rounded-[12px] px-5 font-ui text-[15px] font-semibold transition-colors duration-200 has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel"
+          className="relative flex min-h-11 cursor-pointer items-center rounded-[12px] px-5 font-ui text-[15px] font-semibold transition-colors duration-200 has-checked:bg-blueberry has-checked:text-paper has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry"
         >
           <input
             type="radio"
@@ -361,7 +359,7 @@ function MenuSection({ category, items, lang, t, inCart, eager = false }: Sectio
         >
           {category.name[lang]}
         </h2>
-        <p className="font-body text-[15px] leading-normal text-cacao">
+        <p className="font-body text-[15px] leading-normal text-ink-soft">
           {category.description[lang]}
         </p>
       </div>
@@ -373,7 +371,7 @@ function MenuSection({ category, items, lang, t, inCart, eager = false }: Sectio
               {groupItems.map((item, i) => (
                 <li
                   key={item.id}
-                  className="border-b border-chocolate/8 last:border-b-0 desk:border-0"
+                  className="border-b border-blueberry/8 last:border-b-0 desk:border-0"
                 >
                   <ItemCard
                     item={item}
@@ -403,6 +401,12 @@ type CardProps = {
 function ItemCard({ item, count, lang, t, eager }: CardProps) {
   const soldOut = item.available === false;
   const tag = soldOut ? t.soldOut : item.tag ? t.tags[item.tag] : null;
+  // Tickets: fan favourites in the default blue, the rest in their own colour.
+  const ticket = soldOut
+    ? "tag tag-out"
+    : item.tag && item.tag !== "fav"
+      ? `tag tag-${item.tag}`
+      : "tag";
 
   return (
     <button
@@ -411,27 +415,21 @@ function ItemCard({ item, count, lang, t, eager }: CardProps) {
       aria-haspopup="dialog"
       aria-disabled={soldOut || undefined}
       aria-describedby={count > 0 ? `${item.id}-count` : undefined}
-      className="group flex w-full items-stretch gap-3.5 p-4 text-start focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-caramel desk:h-full desk:flex-col desk:gap-0 desk:overflow-hidden desk:rounded-[22px] desk:border-[1.5px] desk:border-chocolate/10 desk:bg-whipped desk:p-0 desk:transition-[transform,box-shadow,border-color] desk:duration-300 desk:ease-soft desk:hover:-translate-y-1 desk:hover:border-chocolate desk:hover:shadow-[5px_6px_0_var(--color-chocolate)] desk:focus-visible:outline-offset-2"
+      className="group flex w-full items-stretch gap-3.5 p-4 text-start focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-raspberry desk:h-full desk:flex-col desk:gap-0 desk:overflow-hidden desk:rounded-[22px] desk:border-[1.5px] desk:border-blueberry/10 desk:bg-whipped desk:p-0 desk:transition-[transform,box-shadow,border-color] desk:duration-300 desk:ease-soft desk:hover:-translate-y-1 desk:hover:border-blueberry desk:hover:shadow-[5px_6px_0_var(--color-blueberry)] desk:focus-visible:outline-offset-2"
     >
       <span className="flex min-w-0 flex-1 flex-col items-start gap-1 desk:order-2 desk:gap-1.5 desk:px-[18px] desk:pt-4 desk:pb-[18px]">
-        {tag && (
-          <span
-            className={`rounded-full px-2.5 py-1 font-ui text-[11px] leading-[14px] font-bold desk:hidden ${soldOut ? "bg-chocolate/10 text-cacao" : "bg-toffee text-chocolate"}`}
-          >
-            {tag}
-          </span>
-        )}
+        {tag && <span className={`${ticket} desk:hidden`}>{tag}</span>}
         <span className="font-display text-lg leading-[1.2] font-bold desk:text-[19px]">
           {item.name[lang]}
         </span>
-        <span className="line-clamp-2 font-body text-sm leading-[1.45] text-cacao desk:text-[15px]">
+        <span className="line-clamp-2 font-body text-sm leading-[1.45] text-ink-soft desk:text-[15px]">
           {item.description[lang]}
         </span>
         <span className="mt-auto flex w-full items-center justify-between gap-3 pt-2">
           <span className="font-ui text-[15px] font-bold">{formatPrice(item.price, lang)}</span>
           <span
             aria-hidden="true"
-            className="hidden size-10 items-center justify-center rounded-full border-2 border-chocolate bg-blueberry text-vanilla shadow-[2px_2px_0_var(--color-chocolate)] transition-transform duration-200 group-hover:scale-105 desk:flex"
+            className="hidden size-10 items-center justify-center rounded-full border-2 border-paper bg-blueberry text-paper shadow-[2px_2px_0_var(--color-blueberry)] transition-transform duration-200 group-hover:scale-105 desk:flex"
           >
             <PlusIcon />
           </span>
@@ -446,16 +444,12 @@ function ItemCard({ item, count, lang, t, eager }: CardProps) {
           className={`absolute inset-0 size-full rounded-2xl desk:rounded-none ${soldOut ? "grayscale" : ""}`}
         />
         {tag && (
-          <span
-            className={`absolute start-3 top-3 hidden rounded-full px-2.5 py-1 font-ui text-xs leading-4 font-bold desk:block ${soldOut ? "bg-chocolate text-vanilla" : "bg-toffee text-chocolate"}`}
-          >
-            {tag}
-          </span>
+          <span className={`${ticket} absolute start-3 top-3 hidden desk:inline-flex`}>{tag}</span>
         )}
         {count > 0 && (
           <span
             id={`${item.id}-count`}
-            className="absolute end-3 top-3 hidden h-7 min-w-7 items-center justify-center rounded-full bg-blueberry px-2 font-ui text-[13px] font-bold text-vanilla desk:flex"
+            className="absolute end-3 top-3 hidden h-7 min-w-7 items-center justify-center rounded-full bg-blueberry px-2 font-ui text-[13px] font-bold text-paper desk:flex"
           >
             <span className="sr-only">{fill(t.inOrder, { count })}</span>
             <span aria-hidden="true">{count}</span>
@@ -464,7 +458,7 @@ function ItemCard({ item, count, lang, t, eager }: CardProps) {
         {/* Phones: the add badge doubles as the count once it's in the order. */}
         <span
           aria-hidden="true"
-          className="absolute -end-1.5 -bottom-1.5 flex size-9 items-center justify-center rounded-full border-[3px] border-whipped bg-blueberry font-ui text-[13px] font-bold text-vanilla desk:hidden"
+          className="absolute -end-1.5 -bottom-1.5 flex size-9 items-center justify-center rounded-full border-[3px] border-whipped bg-blueberry font-ui text-[13px] font-bold text-paper desk:hidden"
         >
           {count > 0 ? count : <PlusIcon small />}
         </span>
@@ -477,7 +471,7 @@ function EmptyOrder({ t }: { t: Dictionary["order"] }) {
   return (
     <div className="flex flex-col items-center gap-2 rounded-[18px] bg-strawberry-milk px-4 py-7 text-center">
       <span className="font-script text-[26px] leading-[1.35] text-blueberry">{t.treat}</span>
-      <span className="font-body text-base leading-normal text-cacao">{t.empty}</span>
+      <span className="font-body text-base leading-normal text-ink-soft">{t.empty}</span>
     </div>
   );
 }
@@ -495,7 +489,7 @@ function CheckoutButton({ lang, t, total, disabledLabel, onClick }: CheckoutProp
     return (
       <span
         role="note"
-        className="btn btn-lg w-full cursor-not-allowed border-chocolate/30 bg-strawberry-milk text-cacao shadow-none hover:transform-none hover:shadow-none"
+        className="btn btn-lg w-full cursor-not-allowed border-blueberry/30 bg-strawberry-milk text-ink-soft shadow-none hover:transform-none hover:shadow-none"
       >
         {disabledLabel}
       </span>

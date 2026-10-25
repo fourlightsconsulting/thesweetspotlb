@@ -5,6 +5,13 @@
 @import "./brand-colors.css";
 
 @theme {
+  /* The website's neutrals: no brown or beige anywhere on the storefront
+     (the admin keeps the brand file's dark and vanilla colours for now). */
+  --color-ink: #1d1d22; /* near black: text */
+  --color-ink-soft: #4b4b57; /* secondary text */
+  --color-paper: #fafafa; /* near white: page background, text on blue */
+  --color-pink-tint: #fbeef0; /* quiet fills */
+
   /* Roles (always one of the colours above) */
   --color-blueberry-hover: color-mix(in oklab, var(--color-blueberry), black 18%);
   --color-ticker: var(--color-raspberry);
@@ -29,21 +36,22 @@
   --font-script: var(--font-pacifico), cursive;
 }
 
-/* Arabic pages put the Arabic faces first. They only cover Arabic code points,
-   so Latin (prices, brand names) falls through to the English fonts. English
-   pages never reference them, so the lone "عربي" switch uses the system font
-   instead of downloading one. */
+/* Arabic pages put IBM Plex Sans Arabic first, for every role (no playful
+   script in Arabic). It only covers Arabic code points, so Latin (prices,
+   brand names) falls through to the English fonts. English pages never
+   reference it, so the lone "عربي" switch uses the system font instead of
+   downloading one. */
 html[lang="ar"] {
-  --font-display: var(--font-ar-display), var(--font-fraunces), serif;
-  --font-body: var(--font-ar-text), var(--font-fraunces), serif;
-  --font-ui: var(--font-ar-text), var(--font-google-sans), system-ui, sans-serif;
-  --font-script: var(--font-ar-display), var(--font-pacifico), cursive;
+  --font-display: var(--font-plex-ar), var(--font-fraunces), serif;
+  --font-body: var(--font-plex-ar), var(--font-fraunces), serif;
+  --font-ui: var(--font-plex-ar), var(--font-google-sans), system-ui, sans-serif;
+  --font-script: var(--font-plex-ar), var(--font-pacifico), cursive;
 }
 
 /* ── Base ─────────────────────────────────────────────────────── */
 @layer base {
   html {
-    background: var(--color-vanilla);
+    background: var(--color-paper);
     /* Anchor jumps clear the sticky header, plus any sticky bar under it
        (the order page's category tabs set --sticky-extra). */
     scroll-padding-top: calc(var(--header-h, 84px) + var(--sticky-extra, 0px) + 12px);
@@ -51,8 +59,8 @@ html[lang="ar"] {
   }
 
   body {
-    background: var(--color-vanilla);
-    color: var(--color-chocolate);
+    background: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-ui);
   }
 
@@ -100,6 +108,8 @@ html[lang="ar"] {
 /* One size for every section heading and page title. The weekly special title
    and the giant "dessert" word are the two deliberate exceptions. */
 @utility title-section {
+  /* secondary blue; a dark band sets --heading */
+  color: var(--heading, var(--color-blueberry));
   font-family: var(--font-display);
   font-size: clamp(42px, 5cqw, 76px);
   font-weight: 900;
@@ -119,28 +129,32 @@ html[lang="ar"] {
   font-weight: 700;
   font-size: 17px;
   text-decoration: underline;
-  text-decoration-color: var(--color-caramel);
+  text-decoration-color: var(--color-raspberry);
   text-decoration-thickness: 2.5px;
   text-underline-offset: 8px;
   transition: color 0.2s;
 
   &:hover {
-    color: var(--link-hover, var(--color-chocolate));
+    color: var(--link-hover, var(--color-ink));
   }
 }
 
-/* ── Sticker buttons: chocolate outline + hard offset shadow ──── */
+/* ── Sticker buttons: secondary blue outline + hard offset shadow ──
+   --btn-line colours both; coloured buttons get a near-white outline, like a
+   die-cut sticker. Keyboard focus: a secondary pink ring hugs the button
+   (--ring on dark bands) and the hard shadow steps aside. */
 @layer components {
   .btn {
+    --btn-line: var(--color-blueberry);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     min-height: 48px;
     padding: 0 22px;
-    border: 2.5px solid var(--color-chocolate);
+    border: 2.5px solid var(--btn-line);
     border-radius: 14px;
-    box-shadow: 4px 5px 0 var(--color-chocolate);
+    box-shadow: 4px 5px 0 var(--btn-line);
     font-family: var(--font-ui);
     font-weight: 700;
     font-size: 15px;
@@ -154,33 +168,38 @@ html[lang="ar"] {
   }
   .btn:hover {
     transform: translate(-1px, -2px);
-    box-shadow: 5px 7px 0 var(--color-chocolate);
+    box-shadow: 5px 7px 0 var(--btn-line);
   }
   .btn:active {
     transform: translate(3px, 4px);
-    box-shadow: 1px 1px 0 var(--color-chocolate);
+    box-shadow: 1px 1px 0 var(--btn-line);
   }
   .btn:focus-visible {
-    outline: 3px solid var(--color-caramel);
-    outline-offset: 4px;
+    outline: 3px solid var(--ring, var(--color-raspberry));
+    outline-offset: 0;
+    box-shadow: none;
+    transform: none;
   }
 
   .btn-primary {
+    border-color: var(--color-paper);
     background: var(--color-blueberry);
-    color: var(--color-vanilla);
+    color: var(--color-paper);
   }
   .btn-primary:hover {
     background: var(--color-blueberry-hover);
   }
   .btn-secondary {
     background: var(--color-whipped);
-    color: var(--color-chocolate);
+    color: var(--color-blueberry);
   }
   .btn-secondary:hover {
     background: var(--color-strawberry-cream);
   }
+  /* On secondary blue bands: near white, with a primary blue line. */
   .btn-light {
-    background: var(--color-vanilla);
+    --btn-line: var(--color-cotton-candy);
+    background: var(--color-paper);
     color: var(--color-blueberry);
   }
   .btn-light:hover {
@@ -192,7 +211,7 @@ html[lang="ar"] {
     padding: 0 16px;
     border-width: 2px;
     border-radius: 12px;
-    box-shadow: 3px 4px 0 var(--color-chocolate);
+    box-shadow: 3px 4px 0 var(--btn-line);
   }
   .btn-lg {
     min-height: 58px;
@@ -204,43 +223,118 @@ html[lang="ar"] {
     padding: 0 36px;
     font-size: 19px;
     border-radius: 16px;
-    box-shadow: 5px 6px 0 var(--color-chocolate);
+    box-shadow: 5px 6px 0 var(--btn-line);
+  }
+
+  /* ── Tags: little tickets like the brand's TAKE AWAY sticker ──
+     Concave corners and a thin inner line; a variant sets --tag-bg,
+     --tag-ink and --tag-line. */
+  .tag {
+    --tag-bg: var(--color-blueberry);
+    --tag-ink: var(--color-paper);
+    --tag-line: var(--color-strawberry-cream);
+    --r: 6px;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 13px;
+    background: var(--tag-bg);
+    color: var(--tag-ink);
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    rotate: -2deg;
+  }
+  .tag,
+  .tag::before,
+  .tag::after {
+    mask:
+      radial-gradient(circle var(--r) at 0 0, #0000 98%, #000) 0 0 / 51% 51% no-repeat,
+      radial-gradient(circle var(--r) at 100% 0, #0000 98%, #000) 100% 0 / 51% 51% no-repeat,
+      radial-gradient(circle var(--r) at 0 100%, #0000 98%, #000) 0 100% / 51% 51% no-repeat,
+      radial-gradient(circle var(--r) at 100% 100%, #0000 98%, #000) 100% 100% / 51% 51% no-repeat;
+  }
+  .tag::before,
+  .tag::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+  }
+  .tag::before {
+    --r: 4px;
+    inset: 3px;
+    background: var(--tag-line);
+  }
+  .tag::after {
+    --r: 3.5px;
+    inset: 4px;
+    background: var(--tag-bg);
+  }
+  [lang="ar"] .tag {
+    font-size: 12px;
+    text-transform: none;
+  }
+  .tag-new,
+  .tag-deal {
+    --tag-bg: var(--color-raspberry);
+    --tag-ink: var(--color-ink);
+    --tag-line: var(--color-paper);
+  }
+  .tag-limited {
+    --tag-bg: var(--color-cotton-candy);
+    --tag-ink: var(--color-ink);
+    --tag-line: var(--color-paper);
+  }
+  .tag-out {
+    --tag-bg: color-mix(in srgb, var(--color-ink) 10%, var(--color-paper));
+    --tag-ink: var(--color-ink-soft);
+    --tag-line: var(--color-paper);
+    rotate: 0deg;
   }
 }
 
 /* ── Scalloped edges (2a) ─────────────────────────────────────── */
 @utility awning {
-  /* candy-striped awning with a scalloped hem, along the top of the hero */
+  /* candy-striped awning with a scalloped hem (pink and white bubbles),
+     along the top of the hero. The hem is 19px tall: one clear row under the
+     bubbles, or a seam shows along their bottom. */
   &::before {
     content: "";
     display: block;
     height: 14px;
-    border-top: 2px solid var(--color-chocolate);
+    border-top: 2px solid var(--color-blueberry);
     background: repeating-linear-gradient(
       90deg,
       var(--color-strawberry-cream) 0 32px,
-      var(--color-vanilla) 32px 64px
+      var(--color-paper) 32px 64px
     );
   }
   &::after {
     content: "";
     display: block;
-    height: 18px;
+    height: 19px;
     background:
       radial-gradient(
           circle at 16px 0,
           var(--color-strawberry-cream) 0 14.5px,
-          var(--color-chocolate) 15px 17px,
+          var(--color-blueberry) 15px 17px,
           transparent 17.5px
         )
-        0 0 / 64px 18px repeat-x,
+        0 0 / 64px 19px repeat-x,
       radial-gradient(
           circle at 48px 0,
-          var(--color-vanilla) 0 14.5px,
-          var(--color-chocolate) 15px 17px,
+          var(--color-paper) 0 14.5px,
+          var(--color-blueberry) 15px 17px,
           transparent 17.5px
         )
-        0 0 / 64px 18px repeat-x;
+        0 0 / 64px 19px repeat-x;
   }
 }
 
@@ -258,7 +352,7 @@ html[lang="ar"] {
     background: radial-gradient(
         circle at calc(var(--scallop-w, 36px) / 2) var(--scallop-h, 24px),
         var(--scallop) 0 var(--scallop-r, 18.5px),
-        var(--color-chocolate) calc(var(--scallop-r, 18.5px) + 0.5px)
+        var(--color-blueberry) calc(var(--scallop-r, 18.5px) + 0.5px)
           calc(var(--scallop-r, 18.5px) + 2.5px),
         transparent calc(var(--scallop-r, 18.5px) + 3px)
       )
@@ -266,49 +360,77 @@ html[lang="ar"] {
   }
 }
 
-/* ── Section backgrounds ──────────────────────────────────────── */
-@utility hero-scrim {
-  /* chocolate wash so the headline reads over any photo */
-  background: linear-gradient(
-    0deg,
-    rgb(53 37 34 / 0.8) 0%,
-    rgb(53 37 34 / 0.55) 40%,
-    rgb(53 37 34 / 0) 74%
-  );
+@utility wave-top {
+  /* A gentle wavy edge (Brand presentation, Abstracts) where two bands meet:
+     the band's own colour (--wave) rises 9px into the band above. Bubbles
+     stay on the awning, the ticker and the footer only. */
+  position: relative;
 
-  @variant desk {
-    background:
-      linear-gradient(
-        var(--scrim-angle, 90deg),
-        rgb(53 37 34 / 0.72) 0%,
-        rgb(53 37 34 / 0.38) 42%,
-        rgb(53 37 34 / 0) 72%
-      ),
-      linear-gradient(0deg, rgb(53 37 34 / 0.45) 0%, rgb(53 37 34 / 0) 45%);
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: -11px;
+    height: 12px;
+    background: var(--wave);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 12'%3E%3Cpath d='M0 12V2C7.28 2 12.72 11 20 11S32.72 2 40 2V12Z'/%3E%3C/svg%3E")
+      0 0 / 40px 12px repeat-x;
+    pointer-events: none;
+  }
+}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+@utility hero-pinks {
+  /* The hero photo's colours just inside its faded edge, top to bottom:
+     dusty pink wall, the table's lit front edge, pink table. The photo always
+     fills the hero's height, so the table edge lines up on wide screens. */
+  background: linear-gradient(
+    #e4b5b8 0%,
+    #e6b4b7 12%,
+    #e6b2b6 24.5%,
+    #e4afb5 30.6%,
+    #e4adb3 38.3%,
+    #e0a9af 45.9%,
+    #dea5ac 52.1%,
+    #dca3aa 55.1%,
+    #dba2a8 58.2%,
+    #e0aeb1 59.1%,
+    #f1c4c6 60%,
+    #f3c9cb 60.9%,
+    #f3c6c9 62.8%,
+    #efc2c5 67.4%,
+    #eec1c6 73.5%,
+    #edbfc4 79.6%,
+    #edbfc2 85.8%,
+    #edc0c3 91.9%,
+    #eabcbe 98%
+  );
+}
+
+@utility hero-layer {
+  /* A layer the size of the hero photo, at the inline end: the photo, its
+     front layer, and the note pinned under the plate. --dx slides it on
+     phones; Arabic mirrors the images (hero-mirror). */
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  height: 100%;
+  aspect-ratio: 1024 / 653;
+  max-width: none;
+  translate: var(--dx, 0) 0;
+
+  [dir="rtl"] & {
+    translate: calc(-1 * var(--dx, 0)) 0;
+  }
+}
+
+@utility hero-mirror {
+  [dir="rtl"] & {
+    scale: -1 1;
   }
 }
 
 /* ── Motion ───────────────────────────────────────────────────── */
-@keyframes tss-reel {
-  0% {
-    opacity: 0;
-    transform: scale(1.04);
-  }
-  5% {
-    opacity: 1;
-  }
-  33% {
-    opacity: 1;
-  }
-  39% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.18);
-  }
-}
-
 @keyframes tss-marquee {
   to {
     transform: translateX(-50%);
@@ -368,7 +490,6 @@ html[lang="ar"] {
 
 [dir="rtl"] {
   --dir: -1;
-  --scrim-angle: 270deg;
 }
 
 /* Motion runs on desktop only. Phones render everything still: no animation
@@ -379,11 +500,6 @@ html[lang="ar"] {
 }
 [dir="rtl"] .marquee {
   animation-name: tss-marquee-rtl;
-}
-
-/* Hero placeholder stills: only the first is shown (and fetched) on phones. */
-.reel > :not(:first-child) {
-  display: none;
 }
 
 /* Hand-drawn strokes: every path uses pathLength="1" so it can draw itself in. */
@@ -412,14 +528,6 @@ html[lang="ar"] {
 }
 
 @media (width >= 51.25rem) and (prefers-reduced-motion: no-preference) {
-  .reel img {
-    opacity: 0;
-    animation: tss-reel 18s linear infinite;
-  }
-  .reel > :not(:first-child) {
-    display: block;
-  }
-
   .rise {
     animation: tss-rise 0.8s var(--ease-soft) both;
   }
@@ -483,9 +591,9 @@ html:has(dialog[open]) {
   border: 0;
   border-start-start-radius: 28px;
   border-end-start-radius: 28px;
-  background: var(--color-vanilla);
-  color: var(--color-chocolate);
-  box-shadow: calc(-18px * var(--dir, 1)) 0 40px -24px rgb(53 37 34 / 0.45);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: calc(-18px * var(--dir, 1)) 0 40px -24px rgb(26 86 167 / 0.4);
   overflow-y: auto;
   overscroll-behavior: contain;
   translate: calc(100% * var(--dir, 1)) 0;
@@ -533,11 +641,11 @@ html:has(dialog[open]) {
   max-height: calc(100dvh - 32px);
   margin: auto auto 16px;
   padding: 0;
-  border: 2.5px solid var(--color-chocolate);
+  border: 2.5px solid var(--color-blueberry);
   border-radius: 26px;
-  background: var(--color-vanilla);
-  color: var(--color-chocolate);
-  box-shadow: 6px 8px 0 var(--color-chocolate);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: 6px 8px 0 var(--color-blueberry);
   overflow: auto;
   opacity: 0;
   translate: 0 24px;
@@ -589,8 +697,8 @@ html:has(dialog[open]) {
   padding: 0;
   border: 0;
   border-radius: 24px 24px 0 0;
-  background: var(--color-vanilla);
-  color: var(--color-chocolate);
+  background: var(--color-paper);
+  color: var(--color-ink);
   /* clip, not hidden: a focused control must never scroll the sheet itself */
   overflow: clip;
   translate: 0 100%;
@@ -632,7 +740,7 @@ html:has(dialog[open]) {
     border-radius: 0;
     border-start-start-radius: 28px;
     border-end-start-radius: 28px;
-    box-shadow: calc(-18px * var(--dir, 1)) 0 40px -24px rgb(53 37 34 / 0.45);
+    box-shadow: calc(-18px * var(--dir, 1)) 0 40px -24px rgb(26 86 167 / 0.4);
     translate: calc(100% * var(--dir, 1)) 0;
   }
   .sheet[open] {

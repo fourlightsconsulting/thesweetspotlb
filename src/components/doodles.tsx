@@ -14,7 +14,7 @@ export function Underline({ className = "", style }: DoodleProps) {
       aria-hidden="true"
       viewBox="0 0 300 26"
       preserveAspectRatio="none"
-      className={`${base} stroke-caramel ${className}`}
+      className={`${base} stroke-raspberry ${className}`}
       style={style}
     >
       <path pathLength={1} d="M4 15 C 70 5, 170 3, 296 10" strokeWidth={9} />
@@ -99,7 +99,7 @@ export function Circle({ className = "", style }: DoodleProps) {
       aria-hidden="true"
       viewBox="0 0 120 50"
       preserveAspectRatio="none"
-      className={`${base} stroke-caramel ${className}`}
+      className={`${base} stroke-raspberry ${className}`}
       style={style}
     >
       <path

@@ -25,10 +25,10 @@ const en = {
     from: "From",
   },
   hero: {
-    line1: "Chocolate.",
-    line2: "Waffle.",
-    line3: "Problem solved.",
-    lead: "Crêpes, waffles, pancakes, ice cream rolls and more.",
+    // The headline lockup: small words (lead, join) tuck in around the big
+    // ones (first in white, last in blue). Either small word may be empty.
+    title: { lead: "a", first: "Bite", join: "for", last: "Everyone" },
+    tagline: "Stay and make a mess.",
     note: "Ready in 10–15 min",
   },
   categories: {
@@ -69,10 +69,14 @@ const en = {
   },
   reviews: {
     title: "Word on the street",
-    rating: "Google rating · to come",
-    previous: "Previous review",
-    next: "Next review",
-    goTo: "Show review",
+    google: "Google reviews",
+    ratingOf: "{rating} out of 5",
+    count: { one: "{count} review", other: "{count} reviews" } as PluralForms,
+    seeAll: "See all on Google",
+    readMore: "Read more",
+    readLess: "Show less",
+    previous: "Previous reviews",
+    next: "More reviews",
   },
   instagram: {
     title: "Our community",

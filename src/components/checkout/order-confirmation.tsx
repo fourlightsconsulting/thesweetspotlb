@@ -19,10 +19,10 @@ export function OrderPlaced({ lang, t, order }: Props & { order: PlacedOrder }) 
   return (
     <div className="shell flex justify-center pt-section-sm pb-section">
       <div className="flex w-full max-w-[680px] flex-col items-start gap-[clamp(18px,2cqw,26px)]">
-        <section className="relative w-full rounded-[28px] border-[2.5px] border-chocolate bg-strawberry-cream p-[clamp(24px,4cqw,40px)] shadow-[6px_7px_0_var(--color-chocolate)]">
+        <section className="relative w-full rounded-[28px] border-[2.5px] border-blueberry bg-strawberry-cream p-[clamp(24px,4cqw,40px)] shadow-[6px_7px_0_var(--color-blueberry)]">
           <span
             aria-hidden="true"
-            className="mb-4 flex size-14 items-center justify-center rounded-full border-[2.5px] border-chocolate bg-blueberry text-vanilla shadow-[3px_3px_0_var(--color-chocolate)]"
+            className="mb-4 flex size-14 items-center justify-center rounded-full border-[2.5px] border-paper bg-blueberry text-paper shadow-[3px_3px_0_var(--color-blueberry)]"
           >
             <svg
               viewBox="0 0 24 24"
@@ -39,7 +39,7 @@ export function OrderPlaced({ lang, t, order }: Props & { order: PlacedOrder }) 
             <Heart className="ms-[0.14em] inline-block size-[0.48em] rotate-12 align-[0.06em]" />
           </h1>
           {order.demo && (
-            <p className="mt-4 rounded-[14px] bg-whipped/75 px-4 py-2.5 font-ui text-sm text-cacao">
+            <p className="mt-4 rounded-[14px] bg-whipped/75 px-4 py-2.5 font-ui text-sm text-ink-soft">
               {t.demo}
             </p>
           )}
@@ -63,7 +63,7 @@ export function OrderConfirmation({ lang, orderRef, t }: Props & { orderRef: str
     return (
       <div className="shell flex flex-col items-start gap-4 pt-section-sm pb-section">
         <h1 className="title-section">{t.notFoundTitle}</h1>
-        <p className="font-body text-lg text-cacao">{t.notFoundBody}</p>
+        <p className="font-body text-lg text-ink-soft">{t.notFoundBody}</p>
         <Link href={routes(lang).order} className="btn btn-primary btn-lg mt-2">
           {t.again} <span aria-hidden="true">{forwardArrow(lang)}</span>
         </Link>

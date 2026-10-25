@@ -85,7 +85,7 @@ export function WelcomePopup({ popup, lang, t }: Props) {
           type="button"
           onClick={() => close("button")}
           aria-label={t.close}
-          className="absolute end-3 top-3 flex size-11 items-center justify-center rounded-full text-chocolate transition-colors hover:bg-strawberry-cream"
+          className="absolute end-3 top-3 flex size-11 items-center justify-center rounded-full text-ink transition-colors hover:bg-strawberry-cream"
         >
           <svg
             aria-hidden="true"
@@ -103,9 +103,9 @@ export function WelcomePopup({ popup, lang, t }: Props) {
         </h2>
         <p className="font-ui text-[16px] leading-[1.5]">{popup.body[lang]}</p>
         {popup.code && (
-          <div className="flex w-full items-center justify-between gap-3 rounded-[14px] border-[2.5px] border-dashed border-chocolate/50 bg-whipped px-4 py-2.5">
+          <div className="flex w-full items-center justify-between gap-3 rounded-[14px] border-[2.5px] border-dashed border-blueberry/50 bg-whipped px-4 py-2.5">
             <span className="flex flex-col">
-              <span className="font-ui text-[12px] font-bold tracking-[0.06em] text-cacao uppercase">
+              <span className="font-ui text-[12px] font-bold tracking-[0.06em] text-ink-soft uppercase">
                 {t.code}
               </span>
               <span dir="ltr" className="font-ui text-[22px] font-extrabold tracking-[0.08em]">

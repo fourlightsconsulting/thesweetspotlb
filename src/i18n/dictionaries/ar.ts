@@ -24,10 +24,8 @@ const ar: Dictionary = {
     from: "ابتداءً من",
   },
   hero: {
-    line1: "شوكولا.",
-    line2: "وافل.",
-    line3: "وانحلّت.",
-    lead: "كريب، وافل، بان كيك، آيس كريم رولز والمزيد.",
+    title: { lead: "", first: "لقمة", join: "", last: "للكل" },
+    tagline: "خلّيك عنّا… وكُل عَ راحتك.",
     note: "جاهز خلال 10–15 دقيقة",
   },
   categories: {
@@ -67,10 +65,14 @@ const ar: Dictionary = {
   },
   reviews: {
     title: "شو عم يقولوا عنّا",
-    rating: "Google rating · to come",
-    previous: "التقييم السابق",
-    next: "التقييم التالي",
-    goTo: "عرض التقييم",
+    google: "تقييمات Google",
+    ratingOf: "{rating} من 5",
+    count: { one: "تقييم واحد", two: "تقييمين", few: "{count} تقييمات", other: "{count} تقييم" },
+    seeAll: "كل التقييمات على Google",
+    readMore: "اقرأ المزيد",
+    readLess: "أقل",
+    previous: "التقييمات السابقة",
+    next: "تقييمات أكثر",
   },
   instagram: {
     title: "مجتمعنا",

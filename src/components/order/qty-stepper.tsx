@@ -19,7 +19,7 @@ export function QtyStepper({ value, onChange, min = 1, max, labels, size = "sm" 
     <div
       role="group"
       aria-label={labels.quantity}
-      className={`inline-flex flex-none items-center border-chocolate/18 bg-whipped font-ui font-bold ${size === "lg" ? "rounded-[14px] border-[1.5px] p-0.5 text-lg" : "rounded-[11px] border-[1.5px] text-sm"}`}
+      className={`inline-flex flex-none items-center border-blueberry/18 bg-whipped font-ui font-bold ${size === "lg" ? "rounded-[14px] border-[1.5px] p-0.5 text-lg" : "rounded-[11px] border-[1.5px] text-sm"}`}
     >
       <button
         type="button"

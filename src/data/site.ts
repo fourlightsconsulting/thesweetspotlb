@@ -22,19 +22,3 @@ export const tripoliHours: [number, number][] = Array.from(
   { length: 7 },
   (): [number, number] => [12 * 60, 24 * 60], // every day 12 pm – 12 am
 );
-
-/**
- * Hero video, served from /public. Each screen size is optional: without a
- * clip, that size keeps the photo stills. Aim for short, silent H.264 MP4s:
- * ~2 MB 16:9 for desktop, ~1–2 MB portrait for phones (shown as a 4:5 crop,
- * trimmed equally top and bottom).
- *
- * The phone poster (src/assets/images/hero-mobile-poster.jpg) is the frame at
- * `startAt` seconds, so playback picks up exactly where the still leaves off.
- */
-export type HeroVideo = { mobile?: string; desktop?: string; startAt?: number };
-
-export const heroVideo: HeroVideo | null = {
-  mobile: "/video/hero-mobile.mp4",
-  startAt: 4,
-};

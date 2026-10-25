@@ -34,11 +34,17 @@ export const instagramPosts: InstagramPost[] = [
   { id: "stand-in-7", image: photoBox, focus: "30% 50%" },
 ];
 
+/** Shaped like a Google review, so the curated real ones can replace these. */
 export type Review = {
   quote: string;
   author: string;
   rating: number;
+  /** When it was posted (YYYY-MM-DD); cards show it as "2 weeks ago". */
+  date: string;
 };
+
+/** The shop's Google rating. Null until it's connected: the summary then shows no score. */
+export const googleRating: { rating: number; count: number } | null = null;
 
 /** Sample copy for layout only. Replace with real Google reviews before launch. */
 export const sampleReviews: Review[] = [
@@ -47,26 +53,31 @@ export const sampleReviews: Review[] = [
       "The Dubai crêpe is ridiculous. Crispy kunafa, pistachio everywhere. Already planning the next visit.",
     author: "Sample review 1",
     rating: 5,
+    date: "2026-10-12",
   },
   {
     quote:
       "Ordered the Party Box for a birthday and it was gone in ten minutes. Packed beautifully, still warm.",
     author: "Sample review 2",
     rating: 5,
+    date: "2026-09-27",
   },
   {
     quote: "Watching them roll the ice cream is half the fun. The Oreo rolls are the move.",
     author: "Sample review 3",
     rating: 5,
+    date: "2026-09-03",
   },
   {
     quote: "Late-night waffle run, ready before we finished parking. Friendly team, spotless shop.",
     author: "Sample review 4",
     rating: 5,
+    date: "2026-08-16",
   },
   {
     quote: "Profiteroles drowning in warm chocolate. That’s it, that’s the review.",
     author: "Sample review 5",
     rating: 5,
+    date: "2026-07-21",
   },
 ];

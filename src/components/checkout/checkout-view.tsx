@@ -318,7 +318,7 @@ function CheckoutForm({
       <div className="shell flex flex-col items-start gap-4 pt-[clamp(28px,3.4cqw,52px)] pb-section">
         <BackLink lang={lang} label={t.back} />
         <h1 className="title-section">{t.emptyTitle}</h1>
-        <p className="font-body text-lg text-cacao">{t.emptyBody}</p>
+        <p className="font-body text-lg text-ink-soft">{t.emptyBody}</p>
         <Link href={routes(lang).order} className="btn btn-primary btn-lg mt-2">
           {t.browse} <span aria-hidden="true">{forwardArrow(lang)}</span>
         </Link>
@@ -335,12 +335,12 @@ function CheckoutForm({
       <CartLines lines={lines} menu={menu} lang={lang} t={order} />
       <Link
         href={routes(lang).order}
-        className="self-start font-ui text-[13px] font-semibold text-blueberry underline decoration-caramel decoration-2 underline-offset-4"
+        className="self-start font-ui text-[13px] font-semibold text-blueberry underline decoration-raspberry decoration-2 underline-offset-4"
       >
         {order.edit}
       </Link>
       <CartTotals totals={totals} lang={lang} t={order} />
-      <p className="flex items-center gap-2 font-ui text-sm text-cacao">
+      <p className="flex items-center gap-2 font-ui text-sm text-ink-soft">
         <ClockIcon />
         {eta}
       </p>
@@ -356,7 +356,7 @@ function CheckoutForm({
 
       <div className="shell grid items-start gap-[clamp(20px,2.6cqw,40px)] pb-section desk:grid-cols-[minmax(0,1fr)_minmax(340px,420px)]">
         {/* Phones: the summary folds away above the form. */}
-        <div className="rounded-[20px] border-[1.5px] border-chocolate/10 bg-whipped desk:hidden">
+        <div className="rounded-[20px] border-[1.5px] border-blueberry/10 bg-whipped desk:hidden">
           <button
             type="button"
             onClick={() => setSummaryOpen((v) => !v)}
@@ -367,14 +367,14 @@ function CheckoutForm({
             <span>
               {summaryOpen ? t.hideSummary : t.showSummary} · {plural(lang, order.items, count)}
             </span>
-            <span className="text-[17px] font-bold text-chocolate">
+            <span className="text-[17px] font-bold text-ink">
               {formatPrice(totals.total, lang)}
             </span>
           </button>
           {summaryOpen && (
             <div
               id="mobile-summary"
-              className="flex flex-col gap-4 border-t border-dashed border-chocolate/20 px-[18px] pt-4 pb-5"
+              className="flex flex-col gap-4 border-t border-dashed border-blueberry/20 px-[18px] pt-4 pb-5"
             >
               {summary}
             </div>
@@ -386,7 +386,7 @@ function CheckoutForm({
             <div
               ref={bannerRef}
               role={banner.tone === "error" ? "alert" : "status"}
-              className={`flex items-start gap-3 rounded-[18px] border-[1.5px] px-4 py-3.5 font-ui text-[15px] leading-[1.45] font-medium ${banner.tone === "error" ? "border-raspberry bg-strawberry-milk" : "border-chocolate/12 bg-whipped"}`}
+              className={`flex items-start gap-3 rounded-[18px] border-[1.5px] px-4 py-3.5 font-ui text-[15px] leading-[1.45] font-medium ${banner.tone === "error" ? "border-raspberry bg-strawberry-milk" : "border-blueberry/12 bg-whipped"}`}
             >
               <Bang />
               {banner.text}
@@ -396,7 +396,7 @@ function CheckoutForm({
           {closed && status && !banner && (
             <div
               role="status"
-              className="flex items-start gap-3 rounded-[18px] border-[1.5px] border-chocolate/12 bg-whipped px-4 py-3.5 font-ui text-[15px] leading-[1.45]"
+              className="flex items-start gap-3 rounded-[18px] border-[1.5px] border-blueberry/12 bg-whipped px-4 py-3.5 font-ui text-[15px] leading-[1.45]"
             >
               <span className="mt-0.5">
                 <ClockIcon />
@@ -449,9 +449,9 @@ function CheckoutForm({
               >
                 <div
                   dir="ltr"
-                  className={`flex h-[52px] items-stretch overflow-hidden rounded-[14px] border-[1.5px] bg-whipped focus-within:border-blueberry focus-within:ring-3 focus-within:ring-blueberry/15 ${errors.phone ? "border-2 border-caramel" : "border-chocolate/20"}`}
+                  className={`flex h-[52px] items-stretch overflow-hidden rounded-[14px] border-[1.5px] bg-whipped focus-within:border-blueberry focus-within:ring-3 focus-within:ring-blueberry/15 ${errors.phone ? "border-2 border-raspberry" : "border-blueberry/20"}`}
                 >
-                  <span className="flex items-center border-e-[1.5px] border-chocolate/12 px-3.5 font-ui text-base font-semibold text-cacao">
+                  <span className="flex items-center border-e-[1.5px] border-blueberry/12 px-3.5 font-ui text-base font-semibold text-ink-soft">
                     +961
                   </span>
                   <input
@@ -465,14 +465,14 @@ function CheckoutForm({
                     maxLength={24}
                     aria-invalid={Boolean(errors.phone)}
                     aria-describedby={errors.phone ? "phone-error" : undefined}
-                    className="min-w-0 flex-1 bg-transparent px-3.5 font-ui text-base placeholder:text-cacao/55 focus:outline-none"
+                    className="min-w-0 flex-1 bg-transparent px-3.5 font-ui text-base placeholder:text-ink-soft/55 focus:outline-none"
                   />
                 </div>
               </Field>
             </div>
 
             {mode === "delivery" && (
-              <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-chocolate/20 pt-5">
+              <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-blueberry/20 pt-5">
                 <h3 className="font-display text-lg leading-tight font-bold">{t.address}</h3>
                 <fieldset
                   id="field-area"
@@ -486,7 +486,7 @@ function CheckoutForm({
                     {areas.map((z) => (
                       <label
                         key={z.id}
-                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel ${errors.area ? "border-caramel" : "border-chocolate/15 hover:border-chocolate/40"}`}
+                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-paper has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry ${errors.area ? "border-raspberry" : "border-blueberry/15 hover:border-blueberry/40"}`}
                       >
                         <input
                           type="radio"
@@ -550,10 +550,10 @@ function CheckoutForm({
           </Step>
 
           <Step number={3} title={t.stepPayment}>
-            <div className="flex items-start gap-3 rounded-[18px] border-2 border-chocolate bg-strawberry-milk p-4 shadow-[4px_5px_0_var(--color-chocolate)]">
+            <div className="flex items-start gap-3 rounded-[18px] border-2 border-blueberry bg-strawberry-milk p-4 shadow-[4px_5px_0_var(--color-blueberry)]">
               <span
                 aria-hidden="true"
-                className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-blueberry bg-blueberry"
+                className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-paper bg-blueberry"
               >
                 <span className="size-2 rounded-full bg-whipped" />
               </span>
@@ -561,7 +561,7 @@ function CheckoutForm({
                 <span className="font-ui text-base font-bold">
                   {mode === "delivery" ? t.cod : t.pap}
                 </span>
-                <span className="font-ui text-sm text-cacao">
+                <span className="font-ui text-sm text-ink-soft">
                   {mode === "delivery" ? t.codDesc : t.papDesc}
                 </span>
               </span>
@@ -583,7 +583,7 @@ function CheckoutForm({
                       setPromo(null);
                       setPromoInput("");
                     }}
-                    className="min-h-11 font-ui text-[13px] font-semibold text-cacao underline decoration-chocolate/25 decoration-2 underline-offset-4"
+                    className="min-h-11 font-ui text-[13px] font-semibold text-ink-soft underline decoration-blueberry/25 decoration-2 underline-offset-4"
                   >
                     {t.removePromo}
                   </button>
@@ -629,7 +629,7 @@ function CheckoutForm({
 
         <aside
           aria-label={t.summary}
-          className="sticky top-[calc(var(--header-h,74px)+24px)] hidden flex-col gap-4 rounded-[24px] border-[1.5px] border-chocolate/10 bg-whipped p-6 desk:flex"
+          className="sticky top-[calc(var(--header-h,74px)+24px)] hidden flex-col gap-4 rounded-[24px] border-[1.5px] border-blueberry/10 bg-whipped p-6 desk:flex"
         >
           <h2 className="font-display text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">
             {t.summary}
@@ -645,7 +645,7 @@ function CheckoutForm({
       </div>
 
       {/* Phones: the button stays in reach at the bottom of the screen. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-chocolate/10 bg-vanilla/95 px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))] backdrop-blur-md desk:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-blueberry/10 bg-paper/95 px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))] backdrop-blur-md desk:hidden">
         <PlaceButton
           label={placeLabel}
           disabled={disabled}
@@ -658,15 +658,15 @@ function CheckoutForm({
 }
 
 const inputClass =
-  "h-[52px] w-full rounded-[14px] border-[1.5px] border-chocolate/20 bg-whipped px-4 font-ui text-base placeholder:text-cacao/55 focus:border-blueberry focus:ring-3 focus:ring-blueberry/15 focus:outline-none aria-invalid:border-2 aria-invalid:border-caramel";
+  "h-[52px] w-full rounded-[14px] border-[1.5px] border-blueberry/20 bg-whipped px-4 font-ui text-base placeholder:text-ink-soft/55 focus:border-blueberry focus:ring-3 focus:ring-blueberry/15 focus:outline-none aria-invalid:border-2 aria-invalid:border-raspberry";
 
 function Step({ number, title, children }: { number: number; title: string; children: ReactNode }) {
   return (
-    <section className="rounded-[24px] border-[1.5px] border-chocolate/10 bg-whipped p-[clamp(18px,2.2cqw,30px)]">
+    <section className="rounded-[24px] border-[1.5px] border-blueberry/10 bg-whipped p-[clamp(18px,2.2cqw,30px)]">
       <h2 className="mb-5 flex items-center gap-3 font-display text-[clamp(21px,1.8cqw,24px)] leading-tight font-bold">
         <span
           aria-hidden="true"
-          className="flex size-8 flex-none items-center justify-center rounded-full bg-blueberry font-ui text-sm font-bold text-vanilla"
+          className="flex size-8 flex-none items-center justify-center rounded-full bg-blueberry font-ui text-sm font-bold text-paper"
         >
           {number}
         </span>
@@ -691,11 +691,11 @@ function Field({ id, label, hint, optional, error, children }: FieldProps) {
     <div className="flex flex-col gap-2">
       <label htmlFor={`field-${id}`} className="font-ui text-sm font-semibold">
         {label}
-        {optional && <span className="font-normal text-cacao"> ({optional})</span>}
+        {optional && <span className="font-normal text-ink-soft"> ({optional})</span>}
       </label>
       {children}
       {hint && (
-        <p id={`${id}-hint`} className="font-ui text-[13px] text-cacao">
+        <p id={`${id}-hint`} className="font-ui text-[13px] text-ink-soft">
           {hint}
         </p>
       )}
@@ -723,7 +723,7 @@ type ChoiceProps = {
 
 function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps) {
   return (
-    <label className="relative flex cursor-pointer items-start gap-3 rounded-[18px] border-2 border-chocolate/15 bg-vanilla p-4 transition-[border-color,box-shadow,background-color] duration-200 has-checked:border-chocolate has-checked:bg-strawberry-milk has-checked:shadow-[4px_5px_0_var(--color-chocolate)] has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel">
+    <label className="relative flex cursor-pointer items-start gap-3 rounded-[18px] border-2 border-blueberry/15 bg-paper p-4 transition-[border-color,box-shadow,background-color] duration-200 has-checked:border-blueberry has-checked:bg-strawberry-milk has-checked:shadow-[4px_5px_0_var(--color-blueberry)] has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry">
       <input
         type="radio"
         name={name}
@@ -733,13 +733,13 @@ function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps
       />
       <span
         aria-hidden="true"
-        className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-chocolate/45 peer-checked:border-blueberry peer-checked:bg-blueberry"
+        className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-blueberry/45 peer-checked:border-blueberry peer-checked:bg-blueberry"
       >
         <span className={`size-2 rounded-full bg-whipped ${checked ? "" : "hidden"}`} />
       </span>
       <span className="flex flex-col gap-0.5">
         <span className="font-ui text-base font-bold">{title}</span>
-        <span className="font-ui text-sm leading-[1.4] text-cacao">{description}</span>
+        <span className="font-ui text-sm leading-[1.4] text-ink-soft">{description}</span>
       </span>
     </label>
   );
@@ -767,7 +767,7 @@ function PlaceButton({
       {placing ? (
         <span
           aria-hidden="true"
-          className="size-5 animate-spin rounded-full border-[2.5px] border-vanilla/40 border-t-vanilla"
+          className="size-5 animate-spin rounded-full border-[2.5px] border-paper/40 border-t-paper"
         />
       ) : (
         whatsapp && <SocialIcon network="whatsapp" className="size-6 [--icon-stroke:2px]" />

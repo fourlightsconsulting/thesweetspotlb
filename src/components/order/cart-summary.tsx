@@ -55,7 +55,7 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="font-display text-base leading-[1.25] font-bold">
-                  {onEdit ? null : <span className="font-ui text-cacao">{line.qty} × </span>}
+                  {onEdit ? null : <span className="font-ui text-ink-soft">{line.qty} × </span>}
                   {item.name[lang]}
                 </span>
                 <span className="font-ui text-[15px] font-semibold whitespace-nowrap">
@@ -63,10 +63,10 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
                 </span>
               </div>
               {mods && (
-                <span className="font-ui text-[13px] leading-[18px] text-cacao">{mods}</span>
+                <span className="font-ui text-[13px] leading-[18px] text-ink-soft">{mods}</span>
               )}
               {line.note && (
-                <span className="font-ui text-[13px] leading-[18px] text-cacao italic">
+                <span className="font-ui text-[13px] leading-[18px] text-ink-soft italic">
                   “{line.note}”
                 </span>
               )}
@@ -85,7 +85,7 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
                   <button
                     type="button"
                     onClick={() => onEdit(line)}
-                    className="min-h-9 font-ui text-[13px] font-semibold text-blueberry underline decoration-caramel decoration-2 underline-offset-4"
+                    className="min-h-9 font-ui text-[13px] font-semibold text-blueberry underline decoration-raspberry decoration-2 underline-offset-4"
                   >
                     {t.edit}
                   </button>
@@ -96,7 +96,7 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
                       cartActions.remove(line.key);
                     }}
                     aria-label={fill(t.removeItem, { name: item.name[lang] })}
-                    className="min-h-9 font-ui text-[13px] font-semibold text-cacao underline decoration-chocolate/25 decoration-2 underline-offset-4 hover:text-chocolate"
+                    className="min-h-9 font-ui text-[13px] font-semibold text-ink-soft underline decoration-blueberry/25 decoration-2 underline-offset-4 hover:text-ink"
                   >
                     {t.remove}
                   </button>
@@ -118,14 +118,14 @@ type TotalsProps = {
 
 export function CartTotals({ totals, lang, t }: TotalsProps) {
   return (
-    <dl className="flex flex-col gap-2.5 border-t border-dashed border-chocolate/25 pt-4 font-ui text-[15px]">
+    <dl className="flex flex-col gap-2.5 border-t border-dashed border-blueberry/25 pt-4 font-ui text-[15px]">
       <div className="flex justify-between gap-3">
-        <dt className="text-cacao">{t.subtotal}</dt>
+        <dt className="text-ink-soft">{t.subtotal}</dt>
         <dd>{formatPrice(totals.subtotal, lang)}</dd>
       </div>
       {totals.deliveryFee > 0 && (
         <div className="flex justify-between gap-3">
-          <dt className="text-cacao">{t.deliveryFee}</dt>
+          <dt className="text-ink-soft">{t.deliveryFee}</dt>
           <dd>{formatPrice(totals.deliveryFee, lang)}</dd>
         </div>
       )}
