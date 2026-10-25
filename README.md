@@ -32,6 +32,14 @@ Open http://localhost:3000. Without `.env.local` the site runs on its built-in m
 
 Migrations live in `supabase/migrations/` and are applied to the linked project with `supabase db push` (no local database needed); `supabase/seed.sql` holds the starting menu and settings. After a migration, run `npm run db:types`. The first owner is made with `node --env-file=.env.local scripts/make-owner.mjs <email> "<name>"`; owners add everyone else from the admin's Team page.
 
+## Delivery zones and areas
+
+The **Store** page has one **Save changes** button. Ordering status, ready times, delivery zones and areas, opening hours, and closed days stay in a local draft until that button saves them together in one database transaction. Drag the handles to reorder zones or areas; keyboard users can focus a handle and press Up or Down.
+
+Managers manage delivery zones in **Store**: each zone has a name (such as Zone A), a fee, and bilingual delivery areas. Areas can be moved between zones or switched off individually. Customers see one flat list of active areas; checkout inherits the selected area's zone fee.
+
+`delivery_zones` owns the fee; `delivery_areas.zone_id` assigns each area to a zone from the same branch. Orders snapshot the chosen area's name and fee, so later edits don't rewrite past orders. The initial configuration is Zone A at $2 with the six existing areas. A zone must be empty before deletion. The database regression checks run inside a rolled-back transaction: `supabase db query --linked --file supabase/tests/delivery_zones.sql` and `supabase db query --linked --file supabase/tests/store_settings.sql`.
+
 ## Tracking
 
 `track()` in `src/lib/tracking/` sends each visitor event to our own record (`POST /api/e` → `analytics_events`, written with the secret key), to the Meta pixel and to GA4; the event list and each platform's name for it are in `src/lib/tracking/events.ts`. `/api/e` adds the device, browser and Cloudflare location, stamps robots `bot` and staff browsing `internal` (the admin sets a `tss_staff` cookie on the whole domain), and relays events to Meta's Conversions API with the browser's event id. Orders add a server-side `order_placed` event and Meta Purchase with the customer's hashed phone and name (`src/server/tracking.ts`). IP addresses and user agents are cleared after 30 days (pg_cron). Managers can switch our own records off in the admin (Site) if the database nears the free plan's 500 MB. In development, events are recorded as internal and the ad tags stay off unless `NEXT_PUBLIC_TRACKING_IN_DEV=true`.

@@ -97,7 +97,7 @@ export function OrdersReport({ data, before }: { data: OrdersData; before: Order
         </Panel>
         <Panel title="Delivery areas">
           <Bars
-            rows={data.zones.map((z) => ({
+            rows={data.areas.map((z) => ({
               name: z.name,
               value: z.orders,
               detail: money(z.sales_cents),

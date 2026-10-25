@@ -20,7 +20,7 @@ export default async function CustomerPage({ params }: PageProps<"/admin/custome
     db
       .from("orders")
       .select(
-        "id, number, status, fulfilment, total_cents, placed_at, discount_code, delivery_zone_name_en, address_street, address_floor",
+        "id, number, status, fulfilment, total_cents, placed_at, discount_code, delivery_area_name_en, address_street, address_floor",
       )
       .eq("customer_id", id)
       .order("placed_at", { ascending: false })
@@ -58,7 +58,7 @@ export default async function CustomerPage({ params }: PageProps<"/admin/custome
       (orders.data ?? [])
         .filter((o) => o.fulfilment === "delivery" && o.address_street)
         .map((o) =>
-          [o.delivery_zone_name_en, o.address_street, o.address_floor].filter(Boolean).join(", "),
+          [o.delivery_area_name_en, o.address_street, o.address_floor].filter(Boolean).join(", "),
         ),
     ),
   ].slice(0, 5);

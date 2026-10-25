@@ -31,7 +31,7 @@ export async function sendOrderAlerts(orderId?: string) {
   let query = db
     .from("notifications")
     .select(
-      "id, recipient, attempts, orders(number, customer_name, fulfilment, delivery_zone_name_en, total_cents, order_items(name_en, quantity, position))",
+      "id, recipient, attempts, orders(number, customer_name, fulfilment, delivery_area_name_en, total_cents, order_items(name_en, quantity, position))",
     )
     .eq("kind", "new_order_alert")
     .in("status", ["queued", "failed"])
@@ -64,7 +64,7 @@ export async function sendOrderAlerts(orderId?: string) {
         `TSS-${order.number}`,
         order.customer_name,
         itemsSummary(items),
-        order.fulfilment === "delivery" ? `Delivery to ${order.delivery_zone_name_en}` : "Pickup",
+        order.fulfilment === "delivery" ? `Delivery to ${order.delivery_area_name_en}` : "Pickup",
         formatPrice(order.total_cents ?? 0, "en"),
         `${site.adminUrl}/admin/orders`,
       ],

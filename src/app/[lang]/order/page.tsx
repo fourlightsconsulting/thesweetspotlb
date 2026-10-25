@@ -24,7 +24,7 @@ export default async function Order({ params }: PageProps<"/[lang]/order">) {
     getMenu(),
     getOrderingBranch(),
   ]);
-  const { schedule, eta, zones } = branch;
+  const { schedule, eta, areas } = branch;
 
-  return <OrderView lang={lang} t={order} menu={menu} branch={{ schedule, eta, zones }} />;
+  return <OrderView lang={lang} t={order} menu={menu} branch={{ schedule, eta, areas }} />;
 }

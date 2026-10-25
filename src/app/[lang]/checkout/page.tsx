@@ -22,7 +22,7 @@ export default async function Checkout({ params }: PageProps<"/[lang]/checkout">
     getMenu(),
     getOrderingBranch(),
   ]);
-  const { schedule, eta, zones } = branch;
+  const { schedule, eta, areas } = branch;
 
   return (
     <CheckoutView
@@ -32,7 +32,7 @@ export default async function Checkout({ params }: PageProps<"/[lang]/checkout">
       confirmation={t.confirmation}
       whatsapp={t.whatsappOrder}
       menu={menu}
-      branch={{ schedule, eta, zones }}
+      branch={{ schedule, eta, areas }}
       shopPhone={branch.phone}
     />
   );

@@ -39,7 +39,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/admin/ord
   let query = db
     .from("orders")
     .select(
-      "id, number, status, is_test, fulfilment, customer_name, customer_phone, delivery_zone_name_en, total_cents, placed_at, order_items(quantity)",
+      "id, number, status, is_test, fulfilment, customer_name, customer_phone, delivery_area_name_en, total_cents, placed_at, order_items(quantity)",
       { count: "exact" },
     )
     .order("placed_at", { ascending: false })
@@ -142,7 +142,7 @@ export default async function OrdersPage({ searchParams }: PageProps<"/admin/ord
                     </span>
                     <span className="text-muted">
                       {order.fulfilment === "delivery"
-                        ? `Delivery · ${order.delivery_zone_name_en}`
+                        ? `Delivery · ${order.delivery_area_name_en}`
                         : "Pickup"}
                     </span>
                     <span className="text-end tabular-nums">

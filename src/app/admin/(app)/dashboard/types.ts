@@ -20,7 +20,7 @@ export type OrdersData = {
   };
   daily: { day: string; orders: number; sales_cents: number; cancelled: number }[];
   fulfilment: (Named & { orders: number; sales_cents: number })[];
-  zones: (Named & { orders: number; sales_cents: number })[];
+  areas: (Named & { orders: number; sales_cents: number })[];
   heatmap: Cell[];
   timings: {
     to_start: number | null;

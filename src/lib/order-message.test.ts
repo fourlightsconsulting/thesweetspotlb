@@ -11,7 +11,7 @@ const order: PlacedOrder = {
   name: "Rana",
   phone: "+96170123456",
   address: {
-    zone: { en: "Mina", ar: "الميناء" },
+    area: { en: "Mina", ar: "الميناء" },
     street: "Port street",
     floor: "3rd floor",
     note: "Ring twice",

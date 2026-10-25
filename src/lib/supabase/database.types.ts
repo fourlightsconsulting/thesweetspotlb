@@ -502,17 +502,67 @@ export type Database = {
         };
         Relationships: [];
       };
+      delivery_areas: {
+        Row: {
+          branch_id: string;
+          created_at: string;
+          id: string;
+          is_active: boolean;
+          name_ar: string;
+          name_en: string;
+          slug: string;
+          sort_order: number;
+          updated_at: string;
+          zone_id: string;
+        };
+        Insert: {
+          branch_id: string;
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name_ar: string;
+          name_en: string;
+          slug: string;
+          sort_order?: number;
+          updated_at?: string;
+          zone_id: string;
+        };
+        Update: {
+          branch_id?: string;
+          created_at?: string;
+          id?: string;
+          is_active?: boolean;
+          name_ar?: string;
+          name_en?: string;
+          slug?: string;
+          sort_order?: number;
+          updated_at?: string;
+          zone_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "delivery_areas_branch_id_fkey";
+            columns: ["branch_id"];
+            isOneToOne: false;
+            referencedRelation: "branches";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "delivery_areas_zone_branch_fkey";
+            columns: ["zone_id", "branch_id"];
+            isOneToOne: false;
+            referencedRelation: "delivery_zones";
+            referencedColumns: ["id", "branch_id"];
+          },
+        ];
+      };
       delivery_zones: {
         Row: {
           branch_id: string;
           created_at: string;
           fee_cents: number;
           id: string;
-          is_active: boolean;
-          min_order_cents: number;
-          name_ar: string;
-          name_en: string;
-          slug: string;
+          name: string;
           sort_order: number;
           updated_at: string;
         };
@@ -521,11 +571,7 @@ export type Database = {
           created_at?: string;
           fee_cents: number;
           id?: string;
-          is_active?: boolean;
-          min_order_cents?: number;
-          name_ar: string;
-          name_en: string;
-          slug: string;
+          name: string;
           sort_order?: number;
           updated_at?: string;
         };
@@ -534,11 +580,7 @@ export type Database = {
           created_at?: string;
           fee_cents?: number;
           id?: string;
-          is_active?: boolean;
-          min_order_cents?: number;
-          name_ar?: string;
-          name_en?: string;
-          slug?: string;
+          name?: string;
           sort_order?: number;
           updated_at?: string;
         };
@@ -968,11 +1010,11 @@ export type Database = {
           customer_id: string;
           customer_name: string;
           customer_phone: string;
+          delivery_area_id: string | null;
+          delivery_area_name_ar: string | null;
+          delivery_area_name_en: string | null;
           delivery_fee_cents: number;
           delivery_note: string | null;
-          delivery_zone_id: string | null;
-          delivery_zone_name_ar: string | null;
-          delivery_zone_name_en: string | null;
           discount_cents: number;
           discount_code: string | null;
           discount_code_id: string | null;
@@ -1014,11 +1056,11 @@ export type Database = {
           customer_id: string;
           customer_name: string;
           customer_phone: string;
+          delivery_area_id?: string | null;
+          delivery_area_name_ar?: string | null;
+          delivery_area_name_en?: string | null;
           delivery_fee_cents?: number;
           delivery_note?: string | null;
-          delivery_zone_id?: string | null;
-          delivery_zone_name_ar?: string | null;
-          delivery_zone_name_en?: string | null;
           discount_cents?: number;
           discount_code?: string | null;
           discount_code_id?: string | null;
@@ -1060,11 +1102,11 @@ export type Database = {
           customer_id?: string;
           customer_name?: string;
           customer_phone?: string;
+          delivery_area_id?: string | null;
+          delivery_area_name_ar?: string | null;
+          delivery_area_name_en?: string | null;
           delivery_fee_cents?: number;
           delivery_note?: string | null;
-          delivery_zone_id?: string | null;
-          delivery_zone_name_ar?: string | null;
-          delivery_zone_name_en?: string | null;
           discount_cents?: number;
           discount_code?: string | null;
           discount_code_id?: string | null;
@@ -1117,10 +1159,10 @@ export type Database = {
             referencedColumns: ["id"];
           },
           {
-            foreignKeyName: "orders_delivery_zone_id_fkey";
-            columns: ["delivery_zone_id"];
+            foreignKeyName: "orders_delivery_area_id_fkey";
+            columns: ["delivery_area_id"];
             isOneToOne: false;
-            referencedRelation: "delivery_zones";
+            referencedRelation: "delivery_areas";
             referencedColumns: ["id"];
           },
           {
@@ -1499,6 +1541,7 @@ export type Database = {
         Returns: Json;
       };
       run_job: { Args: { p_body?: Json; p_job: string }; Returns: number };
+      save_store_settings: { Args: { payload: Json }; Returns: undefined };
       staff_directory: {
         Args: never;
         Returns: {

@@ -75,7 +75,7 @@ export function OrderDetail({ order }: { order: Order }) {
       <Section title={order.fulfilment === "delivery" ? "Delivery" : "Pickup"}>
         {order.fulfilment === "delivery" ? (
           <div className="flex flex-col gap-0.5">
-            <p className="font-semibold">{order.delivery_zone_name_en}</p>
+            <p className="font-semibold">{order.delivery_area_name_en}</p>
             <p>{order.address_street}</p>
             {order.address_floor && <p>{order.address_floor}</p>}
             {order.delivery_note && <p className="text-muted">“{order.delivery_note}”</p>}

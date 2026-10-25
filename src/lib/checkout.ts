@@ -8,7 +8,7 @@ import type { PromoRule, Selections, Totals } from "@/lib/pricing";
 export type CheckoutFields = {
   name: string;
   phone: string;
-  zone: string;
+  area: string;
   street: string;
   floor: string;
   driverNote: string;
@@ -45,7 +45,7 @@ export type PlacedOrder = {
   mode: Fulfilment;
   name: string;
   phone: string;
-  address: { zone: Localized; street: string; floor: string; note: string } | null;
+  address: { area: Localized; street: string; floor: string; note: string } | null;
   /** Each line's choices, one per entry. */
   lines: { name: Localized; options: Record<Locale, string[]>; note: string; qty: number }[];
   totals: Totals;
@@ -77,7 +77,7 @@ export function validateFields(mode: Fulfilment, fields: CheckoutFields) {
   if (!fields.phone.trim()) errors.phone = "phone";
   else if (!normalisePhone(fields.phone)) errors.phone = "phoneInvalid";
   if (mode === "delivery") {
-    if (!fields.zone) errors.zone = "area";
+    if (!fields.area) errors.area = "area";
     if (fields.street.trim().length < 3) errors.street = "street";
   }
   return errors;

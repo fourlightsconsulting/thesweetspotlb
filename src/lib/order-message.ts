@@ -28,7 +28,7 @@ export function orderMessage(
     `${t.name}: ${order.name}`,
     `${t.phone}: ${lang === "ar" ? `⁦${phone}⁩` : phone}`,
     address
-      ? `${t.address}: ${[address.zone[lang], address.street, address.floor]
+      ? `${t.address}: ${[address.area[lang], address.street, address.floor]
           .filter(Boolean)
           .join(lang === "ar" ? "، " : ", ")}`
       : t.pickup,

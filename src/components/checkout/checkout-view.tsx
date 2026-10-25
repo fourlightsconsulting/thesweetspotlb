@@ -54,7 +54,7 @@ const ATTEMPT_KEY = "tss.checkout.attempt";
 const EMPTY: CheckoutFields = {
   name: "",
   phone: "",
-  zone: "",
+  area: "",
   street: "",
   floor: "",
   driverNote: "",
@@ -154,9 +154,9 @@ function CheckoutForm({
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const mode = cart.mode;
-  const zone = branch.zones.find((z) => z.id === fields.zone);
-  // The delivery fee is the area's, added once an area is picked.
-  const fee = mode === "delivery" ? (zone?.fee ?? 0) : 0;
+  const area = branch.areas.find((z) => z.id === fields.area);
+  // The selected area's zone sets the delivery fee.
+  const fee = mode === "delivery" ? (area?.fee ?? 0) : 0;
   const totals = orderTotals(subtotal, fee, promo);
   const closed = status?.open === false;
 
@@ -473,32 +473,32 @@ function CheckoutForm({
               <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-chocolate/20 pt-5">
                 <h3 className="font-display text-lg leading-tight font-bold">{t.address}</h3>
                 <fieldset
-                  id="field-zone"
+                  id="field-area"
                   tabIndex={-1}
-                  aria-invalid={Boolean(errors.zone)}
-                  aria-describedby={errors.zone ? "zone-error" : undefined}
+                  aria-invalid={Boolean(errors.area)}
+                  aria-describedby={errors.area ? "area-error" : undefined}
                   className="flex flex-col gap-2.5 focus:outline-none"
                 >
                   <legend className="mb-2.5 font-ui text-sm font-semibold">{t.area}</legend>
                   <div className="flex flex-wrap gap-2">
-                    {branch.zones.map((z) => (
+                    {branch.areas.map((z) => (
                       <label
                         key={z.id}
-                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel ${errors.zone ? "border-caramel" : "border-chocolate/15 hover:border-chocolate/40"}`}
+                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel ${errors.area ? "border-caramel" : "border-chocolate/15 hover:border-chocolate/40"}`}
                       >
                         <input
                           type="radio"
-                          name="zone"
+                          name="area"
                           value={z.id}
-                          checked={fields.zone === z.id}
-                          onChange={() => update("zone", z.id)}
+                          checked={fields.area === z.id}
+                          onChange={() => update("area", z.id)}
                           className="sr-only"
                         />
                         {z.name[lang]}
                       </label>
                     ))}
                   </div>
-                  {errors.zone && <ErrorText id="zone-error" text={t.errors.area} />}
+                  {errors.area && <ErrorText id="area-error" text={t.errors.area} />}
                 </fieldset>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field id="street" label={t.street} error={errors.street && t.errors.street}>

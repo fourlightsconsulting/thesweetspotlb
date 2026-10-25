@@ -36,7 +36,7 @@ const emptyOrders: OrdersData = {
   },
   daily: days.map((day) => ({ day, orders: 0, sales_cents: 0, cancelled: 0 })),
   fulfilment: [],
-  zones: [],
+  areas: [],
   heatmap: [],
   timings: {
     to_start: null,
@@ -80,7 +80,7 @@ const orders: OrdersData = {
     { name: "pickup", orders: 1, sales_cents: 1300 },
     { name: "delivery", orders: 1, sales_cents: 700 },
   ],
-  zones: [{ name: "Mina", orders: 1, sales_cents: 700 }],
+  areas: [{ name: "Mina", orders: 1, sales_cents: 700 }],
   heatmap: [{ dow: 5, hour: 21, value: 2 }],
   timings: {
     to_start: 3.5,

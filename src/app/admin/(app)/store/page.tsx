@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import { beirutDate, orderLabel, phone, when } from "@/components/admin/format";
-import { PageHeader } from "@/components/admin/page-header";
-import { storeStatus } from "@/lib/hours";
 import { adminClient } from "@/lib/supabase/server";
-import { getOrderingBranch, ORDERING_BRANCH } from "@/server/catalog";
+import { ORDERING_BRANCH } from "@/server/catalog";
 import { requireStaff } from "@/server/admin/session";
 import { whatsappConfig } from "@/server/whatsapp";
-import { AlertsForm, ClosuresCard, type DayHours, HoursForm, TimesForm, ZonesCard } from "./forms";
-import { orderingNote } from "./ordering-note";
-import { OrderingSwitch } from "./ordering-switch";
+import { StoreForm } from "./store-form";
+import type { DayHours } from "./store-settings";
 
 export const metadata: Metadata = { title: "Store" };
 
@@ -17,11 +14,11 @@ const hhmm = (time: string) => time.slice(0, 5);
 export default async function StorePage() {
   await requireStaff("manager");
   const db = await adminClient();
-  const [branches, hours, closures, zones, alerts, ordering] = await Promise.all([
+  const [branches, hours, closures, zones, areas, alerts] = await Promise.all([
     db
       .from("branches")
       .select(
-        "id, slug, name_en, last_order_minutes, pickup_eta_min, pickup_eta_max, delivery_eta_min, delivery_eta_max",
+        "id, slug, name_en, ordering, last_order_minutes, pickup_eta_min, pickup_eta_max, delivery_eta_min, delivery_eta_max",
       )
       .order("created_at"),
     db.from("branch_hours").select("branch_id, weekday, opens_at, closes_at"),
@@ -32,11 +29,15 @@ export default async function StorePage() {
       .order("on_date"),
     db
       .from("delivery_zones")
-      .select("id, branch_id, name_en, name_ar, fee_cents, is_active")
+      .select("id, branch_id, name, fee_cents")
+      .order("sort_order")
+      .order("name"),
+    db
+      .from("delivery_areas")
+      .select("id, branch_id, zone_id, name_en, name_ar, is_active")
       .order("sort_order")
       .order("name_en"),
     db.from("site_settings").select("value").eq("key", "order_alerts").maybeSingle(),
-    getOrderingBranch(),
   ]);
   // Paid WhatsApp alerts show only once their settings exist; until then the
   // customer sends each order to the shop's WhatsApp from the confirmation page.
@@ -48,13 +49,12 @@ export default async function StorePage() {
         .order("created_at", { ascending: false })
         .limit(8)
     : { data: [] };
-  for (const result of [branches, hours, closures, zones]) {
+  for (const result of [branches, hours, closures, zones, areas]) {
     if (result.error) throw new Error(`Loading the store failed: ${result.error.message}`);
   }
 
   const branchRows = branches.data!;
   const main = branchRows.find((b) => b.slug === ORDERING_BRANCH) ?? branchRows[0];
-  const nameOf = (id: string) => branchRows.find((b) => b.id === id)?.name_en ?? "";
   const weekOf = (branchId: string): DayHours[] =>
     Array.from({ length: 7 }, (_, weekday) => {
       const row = hours.data!.find((h) => h.branch_id === branchId && h.weekday === weekday);
@@ -64,79 +64,63 @@ export default async function StorePage() {
     });
   const alertValue = (alerts.data?.value ?? {}) as { enabled?: boolean; phones?: string[] };
 
+  if (!main) throw new Error("The ordering branch is missing.");
   return (
-    <>
-      <PageHeader title="Store" />
-      <div className="flex flex-col gap-6">
-        <OrderingSwitch
-          value={ordering.schedule.ordering}
-          open={storeStatus(ordering.schedule).open}
-          note={orderingNote(ordering.schedule)}
-          canChange
-        />
-
-        {main && (
-          <div className="grid gap-6 wide:grid-cols-2">
-            <TimesForm
-              branchId={main.id}
-              pickup={[main.pickup_eta_min, main.pickup_eta_max]}
-              delivery={[main.delivery_eta_min, main.delivery_eta_max]}
-            />
-            {alertsConnected && (
-              <AlertsForm
-                enabled={alertValue.enabled ?? true}
-                phones={(alertValue.phones ?? []).map(phone)}
-                connected
-                recent={(notifications ?? []).map((n) => ({
-                  id: n.id,
-                  order: n.orders ? orderLabel(n.orders.number) : "—",
-                  recipient: phone(n.recipient),
-                  status: n.status,
-                  at: when(n.sent_at ?? n.created_at),
-                  error: n.last_error,
-                }))}
-              />
-            )}
-          </div>
-        )}
-
-        {main && (
-          <ZonesCard
-            branchId={main.id}
-            zones={zones
-              .data!.filter((z) => z.branch_id === main.id)
-              .map((z) => ({
-                id: z.id,
-                nameEn: z.name_en,
-                nameAr: z.name_ar,
-                fee: z.fee_cents,
-                active: z.is_active,
-              }))}
-          />
-        )}
-
-        <div className="grid gap-6 wide:grid-cols-2">
-          {branchRows.map((b) => (
-            <HoursForm
-              key={b.id}
-              branchId={b.id}
-              branchName={b.name_en}
-              week={weekOf(b.id)}
-              lastOrderMinutes={b.last_order_minutes}
-            />
-          ))}
-        </div>
-
-        <ClosuresCard
-          branches={branchRows.map((b) => ({ id: b.id, name: b.name_en }))}
-          closures={closures.data!.map((c) => ({
-            id: c.id,
-            branchName: nameOf(c.branch_id),
-            date: c.on_date,
-            note: c.note,
-          }))}
-        />
-      </div>
-    </>
+    <StoreForm
+      today={beirutDate()}
+      initial={{
+        branchId: main.id,
+        ordering: main.ordering as "hours" | "open" | "paused",
+        pickupMin: String(main.pickup_eta_min),
+        pickupMax: String(main.pickup_eta_max),
+        deliveryMin: String(main.delivery_eta_min),
+        deliveryMax: String(main.delivery_eta_max),
+        zones: zones
+          .data!.filter((zone) => zone.branch_id === main.id)
+          .map((zone) => ({
+            id: zone.id,
+            name: zone.name,
+            fee: (zone.fee_cents / 100).toFixed(2),
+          })),
+        areas: areas
+          .data!.filter((area) => area.branch_id === main.id)
+          .map((area) => ({
+            id: area.id,
+            zoneId: area.zone_id,
+            nameEn: area.name_en,
+            nameAr: area.name_ar,
+            active: area.is_active,
+          })),
+        hours: branchRows.map((branch) => ({
+          branchId: branch.id,
+          branchName: branch.name_en,
+          week: weekOf(branch.id),
+          lastOrderMinutes: String(branch.last_order_minutes),
+        })),
+        closures: closures.data!.map((closure) => ({
+          id: closure.id,
+          branchId: closure.branch_id,
+          date: closure.on_date,
+          note: closure.note,
+        })),
+        removedZoneIds: [],
+        removedAreaIds: [],
+        removedClosureIds: [],
+        alerts: alertsConnected
+          ? {
+              enabled: alertValue.enabled ?? true,
+              phones: (alertValue.phones ?? []).map(phone).join("\n"),
+            }
+          : null,
+      }}
+      recent={(notifications ?? []).map((n) => ({
+        id: n.id,
+        order: n.orders ? orderLabel(n.orders.number) : "—",
+        recipient: phone(n.recipient),
+        status: n.status,
+        at: when(n.sent_at ?? n.created_at),
+        error: n.last_error,
+      }))}
+    />
   );
 }

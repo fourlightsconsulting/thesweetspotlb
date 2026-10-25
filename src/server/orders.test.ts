@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PlaceOrderInput } from "@/lib/checkout";
 import { placeOrder } from "./orders";
+import * as catalog from "./catalog";
 
 const OPEN = new Date("2026-10-06T12:00:00Z"); // Tuesday, 3 pm in Beirut
 const CLOSED = new Date("2026-10-06T06:00:00Z"); // Tuesday, 9 am in Beirut
@@ -12,7 +13,7 @@ const base = (): PlaceOrderInput => ({
   fields: {
     name: "Maya Haddad",
     phone: "71 234 567",
-    zone: "",
+    area: "",
     street: "",
     floor: "",
     driverNote: "",
@@ -36,6 +37,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 describe("placeOrder", () => {
@@ -75,12 +77,12 @@ describe("placeOrder", () => {
     const result = await placeOrder({
       ...base(),
       mode: "delivery",
-      fields: { ...base().fields, phone: "12", zone: "paris", street: "" },
+      fields: { ...base().fields, phone: "12", area: "paris", street: "" },
     });
     expect(result).toEqual({
       ok: false,
       code: "invalid",
-      fields: { phone: "phoneInvalid", zone: "area", street: "street" },
+      fields: { phone: "phoneInvalid", area: "area", street: "street" },
     });
   });
 
@@ -88,7 +90,7 @@ describe("placeOrder", () => {
     const result = await placeOrder({
       ...base(),
       mode: "delivery",
-      fields: { ...base().fields, zone: "mina", street: "Port Said Street" },
+      fields: { ...base().fields, area: "mina", street: "Port Said Street" },
       promoCode: "sweet20",
       quotedTotal: 2400 - 480 + 200,
     });
@@ -106,6 +108,51 @@ describe("placeOrder", () => {
       code: "promo",
       error: "invalid",
     });
+  });
+
+  it("charges the selected area's inherited zone fee, regardless of the quoted total", async () => {
+    const branch = await catalog.getOrderingBranch();
+    vi.spyOn(catalog, "getOrderingBranch").mockResolvedValue({
+      ...branch,
+      areas: branch.areas.map((area) => ({ ...area, fee: 450 })),
+    });
+    const result = await placeOrder({
+      ...base(),
+      mode: "delivery",
+      fields: { ...base().fields, area: "mina", street: "Port Said Street" },
+      quotedTotal: 2400,
+    });
+    expect(result.ok && result.order.totals).toEqual({
+      subtotal: 2400,
+      discount: 0,
+      deliveryFee: 450,
+      total: 2850,
+    });
+    expect(result.ok && result.order.address?.area).toEqual({ en: "Mina", ar: "الميناء" });
+  });
+
+  it("accepts configured area slugs longer than forty characters", async () => {
+    const branch = await catalog.getOrderingBranch();
+    const area = { ...branch.areas[0], id: "tripoli-delivery-area-with-a-long-but-valid-name" };
+    vi.spyOn(catalog, "getOrderingBranch").mockResolvedValue({ ...branch, areas: [area] });
+    const result = await placeOrder({
+      ...base(),
+      mode: "delivery",
+      fields: { ...base().fields, area: area.id, street: "Port Said Street" },
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it("refuses an area removed from the current list", async () => {
+    const branch = await catalog.getOrderingBranch();
+    vi.spyOn(catalog, "getOrderingBranch").mockResolvedValue({ ...branch, areas: [] });
+    expect(
+      await placeOrder({
+        ...base(),
+        mode: "delivery",
+        fields: { ...base().fields, area: "mina", street: "Port Said Street" },
+      }),
+    ).toEqual({ ok: false, code: "invalid", fields: { area: "area" } });
   });
 
   it("takes no orders while closed", async () => {

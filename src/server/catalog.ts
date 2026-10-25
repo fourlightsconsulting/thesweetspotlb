@@ -2,16 +2,17 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { type Localized, type Menu, menu as builtInMenu } from "@/data/menu";
 import { site } from "@/data/site";
-import { type DeliveryZone, deliveryZones, type Fulfilment, ordering } from "@/data/ordering";
+import { type DeliveryArea, deliveryAreas, type Fulfilment, ordering } from "@/data/ordering";
 import { builtInSchedule, type Ordering, type Schedule } from "@/lib/hours";
 import { parseSiteSettings, type SiteSettings } from "@/lib/site-settings";
 import { publicClient } from "@/lib/supabase/service";
+import { checkoutAreas } from "@/lib/delivery";
 import { loadMenu, localized } from "./menu";
 
 export { menuPhoto } from "./menu";
 
 // What the public pages read from Supabase: the menu, the branches (hours,
-// zones, the ordering switch) and the site settings. Each is cached under a tag;
+// areas, the ordering switch) and the site settings. Each is cached under a tag;
 // the admin revalidates the tag when it saves, and the pages that used it
 // regenerate. Without Supabase (development, tests), the built-in data is used.
 
@@ -29,7 +30,7 @@ export type Branch = {
   /** Shop hours and the ordering switch ("paused" when the branch takes no online orders). */
   schedule: Schedule;
   eta: Record<Fulfilment, [number, number]>;
-  zones: DeliveryZone[];
+  areas: DeliveryArea[];
 };
 
 const builtInBranches: Branch[] = [
@@ -41,7 +42,7 @@ const builtInBranches: Branch[] = [
     acceptsOnlineOrders: true,
     schedule: builtInSchedule,
     eta: ordering.eta,
-    zones: deliveryZones,
+    areas: deliveryAreas,
   },
 ];
 
@@ -53,7 +54,7 @@ const minutesOf = (time: string) => {
 async function loadBranches(): Promise<Branch[]> {
   const db = publicClient()!;
 
-  const [branches, hours, closures, zones] = await Promise.all([
+  const [branches, hours, closures, areas] = await Promise.all([
     db.from("branches").select("*").order("created_at"),
     db.from("branch_hours").select("*"),
     // Closures from yesterday on (yesterday's can still end a late session).
@@ -61,9 +62,13 @@ async function loadBranches(): Promise<Branch[]> {
       .from("branch_closures")
       .select("*")
       .gte("on_date", new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10)),
-    db.from("delivery_zones").select("*").order("sort_order"),
+    db
+      .from("delivery_areas")
+      .select("branch_id, slug, name_en, name_ar, delivery_zones!inner(fee_cents, sort_order)")
+      .order("sort_order")
+      .order("name_en"),
   ]);
-  for (const result of [branches, hours, closures, zones]) {
+  for (const result of [branches, hours, closures, areas]) {
     if (result.error) throw new Error(`Loading the branches failed: ${result.error.message}`);
   }
 
@@ -93,9 +98,7 @@ async function loadBranches(): Promise<Branch[]> {
         pickup: [b.pickup_eta_min, b.pickup_eta_max],
         delivery: [b.delivery_eta_min, b.delivery_eta_max],
       },
-      zones: zones
-        .data!.filter((z) => z.branch_id === b.id)
-        .map((z) => ({ id: z.slug, name: localized(z, "name"), fee: z.fee_cents })),
+      areas: checkoutAreas(areas.data!.filter((area) => area.branch_id === b.id)),
     };
   });
 }
@@ -113,7 +116,7 @@ async function loadSiteSettingRows(): Promise<{ key: string; value: unknown }[]>
 }
 
 const cachedMenu = unstable_cache(loadMenu, ["menu"], { tags: [catalogTags.menu] });
-const cachedBranches = unstable_cache(loadBranches, ["branches"], {
+const cachedBranches = unstable_cache(loadBranches, ["branches-with-delivery-areas"], {
   tags: [catalogTags.store],
   // Closures are dated, so the schedule refreshes every few hours even without edits.
   revalidate: 6 * 3600,
@@ -128,7 +131,7 @@ const configured = () => publicClient() !== null;
 export const getMenu = (): Promise<Menu> =>
   configured() ? cachedMenu() : Promise.resolve(builtInMenu);
 
-/** Every branch, with its hours, ETAs and delivery zones. */
+/** Every branch, with its hours, ETAs and delivery areas. */
 export const getBranches = (): Promise<Branch[]> =>
   configured() ? cachedBranches() : Promise.resolve(builtInBranches);
 

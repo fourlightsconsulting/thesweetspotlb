@@ -38,7 +38,7 @@ const inputSchema = z.object({
   fields: z.object({
     name: text(60),
     phone: text(24),
-    zone: text(40),
+    area: text(64),
     street: text(160),
     floor: text(80),
     driverNote: text(ordering.noteMaxLength),
@@ -101,8 +101,8 @@ export async function placeOrder(
   const [menu, branch] = await Promise.all([getMenu(), getOrderingBranch()]);
 
   const fieldErrors = validateFields(input.mode, input.fields);
-  const zone = branch.zones.find((z) => z.id === input.fields.zone);
-  if (input.mode === "delivery" && input.fields.zone && !zone) fieldErrors.zone = "area";
+  const area = branch.areas.find((z) => z.id === input.fields.area);
+  if (input.mode === "delivery" && input.fields.area && !area) fieldErrors.area = "area";
   if (Object.keys(fieldErrors).length > 0)
     return { ok: false, code: "invalid", fields: fieldErrors };
 
@@ -120,12 +120,12 @@ export async function placeOrder(
     promo = result.rule;
   }
 
-  const delivery = input.mode === "delivery" && zone ? zone : null;
+  const delivery = input.mode === "delivery" && area ? area : null;
   const totals = orderTotals(subtotal, delivery?.fee ?? 0, promo);
   const name = input.fields.name.trim();
   const address = delivery
     ? {
-        zone: delivery.name,
+        area: delivery.name,
         street: input.fields.street.trim(),
         floor: input.fields.floor.trim(),
         note: input.fields.driverNote.trim(),
@@ -173,7 +173,7 @@ export async function placeOrder(
         phone,
         ...(delivery
           ? {
-              zone: { slug: delivery.id, name_en: delivery.name.en, name_ar: delivery.name.ar },
+              area: { slug: delivery.id, name_en: delivery.name.en, name_ar: delivery.name.ar },
               street: address!.street,
               floor: address!.floor,
               delivery_note: address!.note,
