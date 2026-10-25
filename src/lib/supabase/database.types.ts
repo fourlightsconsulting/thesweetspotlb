@@ -511,7 +511,6 @@ export type Database = {
           name_ar: string;
           name_en: string;
           slug: string;
-          sort_order: number;
           updated_at: string;
           zone_id: string;
         };
@@ -523,7 +522,6 @@ export type Database = {
           name_ar: string;
           name_en: string;
           slug: string;
-          sort_order?: number;
           updated_at?: string;
           zone_id: string;
         };
@@ -535,7 +533,6 @@ export type Database = {
           name_ar?: string;
           name_en?: string;
           slug?: string;
-          sort_order?: number;
           updated_at?: string;
           zone_id?: string;
         };
@@ -563,7 +560,6 @@ export type Database = {
           fee_cents: number;
           id: string;
           name: string;
-          sort_order: number;
           updated_at: string;
         };
         Insert: {
@@ -572,7 +568,6 @@ export type Database = {
           fee_cents: number;
           id?: string;
           name: string;
-          sort_order?: number;
           updated_at?: string;
         };
         Update: {
@@ -581,7 +576,6 @@ export type Database = {
           fee_cents?: number;
           id?: string;
           name?: string;
-          sort_order?: number;
           updated_at?: string;
         };
         Relationships: [

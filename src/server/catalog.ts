@@ -64,8 +64,7 @@ async function loadBranches(): Promise<Branch[]> {
       .gte("on_date", new Date(Date.now() - 2 * 86_400_000).toISOString().slice(0, 10)),
     db
       .from("delivery_areas")
-      .select("branch_id, slug, name_en, name_ar, delivery_zones!inner(fee_cents, sort_order)")
-      .order("sort_order")
+      .select("branch_id, slug, name_en, name_ar, delivery_zones!inner(fee_cents)")
       .order("name_en"),
   ]);
   for (const result of [branches, hours, closures, areas]) {

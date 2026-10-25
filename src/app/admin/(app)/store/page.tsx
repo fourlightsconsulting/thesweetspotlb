@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { beirutDate, orderLabel, phone, when } from "@/components/admin/format";
+import { alphabetical } from "@/lib/alphabetical";
 import { adminClient } from "@/lib/supabase/server";
 import { ORDERING_BRANCH } from "@/server/catalog";
 import { requireStaff } from "@/server/admin/session";
@@ -27,15 +28,10 @@ export default async function StorePage() {
       .select("id, branch_id, on_date, note")
       .gte("on_date", beirutDate())
       .order("on_date"),
-    db
-      .from("delivery_zones")
-      .select("id, branch_id, name, fee_cents")
-      .order("sort_order")
-      .order("name"),
+    db.from("delivery_zones").select("id, branch_id, name, fee_cents").order("name"),
     db
       .from("delivery_areas")
       .select("id, branch_id, zone_id, name_en, name_ar, is_active")
-      .order("sort_order")
       .order("name_en"),
     db.from("site_settings").select("value").eq("key", "order_alerts").maybeSingle(),
   ]);
@@ -75,22 +71,24 @@ export default async function StorePage() {
         pickupMax: String(main.pickup_eta_max),
         deliveryMin: String(main.delivery_eta_min),
         deliveryMax: String(main.delivery_eta_max),
-        zones: zones
-          .data!.filter((zone) => zone.branch_id === main.id)
-          .map((zone) => ({
-            id: zone.id,
-            name: zone.name,
-            fee: (zone.fee_cents / 100).toFixed(2),
-          })),
-        areas: areas
-          .data!.filter((area) => area.branch_id === main.id)
-          .map((area) => ({
-            id: area.id,
-            zoneId: area.zone_id,
-            nameEn: area.name_en,
-            nameAr: area.name_ar,
-            active: area.is_active,
-          })),
+        zones: alphabetical(
+          zones.data!.filter((zone) => zone.branch_id === main.id),
+          (zone) => zone.name,
+        ).map((zone) => ({
+          id: zone.id,
+          name: zone.name,
+          fee: (zone.fee_cents / 100).toFixed(2),
+        })),
+        areas: alphabetical(
+          areas.data!.filter((area) => area.branch_id === main.id),
+          (area) => area.name_en,
+        ).map((area) => ({
+          id: area.id,
+          zoneId: area.zone_id,
+          nameEn: area.name_en,
+          nameAr: area.name_ar,
+          active: area.is_active,
+        })),
         hours: branchRows.map((branch) => ({
           branchId: branch.id,
           branchName: branch.name_en,

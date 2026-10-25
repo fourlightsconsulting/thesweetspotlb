@@ -34,7 +34,7 @@ Migrations live in `supabase/migrations/` and are applied to the linked project 
 
 ## Delivery zones and areas
 
-The **Store** page has one **Save changes** button. Ordering status, ready times, delivery zones and areas, opening hours, and closed days stay in a local draft until that button saves them together in one database transaction. Drag the handles to reorder zones or areas; keyboard users can focus a handle and press Up or Down.
+The **Store** page has one **Save changes** button. Ordering status, ready times, delivery zones and areas, opening hours, and closed days stay in a local draft until that button saves them together in one database transaction. Delivery areas appear alphabetically by their displayed English or Arabic name on the storefront. In admin, zones and areas appear alphabetically after saving or refreshing.
 
 Managers manage delivery zones in **Store**: each zone has a name (such as Zone A), a fee, and bilingual delivery areas. Areas can be moved between zones or switched off individually. Customers see one flat list of active areas; checkout inherits the selected area's zone fee.
 

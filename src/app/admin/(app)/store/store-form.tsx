@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition, type FormEvent } from "react";
 import { FormStatus, idle, type FormState } from "@/components/admin/form";
 import { PageHeader } from "@/components/admin/page-header";
+import { alphabetical } from "@/lib/alphabetical";
 import { storeStatus, type Schedule } from "@/lib/hours";
 import { saveStoreSettings } from "./actions";
 import { DeliveryZones } from "./delivery-zones";
@@ -47,7 +48,14 @@ export function StoreForm({
         const result = await saveStoreSettings(draft);
         setStatus(result);
         if (result.status === "saved") {
-          const clean = { ...draft, removedZoneIds: [], removedAreaIds: [], removedClosureIds: [] };
+          const clean = {
+            ...draft,
+            zones: alphabetical(draft.zones, (zone) => zone.name),
+            areas: alphabetical(draft.areas, (area) => area.nameEn),
+            removedZoneIds: [],
+            removedAreaIds: [],
+            removedClosureIds: [],
+          };
           setDraft(clean);
           setBaseline(JSON.stringify(clean));
         }

@@ -2,16 +2,6 @@
 
 import { Icon } from "@/components/admin/icons";
 import type { AreaDraft, ZoneDraft } from "./store-settings";
-import { DragGrip, useDragOrder } from "./use-drag-order";
-
-export function reorder<T extends { id: string }>(rows: T[], from: string, to: string): T[] {
-  const source = rows.findIndex((row) => row.id === from);
-  const target = rows.findIndex((row) => row.id === to);
-  if (source < 0 || target < 0 || source === target) return rows;
-  const next = [...rows];
-  next.splice(target, 0, next.splice(source, 1)[0]);
-  return next;
-}
 
 function ZoneEditor({
   zone,
@@ -21,8 +11,6 @@ function ZoneEditor({
   onAreas,
   onRemoveZone,
   onRemoveArea,
-  dragHandle,
-  dragging,
 }: {
   zone: ZoneDraft;
   zones: ZoneDraft[];
@@ -31,38 +19,14 @@ function ZoneEditor({
   onAreas: (areas: AreaDraft[]) => void;
   onRemoveZone: () => void;
   onRemoveArea: (id: string) => void;
-  dragHandle: ReturnType<typeof useDragOrder>["handle"];
-  dragging: boolean;
 }) {
   const members = areas.filter((area) => area.zoneId === zone.id);
-  const dnd = useDragOrder(
-    zone.id,
-    members.map((area) => area.id),
-    (from, to) => {
-      const sorted = reorder(members, from, to);
-      let index = 0;
-      onAreas(areas.map((area) => (area.zoneId === zone.id ? sorted[index++] : area)));
-    },
-  );
   const change = (id: string, patch: Partial<AreaDraft>) => {
-    const next = areas.map((area) => (area.id === id ? { ...area, ...patch } : area));
-    onAreas(
-      patch.zoneId
-        ? [...next.filter((area) => area.id !== id), next.find((area) => area.id === id)!]
-        : next,
-    );
+    onAreas(areas.map((area) => (area.id === id ? { ...area, ...patch } : area)));
   };
   return (
-    <section
-      aria-label={zone.name || "New zone"}
-      data-sort-group="zones"
-      data-sort-id={zone.id}
-      className={`rounded-xl border border-line p-4 ${dragging ? "ring-2 ring-accent" : ""}`}
-    >
+    <section aria-label={zone.name || "New zone"} className="rounded-xl border border-line p-4">
       <div className="flex flex-wrap items-end gap-3">
-        <button {...dragHandle(zone.id, `zone ${zone.name || "new zone"}`)}>
-          <DragGrip />
-        </button>
         <label className="min-w-36 flex-1">
           <span className="label">Zone name</span>
           <input
@@ -98,24 +62,13 @@ function ZoneEditor({
         </button>
       </div>
       <p className="mt-3 text-[13px] text-muted">
-        {members.length} area{members.length === 1 ? "" : "s"} · Drag to reorder; use the Zone
-        selector to move an area.
-      </p>
-      <p className="sr-only" aria-live="polite">
-        {dnd.announcement}
+        {members.length} area{members.length === 1 ? "" : "s"} · Use the Zone selector to move an
+        area.
       </p>
       <ul className="mt-1 divide-y divide-line">
         {members.map((area) => (
-          <li
-            key={area.id}
-            data-sort-group={zone.id}
-            data-sort-id={area.id}
-            className={`py-3 ${dnd.dragging === area.id ? "rounded-lg bg-accent-soft ring-2 ring-accent" : ""}`}
-          >
+          <li key={area.id} className="py-3">
             <div className="flex items-end gap-2">
-              <button {...dnd.handle(area.id, `area ${area.nameEn || "new area"}`)}>
-                <DragGrip />
-              </button>
               <div className="grid min-w-0 flex-1 grid-cols-2 items-end gap-2 xl:grid-cols-[1fr_1fr_9rem_auto_auto]">
                 <label className="min-w-0">
                   <span className="label">Area in English</span>
@@ -209,11 +162,6 @@ export function DeliveryZones({
   onRemoveZone: (id: string) => void;
   onRemoveArea: (id: string) => void;
 }) {
-  const dnd = useDragOrder(
-    "zones",
-    zones.map((zone) => zone.id),
-    (from, to) => onZones(reorder(zones, from, to)),
-  );
   const addZone = () => {
     let index = 0;
     let name: string;
@@ -227,14 +175,9 @@ export function DeliveryZones({
     <section className="card p-5">
       <h2 className="text-base font-bold">Delivery zones</h2>
       <p className="mt-1 text-sm text-muted">
-        Set one fee per zone. Customers see only the areas that are on, in one list. All changes
-        apply when you save the Store page.
-      </p>
-      <p id="drag-order-help" className="sr-only">
-        Drag the handle to reorder, or focus it and use the Up and Down arrow keys.
-      </p>
-      <p className="sr-only" aria-live="polite">
-        {dnd.announcement}
+        Set one fee per zone. Customers see the active areas alphabetically in their language. Zones
+        and areas are alphabetised here after saving or refreshing. All changes apply when you save
+        the Store page.
       </p>
       <div className="mt-5 flex flex-col gap-5">
         {zones.map((zone) => (
@@ -247,8 +190,6 @@ export function DeliveryZones({
             onAreas={onAreas}
             onRemoveZone={() => onRemoveZone(zone.id)}
             onRemoveArea={onRemoveArea}
-            dragHandle={dnd.handle}
-            dragging={dnd.dragging === zone.id}
           />
         ))}
       </div>

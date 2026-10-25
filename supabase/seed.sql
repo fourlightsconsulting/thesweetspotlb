@@ -24,21 +24,21 @@ join (values
   ('tripoli', 6, '12:00', '00:00')
 ) as h (branch, weekday, opens_at, closes_at) on h.branch = b.slug;
 
-insert into public.delivery_zones (branch_id, name, fee_cents, sort_order)
-select id, 'Zone A', 200, 10 from public.branches where slug = 'tripoli';
+insert into public.delivery_zones (branch_id, name, fee_cents)
+select id, 'Zone A', 200 from public.branches where slug = 'tripoli';
 
-insert into public.delivery_areas (branch_id, zone_id, slug, name_en, name_ar, sort_order)
-select b.id, z.id, a.slug, a.name_en, a.name_ar, a.sort_order
+insert into public.delivery_areas (branch_id, zone_id, slug, name_en, name_ar)
+select b.id, z.id, a.slug, a.name_en, a.name_ar
 from public.branches b
 join public.delivery_zones z on z.branch_id = b.id and z.name = 'Zone A'
 cross join (values
-  ('mina', 'Mina', 'الميناء', 1),
-  ('tal', 'Tal', 'التل', 2),
-  ('azmi', 'Azmi', 'شارع عزمي', 3),
-  ('dam-w-farez', 'Dam w Farez', 'الضم والفرز', 4),
-  ('abou-samra', 'Abou Samra', 'أبي سمراء', 5),
-  ('bahsas', 'Bahsas', 'البحصاص', 6)
-) as a (slug, name_en, name_ar, sort_order)
+  ('mina', 'Mina', 'الميناء'),
+  ('tal', 'Tal', 'التل'),
+  ('azmi', 'Azmi', 'شارع عزمي'),
+  ('dam-w-farez', 'Dam w Farez', 'الضم والفرز'),
+  ('abou-samra', 'Abou Samra', 'أبي سمراء'),
+  ('bahsas', 'Bahsas', 'البحصاص')
+) as a (slug, name_en, name_ar)
 where b.slug = 'tripoli';
 
 insert into public.categories (slug, name_en, name_ar, description_en, description_ar, image_path, sort_order)

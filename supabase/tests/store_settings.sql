@@ -40,14 +40,13 @@ begin
   assert (select ordering = 'paused' and pickup_eta_min = 12 and delivery_eta_max = 50 and last_order_minutes = 20 from public.branches where id = b), 'Ordering and ready times save together';
   assert (select count(*) = 7 from public.branch_hours where branch_id = b and opens_at = '13:00' and closes_at = '01:00'), 'All opening hours save together';
   assert exists(select 1 from public.branch_closures where id = c), 'Closed days are part of the same save';
-  assert (select sort_order = 10 from public.delivery_zones where id = z1) and (select sort_order = 20 from public.delivery_zones where id = z2), 'Zone order is saved';
 
-  -- Reorder both levels and move one area to the other zone in one save.
+  -- Array order has no delivery meaning; moving an area still updates its zone.
   next_draft := jsonb_set(draft, '{zones}', jsonb_build_array(draft #> '{zones,1}', draft #> '{zones,0}'));
   next_draft := jsonb_set(next_draft, '{areas}', jsonb_build_array(jsonb_set(draft #> '{areas,1}', '{zoneId}', to_jsonb(z2)), draft #> '{areas,0}'));
   perform public.save_store_settings(next_draft);
-  assert (select sort_order = 10 from public.delivery_zones where id = z2), 'Dragging zones persists their order';
-  assert (select zone_id = z2 and sort_order = 10 from public.delivery_areas where id = a2), 'Dragging areas and reassignment persist';
+
+  assert (select zone_id = z2 from public.delivery_areas where id = a2), 'Area reassignment persists';
 
   -- A late failure must undo earlier ordering, fee and hours updates.
   begin

@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { alphabetical } from "./alphabetical";
 import { checkoutAreas } from "./delivery";
 
 describe("checkoutAreas", () => {
   it("flattens areas with their shared zone fee and no zone names", () => {
-    const zone = { fee_cents: 200, sort_order: 10, name: "Zone A" };
+    const zone = { fee_cents: 200, name: "Zone A" };
     const rows = [
       { slug: "mina", name_en: "Mina", name_ar: "الميناء", delivery_zones: zone },
       { slug: "tal", name_en: "Tal", name_ar: "التل", delivery_zones: zone },
@@ -21,35 +22,36 @@ describe("checkoutAreas", () => {
       slug: "mina",
       name_en: "Mina",
       name_ar: "الميناء",
-      delivery_zones: { fee_cents: 500, sort_order: 20 },
+      delivery_zones: { fee_cents: 500 },
     };
     expect(checkoutAreas([row])[0].fee).toBe(500);
-    row.delivery_zones = { fee_cents: 0, sort_order: 10 };
+    row.delivery_zones = { fee_cents: 0 };
     expect(checkoutAreas([row])[0].fee).toBe(0);
   });
 
-  it("keeps each zone's areas together in one list without changing the source rows", () => {
+  it("sorts the flat area list by the displayed language, across all zones", () => {
     const rows = [
+      { slug: "mina", name_en: "Mina", name_ar: "الميناء", delivery_zones: { fee_cents: 500 } },
+      { slug: "tal", name_en: "Tal", name_ar: "التل", delivery_zones: { fee_cents: 200 } },
       {
-        slug: "far",
-        name_en: "Far",
-        name_ar: "بعيد",
-        delivery_zones: { fee_cents: 500, sort_order: 20 },
-      },
-      {
-        slug: "near-1",
-        name_en: "Near 1",
-        name_ar: "قريب",
-        delivery_zones: { fee_cents: 200, sort_order: 10 },
-      },
-      {
-        slug: "near-2",
-        name_en: "Near 2",
-        name_ar: "قريب",
-        delivery_zones: { fee_cents: 200, sort_order: 10 },
+        slug: "abou-samra",
+        name_en: "Abou Samra",
+        name_ar: "أبي سمراء",
+        delivery_zones: { fee_cents: 200 },
       },
     ];
-    expect(checkoutAreas(rows).map((area) => area.id)).toEqual(["near-1", "near-2", "far"]);
-    expect(rows[0].slug).toBe("far");
+    const areas = checkoutAreas(rows);
+    expect(alphabetical(areas, (area) => area.name.en, "en").map((area) => area.id)).toEqual([
+      "abou-samra",
+      "mina",
+      "tal",
+    ]);
+    expect(alphabetical(areas, (area) => area.name.ar, "ar").map((area) => area.id)).toEqual([
+      "abou-samra",
+      "tal",
+      "mina",
+    ]);
+    expect(areas[0].id).toBe("mina");
+    expect(areas.find((area) => area.id === "mina")?.fee).toBe(500);
   });
 });

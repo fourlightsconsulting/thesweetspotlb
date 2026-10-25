@@ -22,6 +22,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
 import { routes } from "@/i18n/routes";
 import { rememberCustomer, track, trackingIds } from "@/lib/tracking";
+import { alphabetical } from "@/lib/alphabetical";
 import { cartActions } from "@/lib/cart";
 import {
   type CheckoutFields,
@@ -154,7 +155,8 @@ function CheckoutForm({
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const mode = cart.mode;
-  const area = branch.areas.find((z) => z.id === fields.area);
+  const areas = alphabetical(branch.areas, (area) => area.name[lang], lang);
+  const area = areas.find((area) => area.id === fields.area);
   // The selected area's zone sets the delivery fee.
   const fee = mode === "delivery" ? (area?.fee ?? 0) : 0;
   const totals = orderTotals(subtotal, fee, promo);
@@ -481,7 +483,7 @@ function CheckoutForm({
                 >
                   <legend className="mb-2.5 font-ui text-sm font-semibold">{t.area}</legend>
                   <div className="flex flex-wrap gap-2">
-                    {branch.areas.map((z) => (
+                    {areas.map((z) => (
                       <label
                         key={z.id}
                         className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-vanilla has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-caramel ${errors.area ? "border-caramel" : "border-chocolate/15 hover:border-chocolate/40"}`}
