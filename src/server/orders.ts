@@ -8,6 +8,7 @@ import {
   type CheckPromoResult,
   type PlaceOrderInput,
   type PlaceOrderResult,
+  type PlacedOrder,
   validateFields,
 } from "@/lib/checkout";
 import { storeStatus } from "@/lib/hours";
@@ -90,6 +91,67 @@ function optionSnapshot(menu: Menu, item: MenuItem, selections: Selections) {
 /** Who's ordering, from the request (the server action reads it). */
 const noRequest: RequestInfo = { ip: null, userAgent: null, internal: false };
 
+type OrderDb = NonNullable<ReturnType<typeof serviceClient>>;
+
+/** Recover from stored snapshots, even if the menu or promo has since changed. */
+async function findPlacedOrder(db: OrderDb, idempotencyKey: string): Promise<PlacedOrder | null> {
+  const { data, error } = await db
+    .from("orders")
+    .select(
+      "public_token, number, fulfilment, customer_name, customer_phone, delivery_area_name_en, delivery_area_name_ar, address_street, address_floor, delivery_note, subtotal_cents, discount_cents, delivery_fee_cents, total_cents, discount_code, order_items(position, name_en, name_ar, quantity, note, order_item_options(group_key, option_name_en, option_name_ar))",
+    )
+    .eq("idempotency_key", idempotencyKey)
+    .maybeSingle();
+  if (error) throw new Error(`Recovering the order failed: ${error.message}`);
+  if (!data) return null;
+
+  return {
+    ref: data.public_token,
+    number: `TSS-${data.number}`,
+    mode: data.fulfilment,
+    name: data.customer_name,
+    phone: data.customer_phone,
+    address:
+      data.fulfilment === "delivery"
+        ? {
+            area: { en: data.delivery_area_name_en ?? "", ar: data.delivery_area_name_ar ?? "" },
+            street: data.address_street ?? "",
+            floor: data.address_floor ?? "",
+            note: data.delivery_note ?? "",
+          }
+        : null,
+    lines: data.order_items
+      .sort((a, b) => a.position - b.position)
+      .map((item) => {
+        const parts = (lang: "en" | "ar") =>
+          item.order_item_options
+            .filter((option) => !option.group_key.includes("/"))
+            .map((option) => {
+              const own = item.order_item_options
+                .filter((child) => child.group_key.startsWith(`${option.group_key}/`))
+                .map((child) => child[`option_name_${lang}`]);
+              const name = option[`option_name_${lang}`];
+              return own.length > 0 ? `${name} (${own.join(lang === "ar" ? "، " : ", ")})` : name;
+            });
+        return {
+          name: { en: item.name_en, ar: item.name_ar },
+          options: { en: parts("en"), ar: parts("ar") },
+          note: item.note,
+          qty: item.quantity,
+        };
+      }),
+    totals: {
+      subtotal: data.subtotal_cents,
+      discount: data.discount_cents,
+      deliveryFee: data.delivery_fee_cents,
+      total:
+        data.total_cents ?? data.subtotal_cents - data.discount_cents + data.delivery_fee_cents,
+    },
+    promoCode: data.discount_code,
+    demo: false,
+  };
+}
+
 export async function placeOrder(
   raw: PlaceOrderInput,
   request: RequestInfo = noRequest,
@@ -97,7 +159,31 @@ export async function placeOrder(
   const parsed = inputSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, code: "invalid", fields: {} };
   const input = parsed.data;
+  const db = serviceClient();
 
+  try {
+    // A saved attempt wins over current hours, availability and promo limits.
+    const saved = db && (await findPlacedOrder(db, input.idempotencyKey));
+    if (saved) return { ok: true, order: saved };
+
+    const result = await placeNewOrder(input, request, db);
+    if (db && !result.ok) {
+      // Another request may have saved this attempt while we were validating it.
+      const saved = await findPlacedOrder(db, input.idempotencyKey);
+      if (saved) return { ok: true, order: saved };
+    }
+    return result;
+  } catch (error) {
+    console.error("place_order failed", error);
+    return { ok: false, code: "failed" };
+  }
+}
+
+async function placeNewOrder(
+  input: PlaceOrderInput,
+  request: RequestInfo,
+  db: OrderDb | null,
+): Promise<PlaceOrderResult> {
   const [menu, branch] = await Promise.all([getMenu(), getOrderingBranch()]);
 
   const fieldErrors = validateFields(input.mode, input.fields);
@@ -141,7 +227,6 @@ export async function placeOrder(
     qty: line.qty,
   }));
 
-  const db = serviceClient();
   if (!db) {
     // Development without Supabase: a demo order that goes nowhere.
     if (process.env.NODE_ENV === "production") return { ok: false, code: "unavailable" };
@@ -213,24 +298,27 @@ export async function placeOrder(
     console.error("create_order failed", error);
     return { ok: false, code: "failed" };
   }
+  if (data.already_placed) {
+    const saved = await findPlacedOrder(db, input.idempotencyKey);
+    return saved ? { ok: true, order: saved } : { ok: false, code: "failed" };
+  }
   // The shop's WhatsApp alerts and the order's tracking happen once the
   // customer has their answer.
-  if (!data.already_placed)
-    after(async () => {
-      await sendOrderAlerts(data.order_id);
-      await reportOrderPlaced(
-        {
-          id: data.order_id,
-          lang: input.lang,
-          fulfilment: input.mode,
-          total: data.total_cents,
-          foodValue: totals.subtotal - totals.discount,
-          items: priced.reduce((n, p) => n + p.line.qty, 0),
-        },
-        input.tracking ?? null,
-        request,
-      );
-    });
+  after(async () => {
+    await sendOrderAlerts(data.order_id);
+    await reportOrderPlaced(
+      {
+        id: data.order_id,
+        lang: input.lang,
+        fulfilment: input.mode,
+        total: data.total_cents,
+        foodValue: totals.subtotal - totals.discount,
+        items: priced.reduce((n, p) => n + p.line.qty, 0),
+      },
+      input.tracking ?? null,
+      request,
+    );
+  });
 
   return {
     ok: true,

@@ -13,7 +13,10 @@ import { getOrderingBranch, getSiteSettings } from "@/server/catalog";
 import { fontVariables } from "../fonts";
 import "../globals.css";
 
-export const dynamicParams = false;
+// OpenNext must regenerate these pages when their R2 entries are missing or
+// invalidated. With dynamicParams=false, that cache miss returns a 404 instead.
+// The hasLocale checks below still reject unsupported languages.
+export const dynamicParams = true;
 
 export function generateStaticParams() {
   return locales.map((lang) => ({ lang }));
