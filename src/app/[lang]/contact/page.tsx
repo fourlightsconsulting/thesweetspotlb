@@ -24,5 +24,15 @@ export default async function Contact({ params }: PageProps<"/[lang]/contact">) 
   if (!hasLocale(lang)) notFound();
   const [t, branch] = await Promise.all([getDictionary(lang), getOrderingBranch()]);
 
-  return <ContactLines lang={lang} t={t.contact} social={t.social} phone={branch.phone} />;
+  return (
+    <ContactLines
+      lang={lang}
+      t={t.contact}
+      social={t.social}
+      phone={branch.phone}
+      hours={branch.schedule}
+      mapsUrl={branch.mapsUrl}
+      locations={t.locations}
+    />
+  );
 }

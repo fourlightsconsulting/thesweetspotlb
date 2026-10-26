@@ -11,15 +11,15 @@ type Props = {
 export function QtyStepper({ value, onChange, min = 1, max, labels, size = "sm" }: Props) {
   const button =
     size === "lg"
-      ? "flex size-10 items-center justify-center rounded-[12px] transition-colors hover:bg-strawberry-milk disabled:opacity-35 disabled:hover:bg-transparent desk:size-12"
-      : "flex size-9 items-center justify-center rounded-[9px] transition-colors hover:bg-strawberry-milk disabled:opacity-35 disabled:hover:bg-transparent";
+      ? "flex size-11 items-center justify-center rounded-[12px] transition-colors hover:bg-strawberry-cream focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-raspberry disabled:opacity-35 disabled:hover:bg-transparent desk:size-12"
+      : "flex size-11 items-center justify-center rounded-[10px] transition-colors hover:bg-strawberry-cream focus-visible:outline-3 focus-visible:outline-offset-1 focus-visible:outline-raspberry disabled:opacity-35 disabled:hover:bg-transparent";
   const icon = size === "lg" ? "size-[18px]" : "size-3.5";
 
   return (
     <div
       role="group"
       aria-label={labels.quantity}
-      className={`inline-flex flex-none items-center border-blueberry/18 bg-whipped font-ui font-bold ${size === "lg" ? "rounded-[14px] border-[1.5px] p-0.5 text-lg" : "rounded-[11px] border-[1.5px] text-sm"}`}
+      className={`inline-flex flex-none items-center border-ink/25 bg-paper font-ui font-bold ${size === "lg" ? "rounded-[14px] border-[1.5px] p-0.5 text-lg" : "rounded-[12px] border-[1.5px] text-sm"}`}
     >
       <button
         type="button"

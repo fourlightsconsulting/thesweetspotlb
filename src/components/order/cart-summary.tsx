@@ -50,11 +50,14 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
       {lines.map(({ line, item, total }) => {
         const mods = describeSelections(item, menu, line.selections, lang);
         return (
-          <li key={line.key} className="flex items-start gap-3">
+          <li
+            key={line.key}
+            className="flex items-start gap-3 border-b border-ink/10 pb-4 last:border-b-0 last:pb-0"
+          >
             <ItemImage item={item} sizes="56px" className="size-14 flex-none rounded-[14px]" />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <div className="flex items-baseline justify-between gap-3">
-                <span className="font-display text-base leading-[1.25] font-bold">
+                <span className="font-display text-base leading-[1.25] font-bold text-blueberry">
                   {onEdit ? null : <span className="font-ui text-ink-soft">{line.qty} × </span>}
                   {item.name[lang]}
                 </span>
@@ -71,7 +74,7 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
                 </span>
               )}
               {onEdit && (
-                <div className="mt-1.5 flex items-center gap-4">
+                <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
                   <QtyStepper
                     value={line.qty}
                     min={0}
@@ -85,7 +88,7 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
                   <button
                     type="button"
                     onClick={() => onEdit(line)}
-                    className="min-h-9 font-ui text-[13px] font-semibold text-blueberry underline decoration-raspberry decoration-2 underline-offset-4"
+                    className="min-h-11 font-ui text-[13px] font-semibold text-blueberry underline decoration-raspberry decoration-2 underline-offset-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-raspberry"
                   >
                     {t.edit}
                   </button>
@@ -96,7 +99,7 @@ export function CartLines({ lines, menu, lang, t, onEdit }: LinesProps) {
                       cartActions.remove(line.key);
                     }}
                     aria-label={fill(t.removeItem, { name: item.name[lang] })}
-                    className="min-h-9 font-ui text-[13px] font-semibold text-ink-soft underline decoration-blueberry/25 decoration-2 underline-offset-4 hover:text-ink"
+                    className="min-h-11 font-ui text-[13px] font-semibold text-ink-soft underline decoration-raspberry decoration-2 underline-offset-4 hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-raspberry"
                   >
                     {t.remove}
                   </button>
@@ -118,7 +121,7 @@ type TotalsProps = {
 
 export function CartTotals({ totals, lang, t }: TotalsProps) {
   return (
-    <dl className="flex flex-col gap-2.5 border-t border-dashed border-blueberry/25 pt-4 font-ui text-[15px]">
+    <dl className="flex flex-col gap-2.5 border-t border-dashed border-ink/25 pt-4 font-ui text-[15px]">
       <div className="flex justify-between gap-3">
         <dt className="text-ink-soft">{t.subtotal}</dt>
         <dd>{formatPrice(totals.subtotal, lang)}</dd>

@@ -123,6 +123,8 @@ const en = {
     instagramNote: "Specials and new flavours first",
     facebookNote: "Message us or leave a review",
     tiktokNote: "Desserts in the making",
+    visit: "Visit the shop",
+    locationValue: "Tripoli, Lebanon",
   },
   order: {
     metaTitle: "Order online",

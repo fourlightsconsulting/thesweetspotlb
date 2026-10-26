@@ -356,13 +356,13 @@ function CheckoutForm({
 
       <div className="shell grid items-start gap-[clamp(20px,2.6cqw,40px)] pb-section desk:grid-cols-[minmax(0,1fr)_minmax(340px,420px)]">
         {/* Phones: the summary folds away above the form. */}
-        <div className="rounded-[20px] border-[1.5px] border-blueberry/10 bg-whipped desk:hidden">
+        <div className="overflow-hidden rounded-[22px] border-2 border-ink bg-pink-tint desk:hidden">
           <button
             type="button"
             onClick={() => setSummaryOpen((v) => !v)}
             aria-expanded={summaryOpen}
             aria-controls="mobile-summary"
-            className="flex min-h-14 w-full items-center justify-between gap-3 px-[18px] font-ui text-[15px] font-semibold text-blueberry"
+            className="flex min-h-14 w-full items-center justify-between gap-3 px-[18px] font-ui text-[15px] font-semibold text-blueberry focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-raspberry"
           >
             <span>
               {summaryOpen ? t.hideSummary : t.showSummary} · {plural(lang, order.items, count)}
@@ -374,7 +374,7 @@ function CheckoutForm({
           {summaryOpen && (
             <div
               id="mobile-summary"
-              className="flex flex-col gap-4 border-t border-dashed border-blueberry/20 px-[18px] pt-4 pb-5"
+              className="flex flex-col gap-4 border-t border-dashed border-ink/25 px-[18px] pt-4 pb-5"
             >
               {summary}
             </div>
@@ -386,7 +386,7 @@ function CheckoutForm({
             <div
               ref={bannerRef}
               role={banner.tone === "error" ? "alert" : "status"}
-              className={`flex items-start gap-3 rounded-[18px] border-[1.5px] px-4 py-3.5 font-ui text-[15px] leading-[1.45] font-medium ${banner.tone === "error" ? "border-raspberry bg-strawberry-milk" : "border-blueberry/12 bg-whipped"}`}
+              className={`flex items-start gap-3 rounded-[18px] border-[1.5px] px-4 py-3.5 font-ui text-[15px] leading-[1.45] font-medium ${banner.tone === "error" ? "border-raspberry bg-pink-tint" : "border-ink/15 bg-whipped"}`}
             >
               <Bang />
               {banner.text}
@@ -396,7 +396,7 @@ function CheckoutForm({
           {closed && status && !banner && (
             <div
               role="status"
-              className="flex items-start gap-3 rounded-[18px] border-[1.5px] border-blueberry/12 bg-whipped px-4 py-3.5 font-ui text-[15px] leading-[1.45]"
+              className="flex items-start gap-3 rounded-[18px] border-[1.5px] border-ink/15 bg-whipped px-4 py-3.5 font-ui text-[15px] leading-[1.45]"
             >
               <span className="mt-0.5">
                 <ClockIcon />
@@ -449,9 +449,9 @@ function CheckoutForm({
               >
                 <div
                   dir="ltr"
-                  className={`flex h-[52px] items-stretch overflow-hidden rounded-[14px] border-[1.5px] bg-whipped focus-within:border-blueberry focus-within:ring-3 focus-within:ring-blueberry/15 ${errors.phone ? "border-2 border-raspberry" : "border-blueberry/20"}`}
+                  className={`flex h-[52px] items-stretch overflow-hidden rounded-[14px] border-[1.5px] bg-paper focus-within:border-ink focus-within:ring-3 focus-within:ring-raspberry/25 ${errors.phone ? "border-2 border-raspberry" : "border-ink/25"}`}
                 >
-                  <span className="flex items-center border-e-[1.5px] border-blueberry/12 px-3.5 font-ui text-base font-semibold text-ink-soft">
+                  <span className="flex items-center border-e-[1.5px] border-ink/15 px-3.5 font-ui text-base font-semibold text-ink-soft">
                     +961
                   </span>
                   <input
@@ -472,7 +472,7 @@ function CheckoutForm({
             </div>
 
             {mode === "delivery" && (
-              <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-blueberry/20 pt-5">
+              <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-ink/20 pt-5">
                 <h3 className="font-display text-lg leading-tight font-bold">{t.address}</h3>
                 <fieldset
                   id="field-area"
@@ -486,7 +486,7 @@ function CheckoutForm({
                     {areas.map((z) => (
                       <label
                         key={z.id}
-                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-whipped px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-blueberry has-checked:bg-blueberry has-checked:text-paper has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry ${errors.area ? "border-raspberry" : "border-blueberry/15 hover:border-blueberry/40"}`}
+                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-paper px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-ink has-checked:bg-blueberry has-checked:text-paper has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry ${errors.area ? "border-raspberry" : "border-ink/20 hover:border-ink/50"}`}
                       >
                         <input
                           type="radio"
@@ -550,10 +550,10 @@ function CheckoutForm({
           </Step>
 
           <Step number={3} title={t.stepPayment}>
-            <div className="flex items-start gap-3 rounded-[18px] border-2 border-blueberry bg-strawberry-milk p-4 shadow-[4px_5px_0_var(--color-blueberry)]">
+            <div className="flex items-start gap-3 rounded-[18px] border-2 border-ink bg-cotton-candy p-4 shadow-[3px_4px_0_var(--color-ink)]">
               <span
                 aria-hidden="true"
-                className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-paper bg-blueberry"
+                className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-ink bg-blueberry"
               >
                 <span className="size-2 rounded-full bg-whipped" />
               </span>
@@ -572,7 +572,7 @@ function CheckoutForm({
                 {t.promo}
               </label>
               {promo ? (
-                <div className="flex min-h-[52px] items-center justify-between gap-3 rounded-[14px] border-[1.5px] border-blueberry bg-whipped px-4">
+                <div className="flex min-h-[52px] items-center justify-between gap-3 rounded-[14px] border-[1.5px] border-ink/40 bg-pink-tint px-4">
                   <span className="flex items-center gap-2 font-ui text-[15px] font-semibold text-blueberry">
                     <Check />
                     {fill(t.promoApplied, { code: promo.code })}
@@ -583,7 +583,7 @@ function CheckoutForm({
                       setPromo(null);
                       setPromoInput("");
                     }}
-                    className="min-h-11 font-ui text-[13px] font-semibold text-ink-soft underline decoration-blueberry/25 decoration-2 underline-offset-4"
+                    className="min-h-11 font-ui text-[13px] font-semibold text-ink-soft underline decoration-raspberry decoration-2 underline-offset-4 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-raspberry"
                   >
                     {t.removePromo}
                   </button>
@@ -629,9 +629,9 @@ function CheckoutForm({
 
         <aside
           aria-label={t.summary}
-          className="sticky top-[calc(var(--header-h,74px)+24px)] hidden flex-col gap-4 rounded-[24px] border-[1.5px] border-blueberry/10 bg-whipped p-6 desk:flex"
+          className="sticky top-[calc(var(--header-h,74px)+24px)] hidden flex-col gap-4 rounded-[24px] border-2 border-ink bg-pink-tint p-6 shadow-[4px_5px_0_var(--color-ink)] desk:flex"
         >
-          <h2 className="font-display text-[26px] leading-[1.15] font-bold tracking-[-0.02em]">
+          <h2 className="font-display text-[26px] leading-[1.15] font-bold tracking-[-0.02em] text-blueberry">
             {t.summary}
           </h2>
           {summary}
@@ -645,7 +645,7 @@ function CheckoutForm({
       </div>
 
       {/* Phones: the button stays in reach at the bottom of the screen. */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-blueberry/10 bg-paper/95 px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))] backdrop-blur-md desk:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-ink/15 bg-paper/95 px-4 pt-3 pb-[max(14px,env(safe-area-inset-bottom))] backdrop-blur-md desk:hidden">
         <PlaceButton
           label={placeLabel}
           disabled={disabled}
@@ -658,15 +658,15 @@ function CheckoutForm({
 }
 
 const inputClass =
-  "h-[52px] w-full rounded-[14px] border-[1.5px] border-blueberry/20 bg-whipped px-4 font-ui text-base placeholder:text-ink-soft/55 focus:border-blueberry focus:ring-3 focus:ring-blueberry/15 focus:outline-none aria-invalid:border-2 aria-invalid:border-raspberry";
+  "h-[52px] w-full rounded-[14px] border-[1.5px] border-ink/25 bg-paper px-4 font-ui text-base placeholder:text-ink-soft/55 focus:border-ink focus:ring-3 focus:ring-raspberry/25 focus:outline-none aria-invalid:border-2 aria-invalid:border-raspberry";
 
 function Step({ number, title, children }: { number: number; title: string; children: ReactNode }) {
   return (
-    <section className="rounded-[24px] border-[1.5px] border-blueberry/10 bg-whipped p-[clamp(18px,2.2cqw,30px)]">
-      <h2 className="mb-5 flex items-center gap-3 font-display text-[clamp(21px,1.8cqw,24px)] leading-tight font-bold">
+    <section className="rounded-[24px] border-[1.5px] border-ink/15 bg-whipped p-[clamp(18px,2.2cqw,30px)]">
+      <h2 className="mb-5 flex items-center gap-3 font-display text-[clamp(21px,1.8cqw,24px)] leading-tight font-bold text-blueberry">
         <span
           aria-hidden="true"
-          className="flex size-8 flex-none items-center justify-center rounded-full bg-blueberry font-ui text-sm font-bold text-paper"
+          className="flex size-8 flex-none items-center justify-center rounded-full border-2 border-ink bg-cotton-candy font-ui text-sm font-bold text-ink"
         >
           {number}
         </span>
@@ -723,7 +723,7 @@ type ChoiceProps = {
 
 function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps) {
   return (
-    <label className="relative flex cursor-pointer items-start gap-3 rounded-[18px] border-2 border-blueberry/15 bg-paper p-4 transition-[border-color,box-shadow,background-color] duration-200 has-checked:border-blueberry has-checked:bg-strawberry-milk has-checked:shadow-[4px_5px_0_var(--color-blueberry)] has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry">
+    <label className="relative flex cursor-pointer items-start gap-3 rounded-[18px] border-2 border-ink/20 bg-paper p-4 transition-[border-color,box-shadow,background-color] duration-200 has-checked:border-ink has-checked:bg-strawberry-cream has-checked:shadow-[3px_4px_0_var(--color-ink)] has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry">
       <input
         type="radio"
         name={name}
@@ -733,7 +733,7 @@ function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps
       />
       <span
         aria-hidden="true"
-        className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-blueberry/45 peer-checked:border-blueberry peer-checked:bg-blueberry"
+        className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-ink/40 peer-checked:border-ink peer-checked:bg-blueberry"
       >
         <span className={`size-2 rounded-full bg-whipped ${checked ? "" : "hidden"}`} />
       </span>
@@ -793,7 +793,7 @@ function Bang() {
   return (
     <span
       aria-hidden="true"
-      className="mt-px flex size-5 flex-none items-center justify-center rounded-full bg-raspberry font-ui text-xs font-bold text-whipped"
+      className="mt-px flex size-5 flex-none items-center justify-center rounded-full bg-raspberry font-ui text-xs font-bold text-ink"
     >
       !
     </span>

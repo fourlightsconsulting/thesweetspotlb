@@ -187,16 +187,16 @@ export function OrderView({ lang, t, menu, branch }: Props) {
         <aside
           id="your-order"
           aria-labelledby="your-order-title"
-          className="sticky top-[calc(var(--header-h,74px)+var(--sticky-extra,66px)+16px)] hidden max-h-[calc(100svh-var(--header-h,74px)-var(--sticky-extra,66px)-32px)] flex-col gap-5 rounded-[24px] border-[1.5px] border-blueberry/10 bg-whipped p-6 desk:flex"
+          className="sticky top-[calc(var(--header-h,74px)+var(--sticky-extra,66px)+16px)] hidden max-h-[calc(100svh-var(--header-h,74px)-var(--sticky-extra,66px)-32px)] flex-col gap-5 rounded-[24px] border-2 border-ink bg-pink-tint p-6 shadow-[4px_5px_0_var(--color-ink)] desk:flex"
         >
           <div className="flex items-center justify-between gap-3">
             <h2
               id="your-order-title"
-              className="font-display text-[26px] leading-[1.15] font-bold tracking-[-0.02em]"
+              className="font-display text-[26px] leading-[1.15] font-bold tracking-[-0.02em] text-blueberry"
             >
               {t.yourOrder}
             </h2>
-            <span className="rounded-full bg-strawberry-milk px-3 py-1 font-ui text-[13px] font-semibold">
+            <span className="rounded-full bg-paper px-3 py-1 font-ui text-[13px] font-semibold">
               {cart.mode === "delivery" ? t.delivery : t.pickup}
             </span>
           </div>
@@ -242,15 +242,15 @@ export function OrderView({ lang, t, menu, branch }: Props) {
           if (e.target === e.currentTarget) cartSheetRef.current?.close();
         }}
       >
-        <div className="flex items-center justify-between gap-3 border-b border-blueberry/10 px-5 pt-4 pb-3">
+        <div className="flex items-center justify-between gap-3 border-b border-ink/15 bg-strawberry-cream px-5 pt-4 pb-3">
           <div className="flex items-center gap-3">
             <h2
               id="cart-sheet-title"
-              className="font-display text-2xl font-bold tracking-[-0.02em]"
+              className="font-display text-2xl font-bold tracking-[-0.02em] text-blueberry"
             >
               {t.yourOrder}
             </h2>
-            <span className="rounded-full bg-strawberry-milk px-3 py-1 font-ui text-[13px] font-semibold">
+            <span className="rounded-full bg-paper px-3 py-1 font-ui text-[13px] font-semibold">
               {plural(lang, t.items, count)}
             </span>
           </div>
@@ -277,7 +277,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
           )}
         </div>
         {lines.length > 0 && (
-          <div className="flex flex-col gap-4 border-t border-blueberry/10 px-5 pt-1 pb-[max(16px,env(safe-area-inset-bottom))]">
+          <div className="flex flex-col gap-4 border-t border-ink/15 px-5 pt-1 pb-[max(16px,env(safe-area-inset-bottom))]">
             <CartTotals totals={totals} lang={lang} t={t} />
             {checkout}
           </div>
@@ -301,7 +301,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
         {toast && (
           <span
             key={toast.id}
-            className="flex items-center gap-2 rounded-full bg-ink px-5 py-3 font-ui text-[15px] font-semibold text-paper shadow-[0_12px_28px_-12px_rgba(26,86,167,.6)]"
+            className="flex items-center gap-2 rounded-full bg-ink px-5 py-3 font-ui text-[15px] font-semibold text-paper shadow-[0_12px_28px_-12px_rgba(29,29,34,.4)]"
           >
             <svg
               aria-hidden="true"
@@ -497,7 +497,7 @@ function ItemCard({ item, count, lang, t, eager }: CardProps) {
 
 function EmptyOrder({ t }: { t: Dictionary["order"] }) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-[18px] bg-strawberry-milk px-4 py-7 text-center">
+    <div className="flex flex-col items-center gap-2 rounded-[18px] border border-ink/10 bg-paper px-4 py-7 text-center">
       <span className="font-script text-[26px] leading-[1.35] text-blueberry">{t.treat}</span>
       <span className="font-body text-base leading-normal text-ink-soft">{t.empty}</span>
     </div>

@@ -112,6 +112,8 @@ const ar: Dictionary = {
     instagramNote: "العروض والنكهات الجديدة أول بأول",
     facebookNote: "راسلنا أو اكتبلنا رأيك",
     tiktokNote: "شوف الحلو وهو عم ينعمل",
+    visit: "زورونا بالمحل",
+    locationValue: "طرابلس، لبنان",
   },
   order: {
     metaTitle: "اطلب أونلاين",

@@ -657,11 +657,11 @@ html:has(dialog[open]) {
   max-height: calc(100dvh - 32px);
   margin: auto auto 16px;
   padding: 0;
-  border: 2.5px solid var(--color-blueberry);
+  border: 2.5px solid var(--color-ink);
   border-radius: 26px;
-  background: var(--color-paper);
+  background: var(--color-strawberry-cream);
   color: var(--color-ink);
-  box-shadow: 6px 8px 0 var(--color-blueberry);
+  box-shadow: 6px 8px 0 var(--color-ink);
   overflow: auto;
   opacity: 0;
   translate: 0 24px;
@@ -676,7 +676,7 @@ html:has(dialog[open]) {
   translate: 0 0;
 }
 .welcome-popup::backdrop {
-  background: rgb(26 86 167 / 0.3);
+  background: rgb(29 29 34 / 0.25);
   backdrop-filter: blur(3px);
   opacity: 0;
   transition:
@@ -711,7 +711,7 @@ html:has(dialog[open]) {
   max-height: none;
   margin: 0;
   padding: 0;
-  border: 0;
+  border: 1.5px solid var(--color-ink);
   border-radius: 24px 24px 0 0;
   background: var(--color-paper);
   color: var(--color-ink);
@@ -729,7 +729,7 @@ html:has(dialog[open]) {
   translate: 0 0;
 }
 .sheet::backdrop {
-  background: rgb(26 86 167 / 0.3);
+  background: rgb(29 29 34 / 0.25);
   backdrop-filter: blur(3px);
   opacity: 0;
   transition:
@@ -756,7 +756,7 @@ html:has(dialog[open]) {
     border-radius: 0;
     border-start-start-radius: 28px;
     border-end-start-radius: 28px;
-    box-shadow: calc(-18px * var(--dir, 1)) 0 40px -24px rgb(26 86 167 / 0.4);
+    box-shadow: calc(-8px * var(--dir, 1)) 0 0 rgb(29 29 34 / 0.14);
     translate: calc(100% * var(--dir, 1)) 0;
   }
   .sheet[open] {
