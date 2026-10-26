@@ -5,7 +5,7 @@ const ar: Dictionary = {
     title: "ذا سويت سبوت · كريب، وافل وآيس كريم رولز في طرابلس",
     titleTemplate: "%s · ذا سويت سبوت",
     description:
-      "كريب، وافل، بان كيك، آيس كريم رولز والمزيد، بينعملوا عالطلب في طرابلس. جاهز خلال 10–15 دقيقة، استلام أو توصيل.",
+      "كريب، وافل، بان كيك، آيس كريم رولز والمزيد، بينعملوا عالطلب في طرابلس، استلام أو توصيل.",
     shareImageAlt: "شعار ذا سويت سبوت مع كاسة آيس كريم رولز أوريو وعلبة حلو مفتوحة",
   },
   nav: {
@@ -26,7 +26,6 @@ const ar: Dictionary = {
   hero: {
     title: { lead: "", first: "لقمة", join: "", last: "للكل" },
     tagline: "خلّيك عنّا… وكُل عَ راحتك.",
-    note: "جاهز خلال 10–15 دقيقة",
   },
   categories: {
     titleStart: "اختار",
@@ -68,7 +67,7 @@ const ar: Dictionary = {
     google: "تقييمات Google",
     ratingOf: "{rating} من 5",
     count: { one: "تقييم واحد", two: "تقييمين", few: "{count} تقييمات", other: "{count} تقييم" },
-    seeAll: "كل التقييمات على Google",
+    leaveReview: "اتركلنا تقييم",
     readMore: "اقرأ المزيد",
     readLess: "أقل",
     previous: "التقييمات السابقة",
@@ -136,6 +135,16 @@ const ar: Dictionary = {
     pausedBody: "راجعين قريباً. تفرّج عالقائمة لهيديك الوقت.",
     pausedShort: "الطلب موقّف",
     categoriesLabel: "أقسام القائمة",
+    appearance: {
+      label: "معاينة الألوان",
+      options: {
+        pink: "وردي / وردي فاتح",
+        white: "أبيض / أبيض ناصع",
+        blue: "أزرق / أزرق فاتح",
+        whitePink: "أبيض / الوردي الأساسي",
+        whiteBlue: "أبيض / الأزرق الأساسي",
+      },
+    },
     tags: { fav: "الأكثر طلباً", new: "جديد", limited: "لفترة محدودة" },
     soldOut: "خلصت الكمية",
     inOrder: "{count} بطلبك",

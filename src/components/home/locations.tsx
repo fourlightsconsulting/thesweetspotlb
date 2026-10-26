@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { OpenStatus } from "@/components/open-status";
 import { Reveal } from "@/components/reveal";
-import { StrawberrySticker } from "@/components/stickers";
 import { site } from "@/data/site";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -30,7 +29,6 @@ export function Locations({ lang, t, orderNow, hours }: Props) {
       <Reveal className="shell grid items-start gap-[clamp(36px,4cqw,64px)] desk:grid-cols-2">
         <div>
           <h2 className="title-section">{t.title}</h2>
-          <StrawberrySticker className="mt-[clamp(28px,4cqw,56px)] hidden w-[clamp(120px,12cqw,170px)] -rotate-6 [--badge:var(--color-cotton-candy)] desk:block" />
         </div>
 
         <div className="flex w-full max-w-[520px] flex-col gap-3.5 font-ui text-[15px] leading-5">

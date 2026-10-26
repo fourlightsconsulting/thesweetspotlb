@@ -139,13 +139,13 @@ html[lang="ar"] {
   }
 }
 
-/* ── Sticker buttons: secondary blue outline + hard offset shadow ──
-   --btn-line colours both; coloured buttons get a near-white outline, like a
-   die-cut sticker. Keyboard focus: a secondary pink ring hugs the button
+/* ── Sticker buttons: near-black outline + hard shadow ──
+   Keyboard focus: a secondary pink ring hugs the button
    (--ring on dark bands) and the hard shadow steps aside. */
 @layer components {
   .btn {
-    --btn-line: var(--color-blueberry);
+    --btn-line: var(--color-ink);
+    --btn-shadow: var(--color-ink);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -154,7 +154,7 @@ html[lang="ar"] {
     padding: 0 22px;
     border: 2.5px solid var(--btn-line);
     border-radius: 14px;
-    box-shadow: 4px 5px 0 var(--btn-line);
+    box-shadow: 4px 5px 0 var(--btn-shadow);
     font-family: var(--font-ui);
     font-weight: 700;
     font-size: 15px;
@@ -168,11 +168,11 @@ html[lang="ar"] {
   }
   .btn:hover {
     transform: translate(-1px, -2px);
-    box-shadow: 5px 7px 0 var(--btn-line);
+    box-shadow: 5px 7px 0 var(--btn-shadow);
   }
   .btn:active {
     transform: translate(3px, 4px);
-    box-shadow: 1px 1px 0 var(--btn-line);
+    box-shadow: 1px 1px 0 var(--btn-shadow);
   }
   .btn:focus-visible {
     outline: 3px solid var(--ring, var(--color-raspberry));
@@ -182,7 +182,6 @@ html[lang="ar"] {
   }
 
   .btn-primary {
-    border-color: var(--color-paper);
     background: var(--color-blueberry);
     color: var(--color-paper);
   }
@@ -196,9 +195,8 @@ html[lang="ar"] {
   .btn-secondary:hover {
     background: var(--color-strawberry-cream);
   }
-  /* On secondary blue bands: near white, with a primary blue line. */
+  /* On secondary blue bands: near white. */
   .btn-light {
-    --btn-line: var(--color-cotton-candy);
     background: var(--color-paper);
     color: var(--color-blueberry);
   }
@@ -211,7 +209,7 @@ html[lang="ar"] {
     padding: 0 16px;
     border-width: 2px;
     border-radius: 12px;
-    box-shadow: 3px 4px 0 var(--btn-line);
+    box-shadow: 3px 4px 0 var(--btn-shadow);
   }
   .btn-lg {
     min-height: 58px;
@@ -223,7 +221,7 @@ html[lang="ar"] {
     padding: 0 36px;
     font-size: 19px;
     border-radius: 16px;
-    box-shadow: 5px 6px 0 var(--btn-line);
+    box-shadow: 5px 6px 0 var(--btn-shadow);
   }
 
   /* ── Tags: little tickets like the brand's TAKE AWAY sticker ──
@@ -456,6 +454,25 @@ html[lang="ar"] {
   }
 }
 
+/* Sticker motion is separate from the existing product and reveal animations. */
+@keyframes tss-sticker-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -3px;
+  }
+}
+
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-sticker[data-sticker-float] {
+      animation: tss-sticker-float 8s ease-in-out infinite;
+    }
+  }
+}
+
 @keyframes tss-drop {
   from {
     opacity: 0;
@@ -492,9 +509,8 @@ html[lang="ar"] {
   --dir: -1;
 }
 
-/* Motion runs on desktop only. Phones render everything still: no animation
-   work, and nothing waits on JS to appear. The ticker is the exception: a
-   compositor-only transform that costs nothing per frame. */
+/* Product and reveal motion runs on desktop only. Phones never wait on JS to
+   appear; only the ticker and the small decorative sticker float move. */
 .marquee {
   animation: tss-marquee 40s linear infinite;
 }

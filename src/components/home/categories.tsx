@@ -4,7 +4,6 @@ import type { CSSProperties } from "react";
 import { Underline } from "@/components/doodles";
 import { MenuIcon } from "@/components/icons";
 import { Reveal } from "@/components/reveal";
-import { CherrySticker } from "@/components/stickers";
 import { lowestPrice, type Menu } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -38,7 +37,6 @@ export function Categories({ lang, t, from, menu }: Props) {
       id="menu"
       className="relative pt-section pb-[calc(min(26cqw,112px)+28px)] desk:pb-[clamp(124px,11cqw,160px)]"
     >
-      <CherrySticker className="absolute end-[clamp(16px,6cqw,96px)] top-[clamp(36px,5cqw,72px)] w-[clamp(70px,8cqw,118px)] rotate-12" />
       <Reveal className="shell" threshold={0.1}>
         <h2 className="mb-[clamp(24px,3cqw,44px)] title-section">
           {t.titleStart}{" "}

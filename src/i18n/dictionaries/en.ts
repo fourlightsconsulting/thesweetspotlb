@@ -5,7 +5,7 @@ const en = {
     title: "The Sweet Spot · Crêpes, waffles & ice cream rolls in Tripoli",
     titleTemplate: "%s · The Sweet Spot",
     description:
-      "Crêpes, waffles, pancakes, ice cream rolls and more, made to order in Tripoli. Ready in 10–15 min for pickup or delivery.",
+      "Crêpes, waffles, pancakes, ice cream rolls and more, made to order in Tripoli for pickup or delivery.",
     shareImageAlt:
       "The Sweet Spot logo beside a cup of Oreo ice cream rolls and an open dessert box",
   },
@@ -25,11 +25,9 @@ const en = {
     from: "From",
   },
   hero: {
-    // The headline lockup: small words (lead, join) tuck in around the big
-    // ones (first in white, last in blue). Either small word may be empty.
+    // Two headline lines; either connecting word may be empty.
     title: { lead: "a", first: "Bite", join: "for", last: "Everyone" },
     tagline: "Stay and make a mess.",
-    note: "Ready in 10–15 min",
   },
   categories: {
     titleStart: "Pick your",
@@ -72,7 +70,7 @@ const en = {
     google: "Google reviews",
     ratingOf: "{rating} out of 5",
     count: { one: "{count} review", other: "{count} reviews" } as PluralForms,
-    seeAll: "See all on Google",
+    leaveReview: "Leave us a review",
     readMore: "Read more",
     readLess: "Show less",
     previous: "Previous reviews",
@@ -149,6 +147,16 @@ const en = {
     pausedBody: "We’ll be back shortly. Have a look around until then.",
     pausedShort: "Ordering paused",
     categoriesLabel: "Menu categories",
+    appearance: {
+      label: "Colour preview",
+      options: {
+        pink: "Pink / pale pink",
+        white: "White / bright white",
+        blue: "Blue / pale blue",
+        whitePink: "White / primary pink",
+        whiteBlue: "White / primary blue",
+      },
+    },
     tags: { fav: "Fan favorite", new: "New", limited: "Limited" },
     soldOut: "Sold out",
     inOrder: "{count} in your order",

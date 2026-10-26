@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path fill="#f2cfd4" stroke="#1a56a7" stroke-width="1.8" stroke-linejoin="miter" d="M100 9.76L113.97 34.27L139.04 12.31L139.5 45.63L167.64 39.1L158.2 66.4L180.46 73.86L166.83 92.98L188.22 109.27L163.91 120.77L182.86 147.84L149.94 144.97L154.38 174.84L127.33 161.39L117.7 183.25L100 167.2L81.85 185.37L72.67 161.39L44.18 176.83L50.06 144.97L18.73 146.92L36.09 120.77L14.47 108.99L33.17 92.98L18.15 73.41L41.8 66.4L30.21 37.16L60.5 45.63L61.4 13.29L86.03 34.27Z"/>
+<path fill="none" stroke="#1a56a7" stroke-width="4" stroke-linecap="round" d="M80 114C80 92 88 72 100 56M122 104C116 86 108 70 100 56"/>
+<circle cx="80" cy="130" r="19" fill="#e75e83"/>
+<circle cx="123" cy="120" r="19" fill="#e75e83"/>
+<ellipse cx="73" cy="123" rx="4" ry="6.5" transform="rotate(30 73 123)" fill="#f2cfd4" opacity=".6"/>
+<ellipse cx="116" cy="113" rx="4" ry="6.5" transform="rotate(30 116 113)" fill="#f2cfd4" opacity=".6"/></svg>

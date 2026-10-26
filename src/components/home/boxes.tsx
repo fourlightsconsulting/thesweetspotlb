@@ -3,7 +3,6 @@ import Link from "next/link";
 import boxCutout from "@/assets/images/box-blue-cutout.png";
 import { Heart } from "@/components/doodles";
 import { Reveal } from "@/components/reveal";
-import { TakeAwaySticker } from "@/components/stickers";
 import type { MenuItem } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
@@ -33,18 +32,13 @@ export function Boxes({ lang, t, items }: Props) {
       className="wave-top bg-strawberry-cream [--wave:var(--color-strawberry-cream)]"
     >
       <div className="relative mx-auto grid max-w-[1440px] items-center gap-[clamp(28px,5cqw,80px)] pt-section-sm pb-section desk:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] desk:px-[clamp(20px,5cqw,72px)]">
-        {/* The cut-out box, slightly tilted, with a soft shadow, and a take-away
-          sticker on its corner. */}
+        {/* The cut-out box, slightly tilted, with a soft shadow. */}
         <div className="relative mx-auto aspect-square w-[min(84%,440px)] desk:w-[min(100%,580px)]">
           <Image
             src={boxCutout}
             alt={t.photoAlt}
             sizes="(min-width: 820px) 480px, 70vw"
             className="absolute inset-[4%] size-[92%] -rotate-4 object-contain drop-shadow-[0_28px_26px_rgba(26,86,167,.28)] transition-transform duration-500 ease-soft hover:scale-[1.02] hover:-rotate-1"
-          />
-          <TakeAwaySticker
-            lang={lang}
-            className="absolute end-[2%] top-[8%] w-[clamp(96px,11cqw,150px)] rotate-6"
           />
         </div>
 

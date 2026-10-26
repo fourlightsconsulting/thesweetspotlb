@@ -345,7 +345,6 @@ values
       jsonb_build_object('en', 'Order now', 'ar', 'اطلب الآن'),
       jsonb_build_object('en', 'Pickup or delivery', 'ar', 'استلام أو توصيل'),
       jsonb_build_object('en', 'Open late', 'ar', 'مفتوحين للسهرة'),
-      jsonb_build_object('en', 'Ready in 10–15 min', 'ar', 'جاهز خلال 10–15 دقيقة'),
       jsonb_build_object('en', '20% off · code SWEET20', 'ar', 'خصم 20% · الرمز SWEET20')
     )
   )),

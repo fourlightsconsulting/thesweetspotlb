@@ -27,11 +27,15 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   const special = menu.items.find((item) => item.id === WEEKLY_SPECIAL_ID);
   const tripoli = branches.find((b) => b.slug === ORDERING_BRANCH) ?? branches[0];
   const ticker = settings.homeTicker;
+  // Older saved ticker settings can still contain the retired time promise.
+  const tickerWords = ticker.phrases
+    .filter(({ en }) => !/^ready in 10[–-]15 min$/i.test(en))
+    .map((phrase) => phrase[lang]);
 
   return (
     <>
       <Hero lang={lang} t={t.hero} orderNow={t.common.orderNow} />
-      {ticker.enabled && <Ticker words={ticker.phrases.map((phrase) => phrase[lang])} />}
+      {ticker.enabled && tickerWords.length > 0 && <Ticker words={tickerWords} />}
       <Categories lang={lang} t={t.categories} from={t.common.from} menu={menu} />
       {special && <WeeklySpecial lang={lang} t={t.special} item={special} />}
       <Boxes lang={lang} t={t.boxes} items={menu.items} />

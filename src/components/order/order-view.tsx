@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { Suspense, useEffect, useRef, useState, type CSSProperties } from "react";
 import type { Category, Menu, MenuItem } from "@/data/menu";
 import type { Fulfilment, OrderingInfo } from "@/data/ordering";
 import { forwardArrow, type Locale } from "@/i18n/config";
@@ -16,6 +17,7 @@ import { orderTotals } from "@/lib/pricing";
 import { CartLines, CartTotals, trackItems, usePricedCart } from "./cart-summary";
 import { CategoryTabs } from "./category-tabs";
 import { ItemImage } from "./item-image";
+import { menuAppearances, MenuAppearancePicker, type MenuAppearance } from "./menu-appearance";
 import { openItem } from "./item-route";
 import { ClockIcon, ItemSheet } from "./item-sheet";
 import { useOrderingStatus } from "./use-store-status";
@@ -71,6 +73,8 @@ export function OrderView({ lang, t, menu, branch }: Props) {
   const closed = status?.open === false;
   const cartSheetRef = useRef<HTMLDialogElement>(null);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
+  const [appearance, setAppearance] = useState<MenuAppearance>("white");
+  const colours = menuAppearances[appearance];
 
   // No delivery fee yet: it's the area's, picked at checkout.
   const totals = orderTotals(subtotal, 0);
@@ -130,7 +134,11 @@ export function OrderView({ lang, t, menu, branch }: Props) {
   );
 
   return (
-    <div className="pb-28 desk:pb-0">
+    <div
+      data-menu-appearance={appearance}
+      className="bg-[var(--menu-bg)] pb-28 desk:pb-0"
+      style={{ "--menu-bg": colours.background, "--menu-card": colours.card } as CSSProperties}
+    >
       <div className="shell flex flex-col gap-4 pt-[clamp(28px,3.4cqw,52px)] pb-[clamp(16px,2cqw,24px)]">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div className="flex flex-col gap-2">
@@ -156,6 +164,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
             {t.dealLine}
           </p>
         )}
+        <MenuAppearancePicker value={appearance} onChange={setAppearance} t={t.appearance} />
       </div>
 
       <CategoryTabs categories={menu.categories} lang={lang} label={t.categoriesLabel} />
@@ -207,7 +216,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
 
       {/* Phones: a floating bar opens the order as a bottom sheet. */}
       {count > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-30 bg-linear-to-t from-paper via-paper/90 to-paper/0 px-4 pt-6 pb-[max(14px,env(safe-area-inset-bottom))] desk:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 bg-linear-to-t from-[var(--menu-bg)] via-[color-mix(in_srgb,var(--menu-bg)_90%,transparent)] to-transparent px-4 pt-6 pb-[max(14px,env(safe-area-inset-bottom))] desk:hidden">
           <button
             type="button"
             onClick={openCartSheet}
@@ -352,27 +361,45 @@ function MenuSection({ category, items, lang, t, inCart, eager = false }: Sectio
 
   return (
     <section id={category.id} aria-labelledby={`${category.id}-title`}>
-      <div className="mb-4 flex flex-col gap-1">
-        <h2
-          id={`${category.id}-title`}
-          className="font-display text-[clamp(26px,2.4cqw,34px)] leading-[1.12] font-bold tracking-[-0.02em]"
+      <div
+        className={`relative mb-4 overflow-hidden rounded-[24px] desk:overflow-visible desk:rounded-none ${category.image ? "bg-cotton-candy desk:bg-transparent" : ""}`}
+      >
+        {category.image && (
+          <>
+            <Image
+              src={category.image}
+              alt=""
+              fill
+              sizes="(min-width: 820px) 0px, 90vw"
+              loading={eager ? "eager" : "lazy"}
+              className="object-cover desk:hidden"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-ink/65 via-ink/40 to-ink/20 desk:hidden" />
+          </>
+        )}
+        <div
+          className={`relative flex flex-col gap-1 ${category.image ? "min-h-[clamp(190px,50cqw,280px)] items-center justify-center p-5 text-center sm:p-7 desk:min-h-0 desk:items-start desk:p-0 desk:text-start" : ""}`}
         >
-          {category.name[lang]}
-        </h2>
-        <p className="font-body text-[15px] leading-normal text-ink-soft">
-          {category.description[lang]}
-        </p>
+          <h2
+            id={`${category.id}-title`}
+            className={`font-display text-[clamp(30px,8cqw,44px)] leading-[1.12] font-bold tracking-[-0.02em] desk:text-[clamp(26px,2.4cqw,34px)] ${category.image ? "text-paper uppercase desk:text-ink desk:normal-case" : "text-blueberry desk:text-ink"}`}
+          >
+            {category.name[lang]}
+          </h2>
+          <p
+            className={`font-body text-[15px] leading-normal ${category.image ? "text-paper desk:text-ink-soft" : "text-ink-soft"}`}
+          >
+            {category.description[lang]}
+          </p>
+        </div>
       </div>
       <div className="flex flex-col gap-6">
         {groups.map(({ sub, items: groupItems }) => (
           <div key={sub?.id ?? "all"} className="flex flex-col gap-3">
             {sub && <h3 className="eyebrow text-blueberry">{sub.name[lang]}</h3>}
-            <ul className="overflow-hidden rounded-[22px] bg-whipped desk:grid desk:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] desk:gap-[18px] desk:overflow-visible desk:rounded-none desk:bg-transparent">
+            <ul className="grid gap-3 desk:grid-cols-[repeat(auto-fill,minmax(220px,1fr))] desk:gap-[18px]">
               {groupItems.map((item, i) => (
-                <li
-                  key={item.id}
-                  className="border-b border-blueberry/8 last:border-b-0 desk:border-0"
-                >
+                <li key={item.id} className="min-w-0">
                   <ItemCard
                     item={item}
                     count={inCart(item)}
@@ -415,53 +442,54 @@ function ItemCard({ item, count, lang, t, eager }: CardProps) {
       aria-haspopup="dialog"
       aria-disabled={soldOut || undefined}
       aria-describedby={count > 0 ? `${item.id}-count` : undefined}
-      className="group flex w-full items-stretch gap-3.5 p-4 text-start focus-visible:outline-3 focus-visible:-outline-offset-3 focus-visible:outline-raspberry desk:h-full desk:flex-col desk:gap-0 desk:overflow-hidden desk:rounded-[22px] desk:border-[1.5px] desk:border-blueberry/10 desk:bg-whipped desk:p-0 desk:transition-[transform,box-shadow,border-color] desk:duration-300 desk:ease-soft desk:hover:-translate-y-1 desk:hover:border-blueberry desk:hover:shadow-[5px_6px_0_var(--color-blueberry)] desk:focus-visible:outline-offset-2"
+      className="group flex h-[148px] w-full items-stretch gap-3.5 rounded-[22px] border-[1.5px] border-blueberry/12 bg-[var(--menu-card)] p-3 text-start focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-raspberry sm:h-[172px] sm:gap-5 sm:p-4 desk:h-full desk:flex-col desk:gap-0 desk:overflow-hidden desk:border-blueberry/10 desk:p-0 desk:transition-[transform,box-shadow,border-color] desk:duration-300 desk:ease-soft desk:hover:-translate-y-1 desk:hover:border-blueberry desk:hover:shadow-[5px_6px_0_var(--color-blueberry)]"
     >
-      <span className="flex min-w-0 flex-1 flex-col items-start gap-1 desk:order-2 desk:gap-1.5 desk:px-[18px] desk:pt-4 desk:pb-[18px]">
-        {tag && <span className={`${ticket} desk:hidden`}>{tag}</span>}
-        <span className="font-display text-lg leading-[1.2] font-bold desk:text-[19px]">
+      <span className="order-2 flex min-w-0 flex-1 flex-col items-start gap-0.5 desk:gap-1.5 desk:px-[18px] desk:pt-4 desk:pb-[18px]">
+        <span className="line-clamp-2 font-display text-lg leading-[1.2] font-bold text-blueberry desk:text-[19px]">
           {item.name[lang]}
         </span>
-        <span className="line-clamp-2 font-body text-sm leading-[1.45] text-ink-soft desk:text-[15px]">
+        <span className="line-clamp-2 font-body text-sm leading-[1.3] text-ink-soft desk:text-[15px] desk:leading-[1.45]">
           {item.description[lang]}
         </span>
-        <span className="mt-auto flex w-full items-center justify-between gap-3 pt-2">
+        <span className="mt-auto flex w-full items-center justify-between gap-3 pt-1 desk:pt-2">
           <span className="font-ui text-[15px] font-bold">{formatPrice(item.price, lang)}</span>
           <span
             aria-hidden="true"
-            className="hidden size-10 items-center justify-center rounded-full border-2 border-paper bg-blueberry text-paper shadow-[2px_2px_0_var(--color-blueberry)] transition-transform duration-200 group-hover:scale-105 desk:flex"
+            className="flex size-8 flex-none items-center justify-center rounded-full bg-raspberry text-ink shadow-[0_4px_14px_color-mix(in_srgb,var(--color-raspberry)_45%,transparent)] transition-transform duration-200 group-hover:scale-105 desk:size-10 desk:border-2 desk:border-paper desk:bg-blueberry desk:text-paper desk:shadow-[2px_2px_0_var(--color-blueberry)]"
           >
-            <PlusIcon />
+            <span className="flex desk:hidden">
+              <PlusIcon small />
+            </span>
+            <span className="hidden desk:flex">
+              <PlusIcon />
+            </span>
           </span>
         </span>
       </span>
 
-      <span className="relative size-[108px] flex-none desk:order-1 desk:aspect-[4/3] desk:size-auto desk:w-full">
+      <span className="relative order-1 size-[104px] flex-none self-center min-[390px]:size-[112px] sm:size-[136px] desk:aspect-[4/3] desk:size-auto desk:w-full">
         <ItemImage
           item={item}
-          sizes="(min-width: 820px) 280px, 108px"
+          sizes="(min-width: 820px) 280px, (min-width: 640px) 136px, (min-width: 390px) 112px, 104px"
           eager={eager}
           className={`absolute inset-0 size-full rounded-2xl desk:rounded-none ${soldOut ? "grayscale" : ""}`}
         />
         {tag && (
-          <span className={`${ticket} absolute start-3 top-3 hidden desk:inline-flex`}>{tag}</span>
+          <span
+            className={`${ticket} absolute start-2 bottom-2 desk:start-3 desk:top-3 desk:bottom-auto`}
+          >
+            {tag}
+          </span>
         )}
         {count > 0 && (
           <span
             id={`${item.id}-count`}
-            className="absolute end-3 top-3 hidden h-7 min-w-7 items-center justify-center rounded-full bg-blueberry px-2 font-ui text-[13px] font-bold text-paper desk:flex"
+            className="absolute end-1 top-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-blueberry px-1.5 font-ui text-[13px] font-bold text-paper desk:end-3 desk:top-3 desk:h-7 desk:min-w-7 desk:px-2"
           >
             <span className="sr-only">{fill(t.inOrder, { count })}</span>
             <span aria-hidden="true">{count}</span>
           </span>
         )}
-        {/* Phones: the add badge doubles as the count once it's in the order. */}
-        <span
-          aria-hidden="true"
-          className="absolute -end-1.5 -bottom-1.5 flex size-9 items-center justify-center rounded-full border-[3px] border-whipped bg-blueberry font-ui text-[13px] font-bold text-paper desk:hidden"
-        >
-          {count > 0 ? count : <PlusIcon small />}
-        </span>
       </span>
     </button>
   );

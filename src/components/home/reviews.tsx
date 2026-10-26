@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { HomeSticker } from "@/components/home/sticker";
 import { site } from "@/data/site";
 import type { Review } from "@/data/social";
 import type { Locale } from "@/i18n/config";
@@ -53,13 +54,83 @@ const avatars = [
 const LONG = 150;
 
 /**
- * Reviews as Google shows them: a summary (score once connected) and a row of
- * review cards that swipes on phones and steps with arrows on desktop.
+ * Reviews as Google shows them: a summary (score once connected) and a looping
+ * row of cards, centred on phones and navigable with arrows on desktop.
  */
 export function Reviews({ lang, reviews, rating, t }: Props) {
   const day = useSyncExternalStore(noSubscribe, today, onServer);
   const [open, setOpen] = useState<Record<number, boolean>>({});
   const listRef = useRef<HTMLUListElement>(null);
+  const currentRef = useRef(0);
+
+  // The outer copies provide neighbours across the seam. Once scrolling stops,
+  // move to the identical card in the middle copy without a visible transition.
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    const count = reviews.length;
+    if (!list || count === 0) return;
+    const cards = Array.from(list.children) as HTMLElement[];
+    let idle: ReturnType<typeof setTimeout>;
+    let width = list.clientWidth;
+
+    const centre = (index: number) => {
+      const card = cards[index].getBoundingClientRect();
+      const rail = list.getBoundingClientRect();
+      const offset = card.left + card.width / 2 - (rail.left + rail.width / 2);
+      // Fractional-pixel corrections with scrollBy can snap to the next card.
+      if (Math.abs(offset) < 1) return;
+      list.scrollTo({
+        left: list.scrollLeft + offset,
+        behavior: "instant",
+      });
+    };
+
+    const settle = () => {
+      clearTimeout(idle);
+      const rail = list.getBoundingClientRect();
+      const middle = rail.left + rail.width / 2;
+      let nearest = 0;
+      let distance = Infinity;
+      cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        const away = Math.abs(rect.left + rect.width / 2 - middle);
+        if (away < distance) {
+          nearest = index;
+          distance = away;
+        }
+      });
+      currentRef.current = nearest % count;
+      if (nearest < count || nearest >= count * 2) {
+        centre(count + currentRef.current);
+      }
+    };
+
+    // scrollend keeps the reset out of a swipe's momentum. The idle timer also
+    // supports browsers that do not yet dispatch scrollend.
+    const onScroll = () => {
+      clearTimeout(idle);
+      idle = setTimeout(settle, 180);
+    };
+    currentRef.current = 0;
+    centre(count);
+    if (!Reflect.has(list, "onscrollend")) {
+      list.addEventListener("scroll", onScroll, { passive: true });
+    }
+    list.addEventListener("scrollend", settle);
+    const observer = new ResizeObserver(() => {
+      if (list.clientWidth === width) return;
+      width = list.clientWidth;
+      centre(count + currentRef.current);
+    });
+    observer.observe(list);
+
+    return () => {
+      clearTimeout(idle);
+      observer.disconnect();
+      list.removeEventListener("scroll", onScroll);
+      list.removeEventListener("scrollend", settle);
+    };
+  }, [reviews.length, lang]);
 
   // One card's width (plus the gap) at a time, in the reading direction.
   const step = (delta: number) => {
@@ -68,7 +139,10 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
     if (!list || !card) return;
     const dir = getComputedStyle(list).direction === "rtl" ? -1 : 1;
     const by = card.getBoundingClientRect().width + parseFloat(getComputedStyle(list).columnGap);
-    list.scrollBy({ left: delta * dir * by, behavior: "smooth" });
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      ? "instant"
+      : "smooth";
+    list.scrollBy({ left: delta * dir * by, behavior });
   };
 
   return (
@@ -79,45 +153,45 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
     >
       <div className="shell">
         <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
-          <h2 id="reviews-title" className="title-section">
-            {t.title}
+          <h2 id="reviews-title" className="relative title-section max-sm:w-full">
+            <span className="block max-w-[calc(100%-96px)] sm:max-w-none">{t.title}</span>
+            <HomeSticker
+              name="smiley"
+              className="absolute end-0 top-0 w-[80px] rotate-10 sm:-end-28 sm:-top-12 sm:w-[96px] desk:-end-36 desk:-top-16 desk:w-[120px] lg:-top-14 xl:-top-8"
+            />
           </h2>
 
-          <div className="flex items-center gap-3.5 rounded-2xl bg-whipped px-4 py-3 shadow-[0_1px_2px_rgba(29,29,34,.16),0_2px_10px_rgba(29,29,34,.08)]">
-            <GoogleG className="size-8 flex-none" />
-            <span className="flex flex-col gap-0.5 font-ui">
-              <span className="text-[15px] leading-5 font-semibold">{t.google}</span>
-              {rating && (
-                <span className="flex flex-wrap items-center gap-x-2 text-sm leading-5">
-                  <b className="text-base">{rating.rating.toFixed(1)}</b>
-                  <Stars
-                    value={rating.rating}
-                    label={fill(t.ratingOf, { rating: rating.rating.toFixed(1) })}
-                  />
-                  <span className="text-ink-soft">{plural(lang, t.count, rating.count)}</span>
-                </span>
-              )}
-              <a
-                href={site.tripoliDirectionsUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm leading-5 font-semibold text-blueberry underline decoration-raspberry decoration-2 underline-offset-4"
-              >
-                {t.seeAll}
-              </a>
-            </span>
-          </div>
+          {rating && (
+            <div
+              aria-label={t.google}
+              className="flex flex-wrap items-center gap-x-2 gap-y-1 font-ui text-sm leading-5"
+            >
+              <GoogleG className="size-5 flex-none" />
+              <b className="text-base">{rating.rating.toFixed(1)}</b>
+              <Stars
+                value={rating.rating}
+                label={fill(t.ratingOf, { rating: rating.rating.toFixed(1) })}
+              />
+              <span className="text-ink-soft">{plural(lang, t.count, rating.count)}</span>
+            </div>
+          )}
         </div>
 
         <ul
           ref={listRef}
-          className="-mx-[clamp(20px,5cqw,72px)] mt-[clamp(28px,3cqw,44px)] grid snap-x snap-mandatory scroll-px-[clamp(20px,5cqw,72px)] [scrollbar-width:none] auto-cols-[min(84%,340px)] grid-flow-col gap-4 overflow-x-auto px-[clamp(20px,5cqw,72px)] py-2 desk:-mx-2 desk:scroll-px-2 desk:auto-cols-[calc((100%-2*20px)/3)] desk:gap-5 desk:px-2"
+          className="-mx-[clamp(20px,5cqw,72px)] mt-[clamp(28px,3cqw,44px)] grid snap-x snap-mandatory [scrollbar-width:none] auto-cols-[min(80%,340px)] grid-flow-col gap-4 overflow-x-auto overscroll-x-contain px-[clamp(20px,5cqw,72px)] py-2 desk:-mx-2 desk:auto-cols-[calc((100%-2*20px)/3)] desk:gap-5 desk:px-2"
         >
-          {reviews.map((review, i) => {
+          {[...reviews, ...reviews, ...reviews].map((review, index) => {
+            const i = index % reviews.length;
+            const copy = index < reviews.length || index >= reviews.length * 2;
             const long = review.quote.length > LONG;
             const expanded = open[i] ?? false;
             return (
-              <li key={review.author} className="snap-start">
+              <li
+                key={`${index}-${review.author}`}
+                aria-hidden={copy || undefined}
+                className="min-w-0 snap-center"
+              >
                 <article className="flex h-full flex-col gap-2.5 rounded-xl bg-whipped p-[18px] shadow-[0_1px_2px_rgba(29,29,34,.16),0_2px_10px_rgba(29,29,34,.08)]">
                   <header className="flex items-center gap-3">
                     <span
@@ -152,6 +226,10 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
                       type="button"
                       onClick={() => setOpen((o) => ({ ...o, [i]: !expanded }))}
                       aria-expanded={expanded}
+                      tabIndex={copy ? -1 : undefined}
+                      onPointerDown={(event) => {
+                        if (copy) event.preventDefault();
+                      }}
                       className="self-start font-ui text-sm font-semibold text-blueberry"
                     >
                       {expanded ? t.readLess : t.readMore}
@@ -163,28 +241,34 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
           })}
         </ul>
 
-        <div className="mt-6 hidden items-center justify-center gap-3 desk:flex">
+        <div className="mt-6 flex items-center justify-center gap-4">
           <button
             type="button"
             onClick={() => step(-1)}
             aria-label={t.previous}
-            className="btn btn-secondary btn-sm size-11 p-0"
+            className="btn btn-secondary btn-sm hidden size-11 p-0 desk:inline-flex"
           >
             <span aria-hidden="true">{lang === "ar" ? "→" : "←"}</span>
           </button>
+          <a
+            href={site.tripoliDirectionsUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`${t.leaveReview} · ${t.google}`}
+            className="btn btn-secondary gap-2.5 px-4 text-sm"
+          >
+            <GoogleG className="size-5 flex-none" />
+            {t.leaveReview}
+          </a>
           <button
             type="button"
             onClick={() => step(1)}
             aria-label={t.next}
-            className="btn btn-secondary btn-sm size-11 p-0"
+            className="btn btn-secondary btn-sm hidden size-11 p-0 desk:inline-flex"
           >
             <span aria-hidden="true">{lang === "ar" ? "←" : "→"}</span>
           </button>
         </div>
-
-        <p className="mt-4 [text-align:left] font-mono text-[11px] leading-normal text-ink-soft [direction:ltr]">
-          Sample reviews · Google feed to connect
-        </p>
       </div>
     </section>
   );

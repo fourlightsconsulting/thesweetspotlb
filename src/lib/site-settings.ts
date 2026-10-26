@@ -61,7 +61,6 @@ export const defaultHomeTicker: HomeTicker = {
     { en: "Order now", ar: "اطلب الآن" },
     { en: "Pickup or delivery", ar: "استلام أو توصيل" },
     { en: "Open late", ar: "مفتوحين للسهرة" },
-    { en: "Ready in 10–15 min", ar: "جاهز خلال 10–15 دقيقة" },
     { en: "20% off · code SWEET20", ar: "خصم 20% · الرمز SWEET20" },
   ],
 };

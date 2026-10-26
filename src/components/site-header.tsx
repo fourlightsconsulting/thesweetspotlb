@@ -81,7 +81,7 @@ export function SiteHeader({ lang, nav, menu }: Props) {
       data-scrolled={scrolled || undefined}
       className="group/header sticky top-0 z-40 border-b border-blueberry/12 bg-strawberry-cream transition-shadow duration-300 data-scrolled:shadow-[0_10px_24px_-20px_rgba(26,86,167,.6)]"
     >
-      <div className="mx-auto flex max-w-[1440px] items-center gap-[clamp(10px,2.2cqw,36px)] px-[clamp(16px,4.5cqw,72px)] py-1.5">
+      <div className="mx-auto flex max-w-[1440px] items-center gap-[clamp(10px,2.2cqw,36px)] px-[clamp(16px,4.5cqw,72px)] py-1">
         <Link
           href={r.home}
           aria-label={nav.home}
@@ -91,8 +91,8 @@ export function SiteHeader({ lang, nav, menu }: Props) {
             src={logo}
             alt="The Sweet Spot"
             loading="eager"
-            sizes="96px"
-            className="h-auto w-[72px] transition-[width] duration-300 ease-soft group-data-scrolled/header:w-14 desk:w-24 desk:group-data-scrolled/header:w-[72px]"
+            sizes="72px"
+            className="h-auto w-[60px] transition-[width] duration-300 ease-soft group-data-scrolled/header:w-[52px] desk:w-[72px] desk:group-data-scrolled/header:w-16"
           />
         </Link>
 

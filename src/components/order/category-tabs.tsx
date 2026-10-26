@@ -82,7 +82,7 @@ export function CategoryTabs({ categories, lang, label }: Props) {
     <nav
       ref={barRef}
       aria-label={label}
-      className="sticky top-[var(--header-h,74px)] z-30 border-b border-blueberry/8 bg-paper/94 backdrop-blur-md"
+      className="sticky top-[var(--header-h,74px)] z-30 border-b border-blueberry/8 bg-[color-mix(in_srgb,var(--menu-bg)_94%,transparent)] backdrop-blur-md"
     >
       <ul ref={listRef} className="shell flex [scrollbar-width:none] gap-2 overflow-x-auto py-2.5">
         {categories.map((category) => (
