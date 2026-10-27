@@ -91,7 +91,9 @@ export async function loadMenu(): Promise<Menu> {
     const productLinks = linkRows.filter((l) => l.product_id === p.id && groupById.has(l.group_id));
     const defaults: Record<string, string[]> = {};
     for (const l of productLinks) {
-      if (l.default_options.length > 0) defaults[groupById.get(l.group_id)!.id] = l.default_options;
+      const group = groupById.get(l.group_id)!;
+      const available = l.default_options.filter((id) => group.options.some((o) => o.id === id));
+      if (available.length > 0) defaults[group.id] = available;
     }
 
     const item: MenuItem = {

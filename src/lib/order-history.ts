@@ -1,13 +1,14 @@
 // Placed orders, kept on this device so the confirmation page can show them.
-// Once orders are stored in Supabase, the page reads them from there instead.
+// Blocked storage falls back to memory for the lifetime of this page.
 import { useSyncExternalStore } from "react";
 import type { PlacedOrder } from "@/lib/checkout";
+import { readBrowserStorage, writeBrowserStorage } from "./browser-storage";
 
 const KEY = "tss.orders.v1";
 
 function readAll(): PlacedOrder[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = readBrowserStorage("localStorage", KEY);
     const data: unknown = raw ? JSON.parse(raw) : [];
     return Array.isArray(data) ? (data as PlacedOrder[]) : [];
   } catch {
@@ -16,11 +17,7 @@ function readAll(): PlacedOrder[] {
 }
 
 export function saveOrder(order: PlacedOrder) {
-  try {
-    localStorage.setItem(KEY, JSON.stringify([order, ...readAll()].slice(0, 10)));
-  } catch {
-    // Storage blocked: the confirmation page falls back to "not found".
-  }
+  writeBrowserStorage("localStorage", KEY, JSON.stringify([order, ...readAll()].slice(0, 10)));
 }
 
 export const findOrder = (ref: string) => readAll().find((o) => o.ref === ref) ?? null;

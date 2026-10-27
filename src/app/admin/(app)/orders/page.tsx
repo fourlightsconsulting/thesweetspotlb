@@ -4,6 +4,7 @@ import { money, orderLabel, phone, startOfBeirutDay, when } from "@/components/a
 import { PageHeader } from "@/components/admin/page-header";
 import { adminClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/server/admin/session";
+import { orderSearch } from "./search";
 
 export const metadata: Metadata = { title: "Orders" };
 
@@ -46,12 +47,12 @@ export default async function OrdersPage({ searchParams }: PageProps<"/admin/ord
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
   if (q) {
-    const number = q.match(/^(?:tss-?)?(\d{4,})$/i);
-    const digits = q.replace(/\D/g, "");
-    if (number) query = query.eq("number", Number(number[1]));
-    else if (digits.length >= 3 && digits.length === q.replace(/[\s+()-]/g, "").length)
-      query = query.like("customer_phone", `%${digits.replace(/^(00961|961|0)/, "")}%`);
-    else query = query.ilike("customer_name", `%${q.replace(/[%_,()]/g, " ")}%`);
+    const search = orderSearch(q);
+    if (search.kind === "number") query = query.eq("number", search.value);
+    else if (search.kind === "phone") query = query.eq("customer_phone", search.value);
+    else if (search.kind === "partialPhone")
+      query = query.like("customer_phone", `%${search.value}%`);
+    else query = query.ilike("customer_name", `%${search.value}%`);
   }
   if (from) query = query.gte("placed_at", startOfBeirutDay(from));
   if (to) query = query.lt("placed_at", startOfBeirutDay(dayAfter(to)));

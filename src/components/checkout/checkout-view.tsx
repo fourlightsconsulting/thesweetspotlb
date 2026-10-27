@@ -32,6 +32,13 @@ import {
   validateFields,
 } from "@/lib/checkout";
 import { formatPrice } from "@/lib/money";
+import {
+  checkoutAttemptKey,
+  completeCheckout,
+  emptyCheckoutFields as EMPTY,
+  readCheckoutFields,
+  saveCheckoutDraft,
+} from "@/lib/checkout-storage";
 import { saveOrder } from "@/lib/order-history";
 import { orderMessage, whatsappMessageUrl } from "@/lib/order-message";
 import { orderTotals, type PromoRule } from "@/lib/pricing";
@@ -49,53 +56,16 @@ type Props = {
   shopPhone: string | null;
 };
 
-const SAVED_KEY = "tss.customer.v1";
-const DRAFT_KEY = "tss.checkout.v1";
-const ATTEMPT_KEY = "tss.checkout.attempt";
-const EMPTY: CheckoutFields = {
-  name: "",
-  phone: "",
-  area: "",
-  street: "",
-  floor: "",
-  driverNote: "",
-};
-
 type Banner = { tone: "error" | "info"; text: string };
 
-const read = <T,>(storage: Storage, key: string): T | null => {
-  try {
-    const raw = storage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : null;
-  } catch {
-    return null;
-  }
-};
-
-const write = (storage: Storage, key: string, value: unknown) => {
-  try {
-    if (value === null) storage.removeItem(key);
-    else storage.setItem(key, JSON.stringify(value));
-  } catch {
-    // Storage blocked: the form still works, it just won't be remembered.
-  }
-};
-
 const subscribeNever = () => () => {};
-// A string, so React sees the same snapshot until storage changes.
-const readStored = () =>
-  JSON.stringify({
-    ...EMPTY,
-    ...read<Partial<CheckoutFields>>(localStorage, SAVED_KEY),
-    ...read<Partial<CheckoutFields>>(sessionStorage, DRAFT_KEY),
-  });
 
 /**
  * Details saved on this device (and any draft from this visit) live in the
  * browser only, so the prerendered form starts empty and remounts with them.
  */
 export function CheckoutView(props: Props) {
-  const stored = useSyncExternalStore(subscribeNever, readStored, () => null);
+  const stored = useSyncExternalStore(subscribeNever, readCheckoutFields, () => null);
   return (
     <CheckoutForm
       key={stored === null ? "server" : "browser"}
@@ -115,17 +85,6 @@ function openWhatsApp(url: string) {
   const tab = computer ? window.open(url, "_blank") : null;
   if (tab) tab.opener = null;
   else window.location.assign(url);
-}
-
-/** One key per checkout attempt, kept for retries until the order goes through. */
-function idempotencyKey() {
-  try {
-    const key = sessionStorage.getItem(ATTEMPT_KEY) ?? crypto.randomUUID();
-    sessionStorage.setItem(ATTEMPT_KEY, key);
-    return key;
-  } catch {
-    return crypto.randomUUID();
-  }
 }
 
 function CheckoutForm({
@@ -165,7 +124,7 @@ function CheckoutForm({
   const update = (key: keyof CheckoutFields, value: string) => {
     setFields((prev) => {
       const next = { ...prev, [key]: value };
-      write(sessionStorage, DRAFT_KEY, next);
+      saveCheckoutDraft(next);
       return next;
     });
     if (errors[key]) {
@@ -228,7 +187,7 @@ function CheckoutForm({
     startPlacing(async () => {
       try {
         const result = await placeOrderAction({
-          idempotencyKey: idempotencyKey(),
+          idempotencyKey: checkoutAttemptKey(),
           lang,
           mode,
           fields,
@@ -290,9 +249,7 @@ function CheckoutForm({
   const finish = (placedOrder: PlacedOrder) => {
     saveOrder(placedOrder);
     // The driver note is for this order only.
-    write(localStorage, SAVED_KEY, remember ? { ...fields, driverNote: "" } : null);
-    write(sessionStorage, DRAFT_KEY, null);
-    write(sessionStorage, ATTEMPT_KEY, null);
+    completeCheckout(fields, remember);
     track("purchase", {
       order_ref: placedOrder.ref,
       value: placedOrder.totals.total,

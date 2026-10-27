@@ -13,6 +13,7 @@ import { track } from "@/lib/tracking";
 import { type CartLine, cartActions } from "@/lib/cart";
 import { beirutTime, formatClock, type StoreStatus } from "@/lib/hours";
 import { formatPrice } from "@/lib/money";
+import { groupMenuItems } from "@/lib/menu-groups";
 import { orderTotals } from "@/lib/pricing";
 import { CartLines, CartTotals, trackItems, usePricedCart } from "./cart-summary";
 import { CategoryTabs } from "./category-tabs";
@@ -353,11 +354,7 @@ type SectionProps = {
 };
 
 function MenuSection({ category, items, lang, t, inCart, eager = false }: SectionProps) {
-  const groups = category.subcategories
-    ? category.subcategories
-        .map((sub) => ({ sub, items: items.filter((i) => i.subcategory === sub.id) }))
-        .filter((g) => g.items.length > 0)
-    : [{ sub: null, items }];
+  const groups = groupMenuItems(category, items);
 
   return (
     <section id={category.id} aria-labelledby={`${category.id}-title`}>
