@@ -1,16 +1,24 @@
 "use client";
 
-import { useEffect, useState, useTransition, type FormEvent } from "react";
-import { FormStatus, idle, type FormState } from "@/components/admin/form";
+import { useState, useTransition, type FormEvent } from "react";
+import { type FormState, idle } from "@/components/admin/form";
 import { PageHeader } from "@/components/admin/page-header";
+import { tabBarClass, tabClass } from "@/components/admin/page-tabs";
+import { SaveBar, useUnsavedGuard } from "@/components/admin/save-bar";
 import { alphabetical } from "@/lib/alphabetical";
-import { storeStatus, type Schedule } from "@/lib/hours";
-import { saveStoreSettings } from "./actions";
+import { storeStatus, type Ordering, type Schedule } from "@/lib/hours";
+import { saveStoreSettings, setOrdering } from "./actions";
 import { DeliveryZones } from "./delivery-zones";
 import { AlertsForm, ClosuresCard, HoursForm, TimesForm, type AlertRow } from "./forms";
 import { orderingNote } from "./ordering-note";
 import { OrderingSwitch } from "./ordering-switch";
 import { parseStoreSettings, type StoreDraft } from "./store-settings";
+
+const sections = [
+  { key: "hours", label: "Hours" },
+  { key: "delivery", label: "Delivery" },
+  { key: "alerts", label: "Alerts" },
+] as const;
 
 export function StoreForm({
   initial,
@@ -25,17 +33,32 @@ export function StoreForm({
   const [baseline, setBaseline] = useState(() => JSON.stringify(initial));
   const [status, setStatus] = useState<FormState>(idle);
   const [pending, startSaving] = useTransition();
+  const [section, setSection] = useState<(typeof sections)[number]["key"]>("hours");
+  const [switching, startSwitching] = useTransition();
+  const [switchError, setSwitchError] = useState<string | null>(null);
   const dirty = JSON.stringify(draft) !== baseline;
+  useUnsavedGuard(dirty);
   const change = (patch: Partial<StoreDraft>) => {
     setStatus(idle);
     setDraft((value) => ({ ...value, ...patch }));
   };
-  useEffect(() => {
-    if (!dirty) return;
-    const warn = (event: BeforeUnloadEvent) => event.preventDefault();
-    window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty]);
+  /** The ordering switch saves by itself, whatever else is waiting to be saved. */
+  const switchOrdering = (ordering: Ordering) => {
+    const apply = (value: Ordering) => {
+      setDraft((current) => ({ ...current, ordering: value }));
+      setBaseline((saved) => JSON.stringify({ ...JSON.parse(saved), ordering: value }));
+    };
+    const before = draft.ordering;
+    setSwitchError(null);
+    apply(ordering);
+    startSwitching(async () => {
+      const { error } = await setOrdering(draft.branchId, ordering);
+      if (error) {
+        apply(before);
+        setSwitchError(error);
+      }
+    });
+  };
   const save = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const parsed = parseStoreSettings(draft);
@@ -87,85 +110,112 @@ export function StoreForm({
   };
   return (
     <form onSubmit={save}>
-      <div className="sticky top-0 z-20 bg-canvas/95 pt-2 pb-1 backdrop-blur-sm">
-        <PageHeader
-          title="Store"
-          actions={
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-[13px] text-muted" role="status">
-                {pending ? "Saving all changes…" : dirty ? "Unsaved changes" : "All changes saved"}
-              </span>
-              <button type="submit" className="btn btn-primary" disabled={pending || !dirty}>
-                {pending ? "Saving…" : "Save changes"}
-              </button>
-            </div>
-          }
-        />
-        <div aria-live="polite" className="mb-3">
-          <FormStatus state={status} />
-        </div>
-      </div>
-      <fieldset disabled={pending} className="flex min-w-0 flex-col gap-6">
+      <PageHeader title="Store" />
+      <div className="mb-6">
         <OrderingSwitch
           value={draft.ordering}
           open={storeStatus(schedule).open}
           note={orderingNote(schedule)}
-          onChange={(ordering) => change({ ordering })}
+          saving={switching}
+          error={switchError}
+          onChange={switchOrdering}
         />
-        <div className="grid gap-6 wide:grid-cols-2">
-          <TimesForm value={draft} onChange={change} />
-          {draft.alerts && (
-            <AlertsForm
-              value={draft.alerts}
-              recent={recent}
-              onChange={(alerts) => change({ alerts })}
-            />
-          )}
-        </div>
-        <DeliveryZones
-          zones={draft.zones}
-          areas={draft.areas}
-          onZones={(zones) => change({ zones })}
-          onAreas={(areas) => change({ areas })}
-          onRemoveZone={(id) =>
-            change({
-              zones: draft.zones.filter((zone) => zone.id !== id),
-              removedZoneIds: [...draft.removedZoneIds, id],
-            })
-          }
-          onRemoveArea={(id) =>
-            change({
-              areas: draft.areas.filter((area) => area.id !== id),
-              removedAreaIds: [...draft.removedAreaIds, id],
-            })
-          }
-        />
-        <div className="grid gap-6 wide:grid-cols-2">
-          {draft.hours.map((branch) => (
-            <HoursForm
-              key={branch.branchId}
-              value={branch}
-              onChange={(value) =>
-                change({
-                  hours: draft.hours.map((row) => (row.branchId === value.branchId ? value : row)),
-                })
-              }
-            />
+      </div>
+
+      <div role="tablist" aria-label="Store settings" className={tabBarClass}>
+        {sections
+          .filter((s) => s.key !== "alerts" || draft.alerts)
+          .map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              role="tab"
+              aria-selected={section === s.key}
+              aria-current={section === s.key ? "page" : undefined}
+              onClick={() => setSection(s.key)}
+              className={tabClass}
+            >
+              {s.label}
+            </button>
           ))}
-        </div>
-        <ClosuresCard
-          closures={draft.closures}
-          branches={draft.hours.map((branch) => ({ id: branch.branchId, name: branch.branchName }))}
-          today={today}
-          onChange={(closures) => change({ closures })}
-          onRemove={(id) =>
-            change({
-              closures: draft.closures.filter((closure) => closure.id !== id),
-              removedClosureIds: [...draft.removedClosureIds, id],
-            })
-          }
-        />
+      </div>
+
+      <fieldset disabled={pending} className="min-w-0">
+        {section === "hours" && (
+          <div className="grid items-start gap-6 wide:grid-cols-2">
+            <div className="flex flex-col gap-6">
+              {draft.hours.map((branch) => (
+                <HoursForm
+                  key={branch.branchId}
+                  value={branch}
+                  onChange={(value) =>
+                    change({
+                      hours: draft.hours.map((row) =>
+                        row.branchId === value.branchId ? value : row,
+                      ),
+                    })
+                  }
+                />
+              ))}
+            </div>
+            <div className="flex flex-col gap-6">
+              <TimesForm value={draft} onChange={change} />
+              <ClosuresCard
+                closures={draft.closures}
+                branches={draft.hours.map((branch) => ({
+                  id: branch.branchId,
+                  name: branch.branchName,
+                }))}
+                today={today}
+                onChange={(closures) => change({ closures })}
+                onRemove={(id) =>
+                  change({
+                    closures: draft.closures.filter((closure) => closure.id !== id),
+                    removedClosureIds: [...draft.removedClosureIds, id],
+                  })
+                }
+              />
+            </div>
+          </div>
+        )}
+        {section === "delivery" && (
+          <DeliveryZones
+            zones={draft.zones}
+            areas={draft.areas}
+            onZones={(zones) => change({ zones })}
+            onAreas={(areas) => change({ areas })}
+            onRemoveZone={(id) =>
+              change({
+                zones: draft.zones.filter((zone) => zone.id !== id),
+                removedZoneIds: [...draft.removedZoneIds, id],
+              })
+            }
+            onRemoveArea={(id) =>
+              change({
+                areas: draft.areas.filter((area) => area.id !== id),
+                removedAreaIds: [...draft.removedAreaIds, id],
+              })
+            }
+          />
+        )}
+        {section === "alerts" && draft.alerts && (
+          <AlertsForm
+            value={draft.alerts}
+            recent={recent}
+            onChange={(alerts) => change({ alerts })}
+          />
+        )}
       </fieldset>
+
+      <SaveBar
+        dirty={dirty}
+        pending={pending}
+        state={status}
+        onDiscard={() => {
+          setDraft(JSON.parse(baseline));
+          setStatus(idle);
+        }}
+      />
     </form>
   );
 }

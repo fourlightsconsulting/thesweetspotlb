@@ -1,6 +1,7 @@
 "use server";
 
 import { updateTag } from "next/cache";
+import { z } from "zod";
 import type { FormState } from "@/components/admin/form";
 import { slugify } from "@/lib/slug";
 import { adminClient } from "@/lib/supabase/server";
@@ -33,6 +34,24 @@ export async function saveStoreSettings(raw: unknown): Promise<FormState> {
     );
   updateTag(catalogTags.store);
   return saved();
+}
+
+/** The ordering switch takes effect at once: pausing can't wait for a save. */
+export async function setOrdering(
+  branchId: string,
+  ordering: string,
+): Promise<{ error: string | null }> {
+  await requireStaff("manager");
+  const value = z.enum(["hours", "open", "paused"]).safeParse(ordering);
+  if (!value.success) return { error: "That didn’t save. Try again." };
+  const db = await adminClient();
+  const { error } = await db
+    .from("branches")
+    .update({ ordering: value.data })
+    .eq("id", z.uuid().parse(branchId));
+  if (error) return { error: "That didn’t save. Try again." };
+  updateTag(catalogTags.store);
+  return { error: null };
 }
 
 /** Sending waiting alerts is an operation, separate from saving settings. */

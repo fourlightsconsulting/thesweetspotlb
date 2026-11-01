@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/admin/page-header";
 import { adminClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/server/admin/session";
 import { categoryLabel, loadCategories } from "../menu/data";
+import { MenuTabs } from "../menu/menu-tabs";
 import { PriceGrid, type PriceSection } from "./price-grid";
 
 export const metadata: Metadata = { title: "Prices" };
@@ -65,9 +66,10 @@ export default async function PricesPage() {
   return (
     <>
       <PageHeader
-        title="Prices"
+        title="Menu"
         help="Tick several items to change them together by % or $. Nothing saves until you press Save. Add-on prices here are the templates’: items with their own price keep it."
       />
+      <MenuTabs />
       <PriceGrid sections={sections} />
       <section className="card p-5">
         <h2 className="mb-2 text-base font-bold">Price changes</h2>

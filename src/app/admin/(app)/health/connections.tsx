@@ -2,7 +2,9 @@ import { beirutDate, daysAgo, money, when } from "@/components/admin/format";
 import { Help } from "@/components/admin/help";
 import { adminClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
+import { parseSiteSettings } from "@/lib/site-settings";
 import { JobControls, SpendCard } from "./connection-forms";
+import { TrackingCard } from "./tracking-card";
 
 // Health's Connections tab: the imports and the retries job, run by hand or
 // for past dates, and ad spend no platform reports.
@@ -87,7 +89,7 @@ export async function ConnectionsTab() {
   await serviceClient()?.rpc("reconcile_jobs");
   const db = await adminClient();
   const since = daysAgo(90);
-  const [runs, spend] = await Promise.all([
+  const [runs, spend, settings, usage] = await Promise.all([
     db
       .from("job_runs")
       .select("id, job, queued_at, finished_at, outcome, response, error, request")
@@ -99,11 +101,28 @@ export async function ConnectionsTab() {
       .eq("platform", "manual")
       .gte("day", since)
       .order("day", { ascending: false }),
+    db.from("site_settings").select("key, value").eq("key", "tracking"),
+    db.rpc("database_usage").maybeSingle(),
   ]);
   const list = (runs.data ?? []) as Run[];
+  const { tracking } = parseSiteSettings(settings.data ?? []);
 
   return (
     <>
+      <div className="mb-6">
+        <TrackingCard
+          firstParty={tracking.first_party}
+          usage={
+            usage.data
+              ? {
+                  databaseBytes: Number(usage.data.database_bytes),
+                  eventsBytes: Number(usage.data.events_bytes),
+                  events: usage.data.events,
+                }
+              : null
+          }
+        />
+      </div>
       <div className="grid gap-4 wide:grid-cols-2">
         {jobs.map((job) => {
           const latest = list.find((r) => r.job === job.key);

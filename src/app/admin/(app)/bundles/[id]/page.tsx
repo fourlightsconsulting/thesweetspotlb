@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { History, type HistoryEntry } from "@/components/admin/history";
 import { Icon } from "@/components/admin/icons";
@@ -113,25 +112,24 @@ export default async function BundlePage({
   return (
     <>
       <PageHeader
+        breadcrumbs={[
+          { href: "/admin/menu", label: "Menu" },
+          { href: "/admin/bundles", label: "Bundles" },
+        ]}
         title={b ? b.name_en : "New bundle"}
         description={created ? "Added to the menu." : undefined}
         actions={
-          <>
-            {b && (
-              <a
-                href={`${publicBase}/en/order?item=${b.slug}`}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-secondary"
-              >
-                <Icon name="external" className="size-4" />
-                See it on the site
-              </a>
-            )}
-            <Link href="/admin/bundles" className="btn btn-ghost">
-              All bundles
-            </Link>
-          </>
+          b && (
+            <a
+              href={`${publicBase}/en/order?item=${b.slug}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-secondary"
+            >
+              <Icon name="external" className="size-4" />
+              See it on the site
+            </a>
+          )
         }
       />
       <BundleForm
@@ -146,10 +144,12 @@ export default async function BundlePage({
         }))}
       />
       {b && (
-        <section className="card mt-6 p-5">
-          <h2 className="mb-2 text-base font-bold">History</h2>
-          <History entries={(history?.data ?? []) as HistoryEntry[]} />
-        </section>
+        <details className="card mt-6 p-5">
+          <summary className="cursor-pointer text-base font-bold">History</summary>
+          <div className="mt-2">
+            <History entries={(history?.data ?? []) as HistoryEntry[]} />
+          </div>
+        </details>
       )}
     </>
   );

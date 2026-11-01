@@ -4,6 +4,7 @@ import { CopyField } from "@/components/admin/copy-button";
 import { Help } from "@/components/admin/help";
 import { beirutDate, dateOf, money } from "@/components/admin/format";
 import { PageHeader } from "@/components/admin/page-header";
+import { PageTabs } from "@/components/admin/page-tabs";
 import { site } from "@/data/site";
 import { feedItems } from "@/lib/feeds/meta-catalog";
 import { adminClient } from "@/lib/supabase/server";
@@ -199,18 +200,14 @@ export default async function AdToolsPage({ searchParams }: PageProps<"/admin/ad
   return (
     <>
       <PageHeader title="Ad tools" />
-      <nav aria-label="Ad tools" className="mb-5 flex gap-1 overflow-x-auto border-b border-line">
-        {tabs.map((t) => (
-          <Link
-            key={t.key}
-            href={t.key === "links" ? "/admin/ads" : `/admin/ads?tab=${t.key}`}
-            aria-current={t.key === tab ? "page" : undefined}
-            className="-mb-px border-b-2 border-transparent px-3 py-2 font-semibold whitespace-nowrap text-muted hover:text-ink aria-[current=page]:border-accent aria-[current=page]:text-ink"
-          >
-            {t.label}
-          </Link>
-        ))}
-      </nav>
+      <PageTabs
+        label="Ad tools"
+        tabs={tabs.map((t) => ({
+          href: t.key === "links" ? "/admin/ads" : `/admin/ads?tab=${t.key}`,
+          label: t.label,
+        }))}
+        current={tab === "links" ? "/admin/ads" : `/admin/ads?tab=${tab}`}
+      />
       {body}
     </>
   );

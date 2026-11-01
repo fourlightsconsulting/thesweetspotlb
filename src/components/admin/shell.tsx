@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, useRef } from "react";
+import { Fragment, type ReactNode, useRef } from "react";
 import logo from "@/assets/images/logo-blueberry.png";
 import { signOut } from "@/app/admin/login/actions";
 import type { NavItem } from "@/app/admin/nav";
@@ -16,11 +16,12 @@ type Props = {
   children: ReactNode;
 };
 
-/** The current section: the longest nav path the URL starts with. */
+/** The current section: the one with the longest path the URL starts with. */
 const activeHref = (pathname: string, items: NavItem[]) =>
   items
-    .filter((i) => pathname === i.href || pathname.startsWith(`${i.href}/`))
-    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+    .flatMap((i) => [i.href, ...(i.also ?? [])].map((path) => ({ path, href: i.href })))
+    .filter(({ path }) => pathname === path || pathname.startsWith(`${path}/`))
+    .sort((a, b) => b.path.length - a.path.length)[0]?.href;
 
 export function AdminShell({ items, account, staff, children }: Props) {
   const pathname = usePathname();
@@ -30,25 +31,31 @@ export function AdminShell({ items, account, staff, children }: Props) {
 
   const nav = (
     <nav className="flex flex-col gap-0.5">
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          onClick={close}
-          aria-current={item.href === active ? "page" : undefined}
-          className="flex min-h-10 items-center gap-3 rounded-[10px] px-3 font-medium text-muted transition-colors hover:bg-tint hover:text-ink aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent"
-        >
-          <Icon name={item.icon} />
-          {item.label}
-          {item.badge && (
-            <span
-              aria-label={`${item.badge.count} to look at`}
-              className={`ms-auto rounded-full px-2 text-xs leading-5 font-bold tabular-nums ${item.badge.tone === "bad" ? "bg-bad-soft text-bad" : "bg-wait-soft text-wait"}`}
-            >
-              {item.badge.count}
-            </span>
+      {items.map((item, index) => (
+        <Fragment key={item.href}>
+          {item.group && item.group !== items[index - 1]?.group && (
+            <p className="mt-5 mb-1 px-3 text-[11px] leading-4 font-bold tracking-[0.08em] text-muted uppercase">
+              {item.group}
+            </p>
           )}
-        </Link>
+          <Link
+            href={item.href}
+            onClick={close}
+            aria-current={item.href === active ? "page" : undefined}
+            className="flex min-h-10 items-center gap-3 rounded-[10px] px-3 font-medium text-muted transition-colors hover:bg-tint hover:text-ink aria-[current=page]:bg-accent-soft aria-[current=page]:text-accent"
+          >
+            <Icon name={item.icon} />
+            {item.label}
+            {item.badge && (
+              <span
+                aria-label={`${item.badge.count} to look at`}
+                className={`ms-auto rounded-full px-2 text-xs leading-5 font-bold tabular-nums ${item.badge.tone === "bad" ? "bg-bad-soft text-bad" : "bg-wait-soft text-wait"}`}
+              >
+                {item.badge.count}
+              </span>
+            )}
+          </Link>
+        </Fragment>
       ))}
     </nav>
   );
@@ -134,7 +141,7 @@ export function AdminShell({ items, account, staff, children }: Props) {
         </div>
       </dialog>
 
-      <main className="min-w-0 px-4 pt-6 pb-16 wide:px-8 wide:pt-8">
+      <main className="min-w-0 px-4 pt-6 pb-24 wide:px-8 wide:pt-8">
         <div className="mx-auto max-w-[1200px]">{children}</div>
       </main>
     </div>

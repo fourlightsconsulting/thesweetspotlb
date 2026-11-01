@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { orderLabel, when } from "@/components/admin/format";
 import { PageHeader } from "@/components/admin/page-header";
@@ -46,16 +45,12 @@ export default async function OrderPage({ params }: PageProps<"/admin/orders/[nu
   return (
     <div className="max-w-[640px]">
       <PageHeader
+        breadcrumbs={[{ href: "/admin/orders", label: "Orders" }]}
         title={orderLabel(order.number)}
         description={
           <span className="inline-flex items-center gap-2">
             <StatusPill order={order} /> placed {when(order.placed_at)}
           </span>
-        }
-        actions={
-          <Link href="/admin/orders" className="btn btn-secondary">
-            All orders
-          </Link>
         }
       />
       <div className="card p-5">

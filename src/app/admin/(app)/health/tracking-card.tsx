@@ -3,23 +3,19 @@
 import { useOptimistic, useTransition } from "react";
 import { Help } from "@/components/admin/help";
 import { Switch } from "@/components/admin/switch";
-import { saveTracking } from "./actions";
-
-export type Connection = { name: string; on: boolean; detail: string };
+import { saveTracking } from "./connection-actions";
 
 const FREE_PLAN_BYTES = 500 * 1024 * 1024;
 
 const megabytes = (bytes: number) => `${Math.round(bytes / (1024 * 1024))} MB`;
 
-/** Website analytics: the switch, how full the database is, and what's connected. */
+/** Website analytics: the switch, and how full the database is. */
 export function TrackingCard({
   firstParty,
   usage,
-  connections,
 }: {
   firstParty: boolean;
   usage: { databaseBytes: number; eventsBytes: number; events: number } | null;
-  connections: Connection[];
 }) {
   const [on, setOn] = useOptimistic(firstParty);
   const [saving, startSaving] = useTransition();
@@ -79,20 +75,6 @@ export function TrackingCard({
           )}
         </div>
       )}
-
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
-        {connections.map((c) => (
-          <li key={c.name} className="flex items-start gap-2 text-[13px]">
-            <span
-              className={`mt-1.5 size-2 flex-none rounded-full ${c.on ? "bg-good" : "bg-line-strong"}`}
-            />
-            <span>
-              <span className="font-semibold">{c.name}</span>{" "}
-              <span className="text-muted">{c.detail}</span>
-            </span>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

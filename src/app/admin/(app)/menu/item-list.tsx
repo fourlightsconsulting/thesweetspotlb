@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useOptimistic, useState, useTransition } from "react";
 import { money } from "@/components/admin/format";
 import { Icon } from "@/components/admin/icons";
+import { type DragSort, moveInList, SortControl, useDragSort } from "@/components/admin/sortable";
 import { Switch } from "@/components/admin/switch";
-import { moveItem, setItemAvailable } from "./actions";
+import { reorderItems, setItemAvailable } from "./actions";
 import type { AdminCategory, AdminItem } from "./data";
 
 const tagLabels = { fav: "Favourite", new: "New", limited: "Limited" } as const;
@@ -78,19 +79,12 @@ export function ItemList({ sections, canEdit, editBase }: Props) {
             {section.items.length === 0 ? (
               <p className="card px-4 py-3 text-muted">No items yet.</p>
             ) : (
-              <ul className="card divide-y divide-line">
-                {section.items.map((item, i) => (
-                  <ItemRow
-                    key={item.id}
-                    item={item}
-                    canEdit={canEdit}
-                    canMove={canEdit && !q && !soldOutOnly}
-                    first={i === 0}
-                    last={i === section.items.length - 1}
-                    editBase={editBase}
-                  />
-                ))}
-              </ul>
+              <SectionItems
+                items={section.items}
+                canEdit={canEdit}
+                canMove={canEdit && !q && !soldOutOnly}
+                editBase={editBase}
+              />
             )}
           </section>
         ))}
@@ -100,19 +94,62 @@ export function ItemList({ sections, canEdit, editBase }: Props) {
   );
 }
 
+function SectionItems({
+  items,
+  canEdit,
+  canMove,
+  editBase,
+}: {
+  items: AdminItem[];
+  canEdit: boolean;
+  canMove: boolean;
+  editBase: string;
+}) {
+  const [order, setOrder] = useOptimistic(items);
+  const [, startMoving] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const sort = useDragSort((from, to) => {
+    const next = moveInList(order, from, to);
+    startMoving(async () => {
+      setOrder(next);
+      setError((await reorderItems(next.map((i) => i.id))).error);
+    });
+  });
+
+  return (
+    <>
+      <ul className="card divide-y divide-line">
+        {order.map((item, index) => (
+          <ItemRow
+            key={item.id}
+            item={item}
+            canEdit={canEdit}
+            sort={canMove ? sort : null}
+            index={index}
+            count={order.length}
+            editBase={editBase}
+          />
+        ))}
+      </ul>
+      {error && <p className="mt-1 text-[13px] text-bad">{error}</p>}
+    </>
+  );
+}
+
 function ItemRow({
   item,
   canEdit,
-  canMove,
-  first,
-  last,
+  sort,
+  index,
+  count,
   editBase,
 }: {
   item: AdminItem;
   canEdit: boolean;
-  canMove: boolean;
-  first: boolean;
-  last: boolean;
+  /** Null while the list is filtered, or for staff. */
+  sort: DragSort | null;
+  index: number;
+  count: number;
   editBase: string;
 }) {
   const [available, setAvailable] = useOptimistic(item.available);
@@ -124,11 +161,13 @@ function ItemRow({
       setAvailable(next);
       setError((await setItemAvailable(item.id, next)).error);
     });
-  const move = (direction: "up" | "down") =>
-    startBusy(async () => setError((await moveItem(item.id, direction)).error));
 
+  // The whole row opens the item; the handle and the switch sit above that link.
   const name = canEdit ? (
-    <Link href={`${editBase}/${item.id}`} className="font-semibold hover:text-accent">
+    <Link
+      href={`${editBase}/${item.id}`}
+      className="font-semibold before:absolute before:inset-0 before:content-['']"
+    >
       {item.nameEn}
     </Link>
   ) : (
@@ -136,7 +175,15 @@ function ItemRow({
   );
 
   return (
-    <li className="flex items-center gap-3 px-3 py-2.5">
+    <li
+      {...sort?.row(index)}
+      className={`sort-row relative flex items-center gap-3 px-3 py-2.5 ${canEdit ? "transition-colors hover:bg-tint" : ""}`}
+    >
+      {sort && (
+        <div className="relative z-10 flex-none">
+          <SortControl sort={sort} index={index} count={count} label={item.nameEn} />
+        </div>
+      )}
       <div className="relative size-11 flex-none overflow-hidden rounded-[10px] bg-cotton-candy">
         {item.imageSrc && (
           <Image src={item.imageSrc} alt="" fill sizes="44px" className="object-cover" />
@@ -152,29 +199,7 @@ function ItemRow({
         </p>
         {error && <p className="text-[13px] text-bad">{error}</p>}
       </div>
-      {canMove && (
-        <div className="hidden flex-none sm:flex">
-          <button
-            type="button"
-            aria-label={`Move ${item.nameEn} up`}
-            disabled={first || busy}
-            onClick={() => move("up")}
-            className="btn btn-ghost btn-sm px-1.5"
-          >
-            <Icon name="up" className="size-4" />
-          </button>
-          <button
-            type="button"
-            aria-label={`Move ${item.nameEn} down`}
-            disabled={last || busy}
-            onClick={() => move("down")}
-            className="btn btn-ghost btn-sm px-1.5"
-          >
-            <Icon name="down" className="size-4" />
-          </button>
-        </div>
-      )}
-      <label className="flex flex-none items-center gap-2 text-[13px]">
+      <label className="relative z-10 flex flex-none items-center gap-2 text-[13px]">
         <span className={available ? "text-muted" : "font-semibold text-bad"}>
           {available ? "Available" : "Sold out"}
         </span>

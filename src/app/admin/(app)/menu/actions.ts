@@ -11,19 +11,19 @@ import { catalogTags } from "@/server/catalog";
 import { failed, saved } from "@/server/admin/form-state";
 import {
   checkbox,
-  dollars,
   freeSlug,
   imagePath,
   name,
   parseItemBasics,
   removeUpload,
+  setOrder,
   swapOrder,
   text,
 } from "@/server/admin/menu";
 import { requireStaff } from "@/server/admin/session";
 import { loadTemplates } from "./data";
 
-// The menu: items, categories and their choices. Managers edit everything;
+// The menu: items, categories and choice templates. Managers edit everything;
 // staff only mark items and choices sold out (the database allows them
 // nothing else). Every save refreshes the public menu (the "menu" tag).
 
@@ -161,23 +161,11 @@ export async function deleteItem(id: string): Promise<Result> {
   redirect("/admin/menu");
 }
 
-/** Moves an item one place up or down within its category. */
-export async function moveItem(id: string, direction: "up" | "down"): Promise<Result> {
+/** Puts a category's items in this order. */
+export async function reorderItems(ids: string[]): Promise<Result> {
   await requireStaff("manager");
   const db = await adminClient();
-  const { data: item } = await db
-    .from("products")
-    .select("category_id")
-    .eq("id", z.uuid().parse(id))
-    .single();
-  if (!item) return oops();
-  const { data: siblings } = await db
-    .from("products")
-    .select("id")
-    .eq("category_id", item.category_id)
-    .order("sort_order")
-    .order("name_en");
-  return (await swapOrder(db, "products", siblings ?? [], id, direction)) ? ok() : oops();
+  return (await setOrder(db, "products", z.array(z.uuid()).max(500).parse(ids))) ? ok() : oops();
 }
 
 // ─── Categories ───────────────────────────────────────────────────────────
@@ -292,35 +280,46 @@ export async function moveCategory(id: string, direction: "up" | "down"): Promis
   return (await swapOrder(db, "categories", data ?? [], id, direction)) ? ok() : oops();
 }
 
-// ─── Choices (option groups and their options) ────────────────────────────
+// ─── Choice templates (option groups and their options) ───────────────────
 
-/** A template: its names and rule (required or optional, at least and at most how many). */
-export async function saveGroup(_prev: FormState, form: FormData): Promise<FormState> {
+const templateInput = z
+  .object({
+    id: z.uuid().nullable(),
+    nameEn: name,
+    nameAr: name,
+    min: z.int().min(0).max(20),
+    max: z.int().min(1).max(20),
+    choices: z
+      .array(
+        z.object({
+          id: z.uuid().nullable(),
+          nameEn: name,
+          nameAr: name,
+          price: z.int().min(0).max(1_000_000),
+          available: z.boolean(),
+        }),
+      )
+      .max(60),
+  })
+  .refine((t) => t.min <= t.max);
+
+/** Creates a template (then opens it) or saves one: its rule and its whole list of choices. */
+export async function saveTemplate(raw: unknown): Promise<FormState> {
   await requireStaff("manager");
-  const parsed = z
-    .object({
-      id: z.uuid().optional(),
-      nameEn: name,
-      nameAr: name,
-      min: z.coerce.number().int().min(1).max(20),
-      max: z.coerce.number().int().min(1).max(20),
-    })
-    .safeParse({
-      id: form.get("id") || undefined,
-      nameEn: form.get("nameEn"),
-      nameAr: form.get("nameAr"),
-      min: form.get("min") ?? 1,
-      max: form.get("max"),
-    });
-  if (!parsed.success) return failed("Give the template a name in both languages and a limit.");
+  const parsed = templateInput.safeParse(raw);
+  if (!parsed.success)
+    return failed("Give the template and every choice a name in both languages.");
   const v = parsed.data;
-  const min = checkbox(form, "required") ? v.min : 0;
-  if (min > v.max) return failed("“At least” can’t be more than “at most”.");
-  const fields = { name_en: v.nameEn, name_ar: v.nameAr, min_select: min, max_select: v.max };
+  const fields = { name_en: v.nameEn, name_ar: v.nameAr, min_select: v.min, max_select: v.max };
 
   const db = await adminClient();
-  if (v.id) {
-    const { error } = await db.from("option_groups").update(fields).eq("id", v.id);
+  let id = v.id;
+  if (id) {
+    const { error } = await db
+      .from("option_groups")
+      .update(fields)
+      .eq("id", id)
+      .eq("kind", "options");
     if (error) return failed();
   } else {
     const { data, error } = await db
@@ -333,98 +332,54 @@ export async function saveGroup(_prev: FormState, form: FormData): Promise<FormS
       .select("id")
       .single();
     if (error || !data) return failed();
-    updateTag(catalogTags.menu);
-    redirect(`/admin/menu/choices#group-${data.id}`);
+    id = data.id;
   }
+
+  const { data: current, error: loadError } = await db
+    .from("options")
+    .select("id, key, name_en, name_ar, price_cents, is_available, sort_order")
+    .eq("group_id", id);
+  if (loadError) return failed();
+  const listed = new Set(v.choices.map((c) => c.id));
+  const gone = current.filter((o) => !listed.has(o.id)).map((o) => o.id);
+  const keys = new Set(current.map((o) => o.key));
+  const writes: PromiseLike<{ error: unknown }>[] = [];
+  if (gone.length > 0) writes.push(db.from("options").delete().in("id", gone));
+  v.choices.forEach((c, i) => {
+    const row = {
+      name_en: c.nameEn,
+      name_ar: c.nameAr,
+      price_cents: c.price,
+      is_available: c.available,
+      sort_order: (i + 1) * 10,
+    };
+    const before = current.find((o) => o.id === c.id);
+    if (before) {
+      // Only what changed, so the price log and audit trail stay true.
+      const same = (Object.keys(row) as (keyof typeof row)[]).every((k) => before[k] === row[k]);
+      if (!same) writes.push(db.from("options").update(row).eq("id", before.id));
+    } else if (!c.id) {
+      const base = slugify(c.nameEn, "choice");
+      let key = base;
+      for (let n = 2; keys.has(key); n++) key = `${base}-${n}`;
+      keys.add(key);
+      writes.push(db.from("options").insert({ ...row, group_id: id!, key }));
+    }
+  });
+  const results = await Promise.all(writes);
+  if (results.some((r) => r.error)) return failed("The template saved, but some choices didn’t.");
+
   updateTag(catalogTags.menu);
+  if (!v.id) redirect(`/admin/menu/choices/${id}?created=1`);
   return saved();
 }
 
+/** Items using it keep the group as their own (keep_template_on_items in the database). */
 export async function deleteGroup(id: string): Promise<Result> {
   await requireStaff("manager");
   const db = await adminClient();
   const { error } = await db.from("option_groups").delete().eq("id", z.uuid().parse(id));
-  return error ? oops() : ok();
-}
-
-/** Adds a choice to a group, or changes one (with `id`). */
-export async function saveChoice(_prev: FormState, form: FormData): Promise<FormState> {
-  await requireStaff("manager");
-  const parsed = z
-    .object({
-      id: z.uuid().optional(),
-      groupId: z.uuid(),
-      nameEn: name,
-      nameAr: name,
-      price: dollars,
-    })
-    .safeParse({
-      id: form.get("id") || undefined,
-      groupId: form.get("groupId"),
-      nameEn: form.get("nameEn"),
-      nameAr: form.get("nameAr"),
-      price: form.get("price") || 0,
-    });
-  if (!parsed.success) return failed("Give the choice a name in both languages.");
-  const v = parsed.data;
-  const fields = { name_en: v.nameEn, name_ar: v.nameAr, price_cents: v.price };
-
-  const db = await adminClient();
-  if (v.id) {
-    const { error } = await db
-      .from("options")
-      .update({ ...fields, is_available: checkbox(form, "available") })
-      .eq("id", v.id);
-    if (error) return failed();
-  } else {
-    const [{ data: taken }, { data: last }] = await Promise.all([
-      db.from("options").select("key").eq("group_id", v.groupId),
-      db
-        .from("options")
-        .select("sort_order")
-        .eq("group_id", v.groupId)
-        .order("sort_order", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-    ]);
-    const keys = new Set((taken ?? []).map((o) => o.key));
-    const base = slugify(v.nameEn, "choice");
-    let key = base;
-    for (let n = 2; keys.has(key); n++) key = `${base}-${n}`;
-    const { error } = await db.from("options").insert({
-      ...fields,
-      group_id: v.groupId,
-      key,
-      sort_order: (last?.sort_order ?? 0) + 10,
-    });
-    if (error) return failed();
-  }
+  if (error) return oops();
   updateTag(catalogTags.menu);
-  return saved();
-}
-
-export async function deleteChoice(id: string): Promise<Result> {
-  await requireStaff("manager");
-  const db = await adminClient();
-  const { error } = await db.from("options").delete().eq("id", z.uuid().parse(id));
-  return error ? oops() : ok();
-}
-
-/** Moves a choice one place up or down in its group. */
-export async function moveChoice(id: string, direction: "up" | "down"): Promise<Result> {
-  await requireStaff("manager");
-  const db = await adminClient();
-  const { data: choice } = await db
-    .from("options")
-    .select("group_id")
-    .eq("id", z.uuid().parse(id))
-    .single();
-  if (!choice) return oops();
-  const { data } = await db
-    .from("options")
-    .select("id")
-    .eq("group_id", choice.group_id)
-    .order("sort_order")
-    .order("name_en");
-  return (await swapOrder(db, "options", data ?? [], id, direction)) ? ok() : oops();
+  redirect("/admin/menu/choices");
 }

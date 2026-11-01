@@ -40,15 +40,15 @@ export function HoursForm({
       week: value.week.map((day, i) => (i === weekday ? { ...day, ...patch } : day)),
     });
   return (
-    <Card
-      title={`${value.branchName} opening hours`}
-      help="A closing time at or before opening means after midnight. Changes apply when you save the Store page."
-    >
+    <Card title="Opening hours" help="A closing time at or before opening means after midnight.">
       <div className="divide-y divide-line">
         {days.map(([weekday, name]) => {
           const day = value.week[weekday];
           return (
-            <div key={weekday} className="flex flex-wrap items-center gap-x-3 gap-y-2 py-2">
+            <div
+              key={weekday}
+              className="flex min-h-[54px] flex-wrap items-center gap-x-3 gap-y-2 py-2"
+            >
               <label className="flex w-28 items-center gap-2 font-semibold">
                 <input
                   type="checkbox"
@@ -66,7 +66,7 @@ export function HoursForm({
                     onChange={(e) => change(weekday, { opens: e.target.value })}
                     aria-label={`${value.branchName} ${name} opens`}
                     required
-                    className="field w-[8.5rem]"
+                    className="field w-[7.75rem]"
                   />
                   <span className="text-muted">to</span>
                   <input
@@ -75,14 +75,14 @@ export function HoursForm({
                     onChange={(e) => change(weekday, { closes: e.target.value })}
                     aria-label={`${value.branchName} ${name} closes`}
                     required
-                    className="field w-[8.5rem]"
+                    className="field w-[7.75rem]"
                   />
                 </div>
               ) : (
                 <span className="text-muted">Closed</span>
               )}
               {day.open && day.closes <= day.opens && (
-                <span className="text-[12px] text-muted">closes the next morning</span>
+                <span className="text-[12px] text-muted">next day</span>
               )}
             </div>
           );
@@ -123,29 +123,28 @@ export function ClosuresCard({
   const change = (id: string, patch: Partial<ClosureDraft>) =>
     onChange(closures.map((closure) => (closure.id === id ? { ...closure, ...patch } : closure)));
   return (
-    <Card
-      title="Closed days"
-      help="Whole days when the branch takes no orders. Additions and removals apply when you save the Store page."
-    >
+    <Card title="Closed days" help="Whole days when the branch takes no orders.">
       {closures.length === 0 && <p className="text-muted">No closed days coming up.</p>}
       <div className="flex flex-col gap-3">
         {closures.map((closure) => (
-          <div key={closure.id} className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_2fr_auto]">
-            <label>
-              <span className="label">Branch</span>
-              <select
-                value={closure.branchId}
-                onChange={(e) => change(closure.id, { branchId: e.target.value })}
-                className="field"
-              >
-                {branches.map((branch) => (
-                  <option key={branch.id} value={branch.id}>
-                    {branch.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
+          <div key={closure.id} className="flex flex-wrap items-end gap-3">
+            {branches.length > 1 && (
+              <label className="min-w-32 flex-1">
+                <span className="label">Branch</span>
+                <select
+                  value={closure.branchId}
+                  onChange={(e) => change(closure.id, { branchId: e.target.value })}
+                  className="field"
+                >
+                  {branches.map((branch) => (
+                    <option key={branch.id} value={branch.id}>
+                      {branch.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <label className="w-40">
               <span className="label">Date</span>
               <input
                 type="date"
@@ -156,7 +155,7 @@ export function ClosuresCard({
                 className="field"
               />
             </label>
-            <label>
+            <label className="min-w-40 flex-1">
               <span className="label">Note for the team</span>
               <input
                 value={closure.note}

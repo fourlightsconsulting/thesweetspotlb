@@ -25,6 +25,18 @@ export type Template = {
   choices: TemplateChoice[];
 };
 
+/** A group's rule in words. */
+export const ruleLabel = (g: { min: number; max: number }) =>
+  g.min > 0
+    ? g.max === 1
+      ? "Required · pick one"
+      : g.min === g.max
+        ? `Required · pick ${g.min}`
+        : `Required · pick ${g.min}–${g.max}`
+    : g.max === 1
+      ? "Optional · up to one"
+      : `Optional · up to ${g.max}`;
+
 /** A product_option_groups row. */
 export type LinkRow = {
   id: string;

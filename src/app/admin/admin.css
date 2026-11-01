@@ -175,6 +175,31 @@
     background: var(--color-surface);
   }
 
+  /* A row in a reorderable list (see sortable.tsx). */
+  .sort-row {
+    &[data-dragging] {
+      opacity: 0.5;
+    }
+
+    &[data-drop="before"] {
+      box-shadow: 0 -2px 0 var(--color-accent);
+    }
+
+    &[data-drop="after"] {
+      box-shadow: 0 2px 0 var(--color-accent);
+    }
+  }
+
+  .slide-up {
+    animation: slide-up 160ms ease-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide-up {
+      animation: none;
+    }
+  }
+
   .pill {
     display: inline-flex;
     align-items: center;
@@ -186,5 +211,11 @@
     font-weight: 600;
     background: var(--color-tint);
     color: var(--color-muted);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
   }
 }

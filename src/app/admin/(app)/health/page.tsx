@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { minutesAgo } from "@/components/admin/format";
 import { PageHeader } from "@/components/admin/page-header";
+import { PageTabs } from "@/components/admin/page-tabs";
 import { adminClient } from "@/lib/supabase/server";
 import { serviceClient } from "@/lib/supabase/service";
 import { needsAttention } from "@/server/admin/health";
@@ -71,18 +71,14 @@ export default async function HealthPage({ searchParams }: PageProps<"/admin/hea
   return (
     <>
       <PageHeader title="Health" />
-      <nav aria-label="Health" className="mb-5 flex gap-1 overflow-x-auto border-b border-line">
-        {tabs.map((t) => (
-          <Link
-            key={t.key}
-            href={t.key === "overview" ? "/admin/health" : `/admin/health?tab=${t.key}`}
-            aria-current={t.key === tab ? "page" : undefined}
-            className="-mb-px border-b-2 border-transparent px-3 py-2 font-semibold whitespace-nowrap text-muted hover:text-ink aria-[current=page]:border-accent aria-[current=page]:text-ink"
-          >
-            {t.label}
-          </Link>
-        ))}
-      </nav>
+      <PageTabs
+        label="Health"
+        tabs={tabs.map((t) => ({
+          href: t.key === "overview" ? "/admin/health" : `/admin/health?tab=${t.key}`,
+          label: t.label,
+        }))}
+        current={tab === "overview" ? "/admin/health" : `/admin/health?tab=${tab}`}
+      />
       {body}
     </>
   );

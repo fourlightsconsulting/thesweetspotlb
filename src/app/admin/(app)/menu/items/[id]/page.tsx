@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { History, type HistoryEntry } from "@/components/admin/history";
 import { Icon } from "@/components/admin/icons";
@@ -94,35 +93,33 @@ export default async function ItemPage({
   return (
     <>
       <PageHeader
+        breadcrumbs={[{ href: "/admin/menu", label: "Menu" }]}
         title={p ? p.name_en : "New item"}
         description={
           created ? "Added to the menu." : p ? categoryLabel(categories, p.category_id) : undefined
         }
         actions={
-          <>
-            {p && (
-              <a
-                href={`${publicBase}/en/order?item=${p.slug}`}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-secondary"
-              >
-                <Icon name="external" className="size-4" />
-                See it on the site
-              </a>
-            )}
-            <Link href="/admin/menu" className="btn btn-ghost">
-              Back to the menu
-            </Link>
-          </>
+          p && (
+            <a
+              href={`${publicBase}/en/order?item=${p.slug}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-secondary"
+            >
+              <Icon name="external" className="size-4" />
+              See it on the site
+            </a>
+          )
         }
       />
       <ItemForm item={values} categories={categoryChoices} groups={groups} templates={templates} />
       {p && (
-        <section className="card mt-6 p-5">
-          <h2 className="mb-2 text-base font-bold">History</h2>
-          <History entries={(history?.data ?? []) as HistoryEntry[]} />
-        </section>
+        <details className="card mt-6 p-5">
+          <summary className="cursor-pointer text-base font-bold">History</summary>
+          <div className="mt-2">
+            <History entries={(history?.data ?? []) as HistoryEntry[]} />
+          </div>
+        </details>
       )}
     </>
   );

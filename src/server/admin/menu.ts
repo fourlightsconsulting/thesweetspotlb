@@ -44,10 +44,23 @@ export const imagePath = z
   .regex(/^[a-z0-9-]+(\/[a-z0-9-]+)*\.(webp|jpg|png|avif)$/)
   .nullable();
 
+/** Numbers the rows in this order (10, 20, 30…). */
+export async function setOrder(db: Db, table: "products" | "categories", ids: string[]) {
+  const results = await Promise.all(
+    ids.map((id, i) =>
+      db
+        .from(table)
+        .update({ sort_order: (i + 1) * 10 })
+        .eq("id", id),
+    ),
+  );
+  return results.every((r) => !r.error);
+}
+
 /** Swaps a row with its neighbour and renumbers the list (10, 20, 30…). */
 export async function swapOrder(
   db: Db,
-  table: "products" | "categories" | "options",
+  table: "categories",
   rows: { id: string }[],
   id: string,
   direction: "up" | "down",

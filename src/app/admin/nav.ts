@@ -8,6 +8,10 @@ export type NavItem = {
   label: string;
   icon: NavIcon;
   minimum: StaffRole;
+  /** The heading it sits under; items without one come first. */
+  group?: string;
+  /** Other paths that belong to this section. */
+  also?: string[];
   /** A count beside the label (Health's problems). */
   badge?: { count: number; tone: "bad" | "wait" };
 };
@@ -17,8 +21,6 @@ export type NavIcon =
   | "orders"
   | "customers"
   | "dishes"
-  | "bundles"
-  | "prices"
   | "offers"
   | "site"
   | "store"
@@ -31,15 +33,44 @@ export const navItems: NavItem[] = [
   { href: "/admin", label: "Home", icon: "home", minimum: "manager" },
   { href: "/admin/orders", label: "Orders", icon: "orders", minimum: "staff" },
   { href: "/admin/customers", label: "Customers", icon: "customers", minimum: "staff" },
-  { href: "/admin/menu", label: "Menu", icon: "dishes", minimum: "staff" },
-  { href: "/admin/bundles", label: "Bundles", icon: "bundles", minimum: "manager" },
-  { href: "/admin/prices", label: "Prices", icon: "prices", minimum: "manager" },
-  { href: "/admin/offers", label: "Offers", icon: "offers", minimum: "manager" },
-  { href: "/admin/site", label: "Site", icon: "site", minimum: "manager" },
-  { href: "/admin/store", label: "Store", icon: "store", minimum: "manager" },
-  { href: "/admin/ads", label: "Ad tools", icon: "ads", minimum: "manager" },
-  { href: "/admin/health", label: "Health", icon: "health", minimum: "manager" },
-  { href: "/admin/team", label: "Team", icon: "team", minimum: "owner" },
+  {
+    href: "/admin/menu",
+    label: "Menu",
+    icon: "dishes",
+    minimum: "staff",
+    group: "Sell",
+    also: ["/admin/bundles", "/admin/prices"],
+  },
+  { href: "/admin/offers", label: "Offers", icon: "offers", minimum: "manager", group: "Sell" },
+  {
+    href: "/admin/store",
+    label: "Store",
+    icon: "store",
+    minimum: "manager",
+    group: "Run the shop",
+  },
+  {
+    href: "/admin/site",
+    label: "Website",
+    icon: "site",
+    minimum: "manager",
+    group: "Run the shop",
+  },
+  {
+    href: "/admin/ads",
+    label: "Ad tools",
+    icon: "ads",
+    minimum: "manager",
+    group: "Grow & manage",
+  },
+  {
+    href: "/admin/health",
+    label: "Health",
+    icon: "health",
+    minimum: "manager",
+    group: "Grow & manage",
+  },
+  { href: "/admin/team", label: "Team", icon: "team", minimum: "owner", group: "Grow & manage" },
 ];
 
 export const accountItem: NavItem = {

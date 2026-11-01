@@ -6,6 +6,7 @@ import { adminClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/server/admin/session";
 import { categoryTree, loadCategories, loadItems } from "../menu/data";
 import { ItemList } from "../menu/item-list";
+import { MenuTabs } from "../menu/menu-tabs";
 
 export const metadata: Metadata = { title: "Bundles" };
 
@@ -28,14 +29,15 @@ export default async function BundlesPage() {
   return (
     <>
       <PageHeader
-        title="Bundles"
+        title="Menu"
         actions={
           <Link href="/admin/bundles/new" className="btn btn-primary">
             <Icon name="plus" className="size-4" />
-            New bundle
+            Add a bundle
           </Link>
         }
       />
+      <MenuTabs />
       {sections.length === 0 ? (
         <div className="card p-6 text-center">
           <p className="font-semibold">No bundles yet.</p>

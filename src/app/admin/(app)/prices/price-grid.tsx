@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { type FormState, idle } from "@/components/admin/form";
 import { money } from "@/components/admin/format";
+import { SaveBar, useUnsavedGuard } from "@/components/admin/save-bar";
 import { savePrices } from "./actions";
 
 export type PriceRow = { kind: "product" | "option"; id: string; name: string; cents: number };
@@ -22,10 +24,11 @@ export function PriceGrid({ sections }: { sections: PriceSection[] }) {
   const [amount, setAmount] = useState("");
   const [step, setStep] = useState(25);
   const [saving, startSaving] = useTransition();
-  const [message, setMessage] = useState<{ tone: "good" | "bad"; text: string } | null>(null);
+  const [status, setStatus] = useState<FormState>(idle);
 
   const current = (row: PriceRow) => edits[keyOf(row)] ?? row.cents;
   const changed = all.filter((row) => current(row) !== row.cents);
+  useUnsavedGuard(changed.length > 0);
 
   const setPrice = (row: PriceRow, cents: number) =>
     setEdits((e) => {
@@ -60,7 +63,7 @@ export function PriceGrid({ sections }: { sections: PriceSection[] }) {
       }
       return next;
     });
-    setMessage(null);
+    setStatus(idle);
   };
 
   const save = () =>
@@ -68,12 +71,9 @@ export function PriceGrid({ sections }: { sections: PriceSection[] }) {
       const result = await savePrices(
         changed.map((row) => ({ kind: row.kind, id: row.id, cents: current(row) })),
       );
-      if (result.error) setMessage({ tone: "bad", text: result.error });
+      if (result.error) setStatus({ status: "error", message: result.error });
       else {
-        setMessage({
-          tone: "good",
-          text: `${changed.length} price${changed.length === 1 ? "" : "s"} saved.`,
-        });
+        setStatus({ status: "saved", at: Date.now() });
         setEdits({});
         setSelected(new Set());
       }
@@ -132,12 +132,12 @@ export function PriceGrid({ sections }: { sections: PriceSection[] }) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-6 pb-20">
+      <div className="flex flex-col gap-6">
         {sections.map((section) => {
           const keys = section.rows.map(keyOf);
           const allOn = keys.length > 0 && keys.every((k) => selected.has(k));
           return (
-            <section key={section.title}>
+            <section key={keys[0]}>
               <div className="mb-2 flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -202,37 +202,21 @@ export function PriceGrid({ sections }: { sections: PriceSection[] }) {
         })}
       </div>
 
-      {(changed.length > 0 || message) && (
-        <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 px-4 py-3 backdrop-blur wide:ps-[264px]">
-          <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-3">
-            {changed.length > 0 ? (
-              <>
-                <span className="font-semibold">
-                  {changed.length} price{changed.length === 1 ? "" : "s"} changed
-                </span>
-                <button type="button" onClick={save} disabled={saving} className="btn btn-primary">
-                  {saving ? "Saving…" : "Save prices"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setEdits({})}
-                  disabled={saving}
-                  className="btn btn-ghost"
-                >
-                  Discard
-                </button>
-              </>
-            ) : null}
-            {message && (
-              <span
-                className={`text-[13px] font-semibold ${message.tone === "good" ? "text-good" : "text-bad"}`}
-              >
-                {message.text}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          save();
+        }}
+      >
+        <SaveBar
+          dirty={changed.length > 0}
+          pending={saving}
+          state={status}
+          saveLabel="Save prices"
+          dirtyText={`${changed.length} price${changed.length === 1 ? "" : "s"} changed`}
+          onDiscard={() => setEdits({})}
+        />
+      </form>
     </>
   );
 }

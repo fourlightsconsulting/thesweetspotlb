@@ -1,9 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { z } from "zod";
 import type { FormState } from "@/components/admin/form";
+import { siteSettingKeys } from "@/lib/site-settings";
 import { adminClient } from "@/lib/supabase/server";
+import { catalogTags } from "@/server/catalog";
 import { failed, saved } from "@/server/admin/form-state";
 import { requireStaff } from "@/server/admin/session";
 
@@ -78,5 +80,19 @@ export async function removeSpend(id: number): Promise<{ error: string | null }>
     .eq("platform", "manual");
   if (error) return { error: "That didn’t save. Try again." };
   revalidatePath("/admin/health");
+  return { error: null };
+}
+
+/** The website's own visitor records on or off (the ad platforms' tags carry on). */
+export async function saveTracking(firstParty: boolean): Promise<{ error: string | null }> {
+  await requireStaff("manager");
+  const db = await adminClient();
+  const { error } = await db.from("site_settings").upsert({
+    key: siteSettingKeys.tracking,
+    value: { first_party: firstParty === true },
+    is_public: true,
+  });
+  if (error) return { error: "That didn’t save. Try again." };
+  updateTag(catalogTags.settings);
   return { error: null };
 }

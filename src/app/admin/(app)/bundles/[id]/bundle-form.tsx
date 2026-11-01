@@ -5,7 +5,9 @@ import { Help } from "@/components/admin/help";
 import { idle, useSubmit } from "@/components/admin/form";
 import { money } from "@/components/admin/format";
 import { Icon } from "@/components/admin/icons";
-import { ItemBasics, type ItemValues, SaveBar } from "../../menu/items/[id]/item-form";
+import { SaveBar, useDirtyForm, useUnsavedGuard } from "@/components/admin/save-bar";
+import { type DragSort, moveInList, SortControl, useDragSort } from "@/components/admin/sortable";
+import { DeleteButton, ItemBasics, type ItemValues } from "../../menu/items/[id]/item-form";
 import { deleteBundle, saveBundle } from "../actions";
 
 export type MenuChoice = { id: string; name: string; price: number; categoryLabel: string };
@@ -39,20 +41,46 @@ const newSlot = (): Slot => ({
 });
 
 /** A bundle's editor: the usual item fields, then its parts. */
-export function BundleForm({ bundle, slots: initialSlots, categories, items }: Props) {
+export function BundleForm({ bundle, slots, categories, items }: Props) {
   const [state, action, pending] = useActionState(saveBundle, idle);
   const submit = useSubmit(action);
+  const { formRef, dirty, settle } = useDirtyForm(state.status === "saved" ? state.at : 0);
+  const [version, setVersion] = useState(0);
+  useUnsavedGuard(dirty);
+
+  return (
+    <form ref={formRef} onSubmit={submit}>
+      {bundle.id && <input type="hidden" name="id" value={bundle.id} />}
+      <BundleFields
+        // A discard starts over from what's saved; so does a save, so new parts pick up their ids.
+        key={`${version}:${JSON.stringify(slots)}:${JSON.stringify(bundle)}`}
+        bundle={bundle}
+        slots={slots}
+        categories={categories}
+        items={items}
+      />
+      <SaveBar
+        dirty={dirty}
+        pending={pending}
+        state={state}
+        isNew={!bundle.id}
+        saveLabel={bundle.id ? "Save" : "Add the bundle"}
+        onDiscard={() => {
+          setVersion((v) => v + 1);
+          settle();
+        }}
+      />
+    </form>
+  );
+}
+
+function BundleFields({ bundle, slots: initialSlots, categories, items }: Props) {
   const [slots, setSlots] = useState(initialSlots.length > 0 ? initialSlots : [newSlot()]);
   const [price, setPrice] = useState(bundle.price);
+  const sort = useDragSort((from, to) => setSlots((list) => moveInList(list, from, to)));
 
   const update = (key: string, patch: Partial<Slot>) =>
     setSlots((list) => list.map((s) => (s.key === key ? { ...s, ...patch } : s)));
-  const move = (index: number, by: -1 | 1) =>
-    setSlots((list) => {
-      const next = [...list];
-      [next[index], next[index + by]] = [next[index + by], next[index]];
-      return next;
-    });
 
   const payload = slots.map((s) => ({
     groupId: s.groupId,
@@ -71,8 +99,7 @@ export function BundleForm({ bundle, slots: initialSlots, categories, items }: P
   const high = price + payload.reduce((sum, s) => sum + extra(s, "max"), 0);
 
   return (
-    <form
-      onSubmit={submit}
+    <div
       onChange={(e) => {
         const target = e.target;
         if (target instanceof HTMLInputElement && target.name === "price")
@@ -80,7 +107,6 @@ export function BundleForm({ bundle, slots: initialSlots, categories, items }: P
       }}
       className="flex flex-col gap-6"
     >
-      {bundle.id && <input type="hidden" name="id" value={bundle.id} />}
       <input type="hidden" name="slots" value={JSON.stringify(payload)} />
       <ItemBasics item={bundle} categories={categories} />
 
@@ -112,10 +138,10 @@ export function BundleForm({ bundle, slots: initialSlots, categories, items }: P
               slot={slot}
               index={index}
               count={slots.length}
+              sort={sort}
               items={items}
               categories={categories}
               onChange={(patch) => update(slot.key, patch)}
-              onMove={(by) => move(index, by)}
               onRemove={() => setSlots((list) => list.filter((s) => s.key !== slot.key))}
             />
           ))}
@@ -130,18 +156,15 @@ export function BundleForm({ bundle, slots: initialSlots, categories, items }: P
           Add a part
         </button>
       </section>
-
-      <SaveBar
-        saved={bundle.id !== null}
-        pending={pending}
-        state={state}
-        name={bundle.nameEn}
-        addLabel="Add the bundle"
-        deleteLabel="Delete bundle"
-        deleteWarning="Its orders stay in the records. To take it off for now, switch “Listed on the menu” off instead."
-        onDelete={() => deleteBundle(bundle.id!)}
-      />
-    </form>
+      {bundle.id && (
+        <DeleteButton
+          name={bundle.nameEn}
+          label="Delete bundle"
+          warning="Its orders stay in the records. To take it off for now, switch “Listed on the menu” off instead."
+          onDelete={() => deleteBundle(bundle.id!)}
+        />
+      )}
+    </div>
   );
 }
 
@@ -149,19 +172,19 @@ function SlotEditor({
   slot,
   index,
   count,
+  sort,
   items,
   categories,
   onChange,
-  onMove,
   onRemove,
 }: {
   slot: Slot;
   index: number;
   count: number;
+  sort: DragSort;
   items: MenuChoice[];
   categories: { id: string; label: string }[];
   onChange: (patch: Partial<Slot>) => void;
-  onMove: (by: -1 | 1) => void;
   onRemove: () => void;
 }) {
   const [adding, setAdding] = useState("");
@@ -170,37 +193,18 @@ function SlotEditor({
   const prefix = `slot-${slot.key}`;
 
   return (
-    <li className="rounded-[12px] border border-line p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <li {...sort.row(index)} className="sort-row rounded-[12px] border border-line p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <SortControl sort={sort} index={index} count={count} label={`part ${index + 1}`} />
         <p className="font-semibold">Part {index + 1}</p>
-        <div className="flex">
-          <button
-            type="button"
-            aria-label="Move up"
-            disabled={index === 0}
-            onClick={() => onMove(-1)}
-            className="btn btn-ghost btn-sm px-1.5"
-          >
-            <Icon name="up" className="size-4" />
-          </button>
-          <button
-            type="button"
-            aria-label="Move down"
-            disabled={index === count - 1}
-            onClick={() => onMove(1)}
-            className="btn btn-ghost btn-sm px-1.5"
-          >
-            <Icon name="down" className="size-4" />
-          </button>
-          <button
-            type="button"
-            disabled={count === 1}
-            onClick={onRemove}
-            className="btn btn-ghost btn-sm text-bad"
-          >
-            Remove
-          </button>
-        </div>
+        <button
+          type="button"
+          disabled={count === 1}
+          onClick={onRemove}
+          className="btn btn-ghost btn-sm ms-auto text-bad"
+        >
+          Remove
+        </button>
       </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">

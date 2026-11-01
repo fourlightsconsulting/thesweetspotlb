@@ -105,7 +105,7 @@ function allCards(d: HealthOverview, setup: Setup, now: number): Card[] {
           : "No visitor events in the last 7 days.",
         `Left out in the last 24 hours: ${d.events.robots} from robots, ${d.events.staff} from staff browsing.`,
       ],
-      href: "/admin/site",
+      href: "/admin/health?tab=connections",
       link: "Analytics switch",
     },
     {
@@ -133,9 +133,9 @@ function allCards(d: HealthOverview, setup: Setup, now: number): Card[] {
       status: dbShare > 0.8 ? "bad" : dbShare > 0.6 ? "wait" : "good",
       lines: [
         `${megabytes(d.database.bytes)} of the free plan’s 500 MB (${Math.round(dbShare * 100)}%).`,
-        `Website analytics takes ${megabytes(d.database.events_bytes)}. Switch it off in Site if space runs short; orders always save.`,
+        `Website analytics takes ${megabytes(d.database.events_bytes)}. Switch it off under Connections if space runs short; orders always save.`,
       ],
-      href: "/admin/site",
+      href: "/admin/health?tab=connections",
       link: "Analytics switch",
     },
   ];

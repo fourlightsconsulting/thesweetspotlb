@@ -79,6 +79,7 @@ export default async function CustomerPage({ params }: PageProps<"/admin/custome
   return (
     <>
       <PageHeader
+        breadcrumbs={[{ href: "/admin/customers", label: "Customers" }]}
         title={c.name || "No name"}
         description={
           <>

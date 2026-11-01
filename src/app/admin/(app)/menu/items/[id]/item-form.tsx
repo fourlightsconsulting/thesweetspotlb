@@ -1,8 +1,9 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
-import { type FormState, FormStatus, idle, useSubmit } from "@/components/admin/form";
+import { idle, useSubmit } from "@/components/admin/form";
 import { PhotoUpload } from "@/components/admin/photo-upload";
+import { SaveBar, useDirtyForm, useUnsavedGuard } from "@/components/admin/save-bar";
 import { Switch } from "@/components/admin/switch";
 import type { GroupDraft, Template } from "@/lib/item-groups";
 import { deleteItem, saveItem } from "../../actions";
@@ -31,29 +32,43 @@ type Props = {
   templates: Template[];
 };
 
-/** An item's editor: text, price, photo, visibility and its choices. */
+/** An item's editor: text and price beside its photo and visibility, then its choices. */
 export function ItemForm({ item, categories, groups, templates }: Props) {
   const [state, action, pending] = useActionState(saveItem, idle);
   const submit = useSubmit(action);
+  const { formRef, dirty, settle } = useDirtyForm(state.status === "saved" ? state.at : 0);
+  const [version, setVersion] = useState(0);
+  useUnsavedGuard(dirty);
 
   return (
-    <form onSubmit={submit} className="flex flex-col gap-6">
+    <form ref={formRef} onSubmit={submit}>
       {item.id && <input type="hidden" name="id" value={item.id} />}
-
-      <ItemBasics item={item} categories={categories} />
-
-      {/* Starts over from what's saved, so new groups and choices pick up their keys. */}
-      <GroupEditor key={JSON.stringify(groups)} initial={groups} templates={templates} />
-
+      {/* A discard starts over from what's saved; so does a save, so new groups pick up keys. */}
+      <div
+        key={`${version}:${JSON.stringify(groups)}:${JSON.stringify(item)}`}
+        className="flex flex-col gap-6"
+      >
+        <ItemBasics item={item} categories={categories} />
+        <GroupEditor initial={groups} templates={templates} />
+        {item.id && (
+          <DeleteButton
+            name={item.nameEn}
+            label="Delete item"
+            warning="It also leaves any bundle it’s in. To take it off for now, switch “Listed on the menu” off instead."
+            onDelete={() => deleteItem(item.id!)}
+          />
+        )}
+      </div>
       <SaveBar
-        saved={item.id !== null}
+        dirty={dirty}
         pending={pending}
         state={state}
-        name={item.nameEn}
-        addLabel="Add to the menu"
-        deleteLabel="Delete item"
-        deleteWarning="It also leaves any bundle it’s in. To take it off for now, switch “Listed on the menu” off instead."
-        onDelete={() => deleteItem(item.id!)}
+        isNew={!item.id}
+        saveLabel={item.id ? "Save" : "Add to the menu"}
+        onDiscard={() => {
+          setVersion((v) => v + 1);
+          settle();
+        }}
       />
     </form>
   );
@@ -71,8 +86,8 @@ export function ItemBasics({
   const [online, setOnline] = useState(item.online);
   const [available, setAvailable] = useState(item.available);
   return (
-    <>
-      <section className="card grid gap-4 p-5 sm:grid-cols-2">
+    <div className="grid items-stretch gap-6 wide:grid-cols-[minmax(0,1fr)_320px]">
+      <section className="card grid content-start gap-4 p-5 sm:grid-cols-2">
         <div>
           <label htmlFor="nameEn" className="label">
             Name
@@ -108,7 +123,7 @@ export function ItemBasics({
           <textarea
             id="descriptionEn"
             name="descriptionEn"
-            rows={3}
+            rows={6}
             maxLength={300}
             defaultValue={item.descriptionEn}
             className="field"
@@ -121,7 +136,7 @@ export function ItemBasics({
           <textarea
             id="descriptionAr"
             name="descriptionAr"
-            rows={3}
+            rows={6}
             maxLength={300}
             defaultValue={item.descriptionAr}
             lang="ar"
@@ -129,25 +144,25 @@ export function ItemBasics({
             className="field"
           />
         </div>
-        <div>
-          <label htmlFor="categoryId" className="label">
-            Category
-          </label>
-          <select
-            id="categoryId"
-            name="categoryId"
-            required
-            defaultValue={item.categoryId}
-            className="field"
-          >
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-4 sm:col-span-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
+          <div>
+            <label htmlFor="categoryId" className="label">
+              Category
+            </label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              required
+              defaultValue={item.categoryId}
+              className="field"
+            >
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>
             <label htmlFor="price" className="label">
               Price ($)
@@ -177,15 +192,17 @@ export function ItemBasics({
         </div>
       </section>
 
-      <section className="card grid gap-6 p-5 sm:grid-cols-2">
-        <PhotoUpload
-          name="imagePath"
-          path={item.imagePath}
-          src={item.imageSrc}
-          folder="items"
-          label="Photo"
-        />
-        <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-6">
+        <section className="card p-5">
+          <PhotoUpload
+            name="imagePath"
+            path={item.imagePath}
+            src={item.imageSrc}
+            folder="items"
+            label="Photo"
+          />
+        </section>
+        <section className="card flex flex-col gap-3 p-5">
           <span className="label mb-0">On the website</span>
           {(
             [
@@ -208,54 +225,40 @@ export function ItemBasics({
               </div>
             </div>
           ))}
-        </div>
-      </section>
-    </>
+        </section>
+      </div>
+    </div>
   );
 }
 
-/** The sticky save bar with delete, at the bottom of an item or bundle form. */
-export function SaveBar({
-  saved,
-  pending,
-  state,
+/** Deleting, apart from saving: a quiet button at the end of the page. */
+export function DeleteButton({
   name,
-  addLabel,
-  deleteLabel,
-  deleteWarning,
+  label,
+  warning,
   onDelete,
 }: {
-  saved: boolean;
-  pending: boolean;
-  state: FormState;
   name: string;
-  addLabel: string;
-  deleteLabel: string;
-  deleteWarning: string;
+  label: string;
+  warning: string;
   onDelete: () => Promise<{ error: string | null }>;
 }) {
   const [deleting, startDeleting] = useTransition();
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   return (
-    <div className="sticky bottom-0 -mx-4 flex flex-wrap items-center gap-3 border-t border-line bg-canvas/95 px-4 py-3 backdrop-blur wide:-mx-8 wide:px-8">
-      <button className="btn btn-primary" disabled={pending}>
-        {pending ? "Saving…" : saved ? "Save changes" : addLabel}
+    <div className="text-end">
+      <button
+        type="button"
+        disabled={deleting}
+        onClick={() => {
+          if (confirm(`Delete ${name} for good? ${warning}`))
+            startDeleting(async () => setError((await onDelete()).error));
+        }}
+        className="btn btn-ghost text-bad"
+      >
+        {deleting ? "Deleting…" : label}
       </button>
-      <FormStatus state={state} />
-      {saved && (
-        <button
-          type="button"
-          disabled={deleting}
-          onClick={() => {
-            if (confirm(`Delete ${name} for good? ${deleteWarning}`))
-              startDeleting(async () => setDeleteError((await onDelete()).error));
-          }}
-          className="btn btn-danger ms-auto"
-        >
-          {deleting ? "Deleting…" : deleteLabel}
-        </button>
-      )}
-      {deleteError && <p className="w-full text-[13px] text-bad">{deleteError}</p>}
+      {error && <p className="mt-1 text-[13px] text-bad">{error}</p>}
     </div>
   );
 }

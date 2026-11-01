@@ -91,11 +91,15 @@ export function attentionItems(c: AttentionCounts, ctx: AttentionContext): Atten
   if (ctx.ordering === "paused")
     items.push({ text: "Online ordering is paused", href: "/admin/store", tone: "wait" });
   if (!ctx.firstParty)
-    items.push({ text: "Website analytics is switched off", href: "/admin/site", tone: "wait" });
+    items.push({
+      text: "Website analytics is switched off",
+      href: "/admin/health?tab=connections",
+      tone: "wait",
+    });
   if (c.database_bytes > DATABASE_LIMIT_BYTES * 0.8)
     items.push({
       text: `The database is at ${Math.round(c.database_bytes / 1024 / 1024)} MB of the free plan’s 500 MB`,
-      href: "/admin/site",
+      href: "/admin/health?tab=connections",
       tone: "bad",
     });
   return items;
