@@ -38,7 +38,7 @@ async function currentSlots(db: Awaited<ReturnType<typeof adminClient>>, bundleI
     .select("group_id, option_groups!inner(kind)")
     .eq("product_id", bundleId)
     .eq("option_groups.kind", "items");
-  return new Set((data ?? []).map((l) => l.group_id));
+  return new Set((data ?? []).flatMap((l) => (l.group_id ? [l.group_id] : [])));
 }
 
 export async function saveBundle(_prev: FormState, form: FormData): Promise<FormState> {
@@ -100,7 +100,7 @@ export async function saveBundle(_prev: FormState, form: FormData): Promise<Form
     return failed("A bundle can only contain menu items (not other bundles).");
 
   const existing = await currentSlots(db, id);
-  const kept: string[] = [];
+  const kept: { id: string; key: string }[] = [];
   for (const slot of slots.data) {
     const groupFields = {
       name_en: slot.nameEn,
@@ -108,9 +108,16 @@ export async function saveBundle(_prev: FormState, form: FormData): Promise<Form
       source_category_id: slot.sourceCategoryId,
     };
     let groupId = slot.groupId && existing.has(slot.groupId) ? slot.groupId : undefined;
+    let slotKey: string;
     if (groupId) {
-      const { error } = await db.from("option_groups").update(groupFields).eq("id", groupId);
-      if (error) return failed("The bundle saved, but its parts didn’t.");
+      const { data, error } = await db
+        .from("option_groups")
+        .update(groupFields)
+        .eq("id", groupId)
+        .select("key")
+        .single();
+      if (error || !data) return failed("The bundle saved, but its parts didn’t.");
+      slotKey = data.key;
     } else {
       const key = await freeSlug(
         db,
@@ -125,8 +132,9 @@ export async function saveBundle(_prev: FormState, form: FormData): Promise<Form
         .single();
       if (error || !data) return failed("The bundle saved, but its parts didn’t.");
       groupId = data.id;
+      slotKey = key;
     }
-    kept.push(groupId);
+    kept.push({ id: groupId, key: slotKey });
 
     // Its choices, replaced as a whole (each item once).
     const choices = slot.choices.filter(
@@ -153,13 +161,17 @@ export async function saveBundle(_prev: FormState, form: FormData): Promise<Form
   }
 
   // Links in order, then remove the parts that were taken out.
-  const { error: linkError } = await db
-    .from("product_option_groups")
-    .upsert(
-      kept.map((groupId, i) => ({ product_id: id!, group_id: groupId, sort_order: (i + 1) * 10 })),
-    );
+  const { error: linkError } = await db.from("product_option_groups").upsert(
+    kept.map((slot, i) => ({
+      product_id: id!,
+      group_id: slot.id,
+      key: slot.key,
+      sort_order: (i + 1) * 10,
+    })),
+    { onConflict: "product_id,group_id" },
+  );
   if (linkError) return failed("The bundle saved, but its parts didn’t.");
-  const removed = [...existing].filter((g) => !kept.includes(g));
+  const removed = [...existing].filter((g) => !kept.some((slot) => slot.id === g));
   if (removed.length > 0) {
     await db.from("product_option_groups").delete().eq("product_id", id).in("group_id", removed);
     await db.from("option_groups").delete().in("id", removed);

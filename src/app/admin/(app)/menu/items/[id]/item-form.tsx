@@ -1,21 +1,12 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
-import { Help } from "@/components/admin/help";
 import { type FormState, FormStatus, idle, useSubmit } from "@/components/admin/form";
-import { money } from "@/components/admin/format";
-import { Icon } from "@/components/admin/icons";
 import { PhotoUpload } from "@/components/admin/photo-upload";
 import { Switch } from "@/components/admin/switch";
+import type { GroupDraft, Template } from "@/lib/item-groups";
 import { deleteItem, saveItem } from "../../actions";
-
-export type ChoiceGroup = {
-  id: string;
-  nameEn: string;
-  min: number;
-  max: number;
-  options: { key: string; nameEn: string; price: number }[];
-};
+import { GroupEditor } from "./group-editor";
 
 export type ItemValues = {
   id: string | null;
@@ -31,168 +22,28 @@ export type ItemValues = {
   active: boolean;
   online: boolean;
   available: boolean;
-  groups: { groupId: string; defaults: string[] }[];
 };
-
-export const ruleLabel = (g: Pick<ChoiceGroup, "min" | "max">) =>
-  g.min > 0
-    ? g.max === 1
-      ? "Required · pick one"
-      : `Required · pick ${g.min}–${g.max}`
-    : g.max === 1
-      ? "Optional · up to one"
-      : `Optional · up to ${g.max}`;
 
 type Props = {
   item: ItemValues;
   categories: { id: string; label: string }[];
-  groups: ChoiceGroup[];
+  groups: GroupDraft[];
+  templates: Template[];
 };
 
 /** An item's editor: text, price, photo, visibility and its choices. */
-export function ItemForm({ item, categories, groups }: Props) {
+export function ItemForm({ item, categories, groups, templates }: Props) {
   const [state, action, pending] = useActionState(saveItem, idle);
   const submit = useSubmit(action);
-  const [attached, setAttached] = useState(item.groups);
-  const [adding, setAdding] = useState("");
-
-  const groupOf = (id: string) => groups.find((g) => g.id === id);
-  const unattached = groups.filter((g) => !attached.some((a) => a.groupId === g.id));
-  const update = (index: number, defaults: string[]) =>
-    setAttached((list) => list.map((a, i) => (i === index ? { ...a, defaults } : a)));
-  const move = (index: number, by: -1 | 1) =>
-    setAttached((list) => {
-      const next = [...list];
-      [next[index], next[index + by]] = [next[index + by], next[index]];
-      return next;
-    });
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
       {item.id && <input type="hidden" name="id" value={item.id} />}
-      <input type="hidden" name="groups" value={JSON.stringify(attached)} />
 
       <ItemBasics item={item} categories={categories} />
 
-      <section className="card p-5">
-        <h2 className="text-base font-bold">
-          Choices & add-ons
-          <Help>Shown to the customer in this order. Preselected choices start ticked.</Help>
-        </h2>
-        <ul className="mt-4 flex flex-col gap-3">
-          {attached.map((a, index) => {
-            const group = groupOf(a.groupId);
-            if (!group) return null;
-            return (
-              <li key={a.groupId} className="rounded-[12px] border border-line p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p>
-                    <span className="font-semibold">{group.nameEn}</span>{" "}
-                    <span className="text-[13px] text-muted">{ruleLabel(group)}</span>
-                  </p>
-                  <div className="flex">
-                    <button
-                      type="button"
-                      aria-label="Move up"
-                      disabled={index === 0}
-                      onClick={() => move(index, -1)}
-                      className="btn btn-ghost btn-sm px-1.5"
-                    >
-                      <Icon name="up" className="size-4" />
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Move down"
-                      disabled={index === attached.length - 1}
-                      onClick={() => move(index, 1)}
-                      className="btn btn-ghost btn-sm px-1.5"
-                    >
-                      <Icon name="down" className="size-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAttached((list) => list.filter((_, i) => i !== index))}
-                      className="btn btn-ghost btn-sm text-bad"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-                {group.max === 1 ? (
-                  <label className="mt-2 flex flex-wrap items-center gap-2 text-[13px]">
-                    Preselected:
-                    <select
-                      value={a.defaults[0] ?? ""}
-                      onChange={(e) => update(index, e.target.value ? [e.target.value] : [])}
-                      className="field h-[30px] min-h-[30px] w-auto py-1 text-[13px]"
-                    >
-                      <option value="">
-                        {group.min > 0 ? "None: the customer picks" : "None"}
-                      </option>
-                      {group.options.map((o) => (
-                        <option key={o.key} value={o.key}>
-                          {o.nameEn}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ) : (
-                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13px]">
-                    {group.options.map((o) => (
-                      <label key={o.key} className="flex items-center gap-1.5">
-                        <input
-                          type="checkbox"
-                          checked={a.defaults.includes(o.key)}
-                          onChange={(e) =>
-                            update(
-                              index,
-                              e.target.checked
-                                ? [...a.defaults, o.key]
-                                : a.defaults.filter((k) => k !== o.key),
-                            )
-                          }
-                          className="accent-accent"
-                        />
-                        {o.nameEn}
-                        {o.price > 0 && <span className="text-muted">+{money(o.price)}</span>}
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-          {attached.length === 0 && <li className="text-muted">No choices</li>}
-        </ul>
-        {unattached.length > 0 && (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <select
-              value={adding}
-              onChange={(e) => setAdding(e.target.value)}
-              aria-label="Choices to add"
-              className="field w-auto"
-            >
-              <option value="">Add choices…</option>
-              {unattached.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.nameEn} ({ruleLabel(g).toLowerCase()})
-                </option>
-              ))}
-            </select>
-            <button
-              type="button"
-              disabled={!adding}
-              onClick={() => {
-                setAttached((list) => [...list, { groupId: adding, defaults: [] }]);
-                setAdding("");
-              }}
-              className="btn btn-secondary"
-            >
-              Add
-            </button>
-          </div>
-        )}
-      </section>
+      {/* Starts over from what's saved, so new groups and choices pick up their keys. */}
+      <GroupEditor key={JSON.stringify(groups)} initial={groups} templates={templates} />
 
       <SaveBar
         saved={item.id !== null}

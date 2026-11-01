@@ -66,7 +66,7 @@ export default async function PricesPage() {
     <>
       <PageHeader
         title="Prices"
-        help="Tick several items to change them together by % or $. Nothing saves until you press Save."
+        help="Tick several items to change them together by % or $. Nothing saves until you press Save. Add-on prices here are the templates’: items with their own price keep it."
       />
       <PriceGrid sections={sections} />
       <section className="card p-5">

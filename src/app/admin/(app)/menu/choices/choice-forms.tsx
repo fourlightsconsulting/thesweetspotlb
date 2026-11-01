@@ -5,7 +5,7 @@ import { Help } from "@/components/admin/help";
 import { FormStatus, idle, useSubmit } from "@/components/admin/form";
 import { Icon } from "@/components/admin/icons";
 import { deleteChoice, deleteGroup, moveChoice, saveChoice, saveGroup } from "../actions";
-import { ruleLabel } from "../items/[id]/item-form";
+import { ruleLabel } from "../items/[id]/group-editor";
 
 export type Choice = {
   id: string;
@@ -13,6 +13,8 @@ export type Choice = {
   nameAr: string;
   price: number;
   available: boolean;
+  /** Items with their own price for this choice. */
+  ownPrices: number;
 };
 
 export type Group = {
@@ -25,10 +27,13 @@ export type Group = {
   choices: Choice[];
 };
 
+const items = (count: number) => `${count} item${count === 1 ? "" : "s"}`;
+
 function GroupFields({ group }: { group: Group | null }) {
   const prefix = group?.id ?? "new";
+  const [required, setRequired] = useState((group?.min ?? 0) > 0);
   return (
-    <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto] sm:items-end">
+    <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto_auto] sm:items-end">
       {group && <input type="hidden" name="id" value={group.id} />}
       <div>
         <label htmlFor={`${prefix}-gen`} className="label">
@@ -63,14 +68,31 @@ function GroupFields({ group }: { group: Group | null }) {
         <input
           type="checkbox"
           name="required"
-          defaultChecked={(group?.min ?? 0) > 0}
+          checked={required}
+          onChange={(e) => setRequired(e.target.checked)}
           className="size-4 accent-accent"
         />
         Required
       </label>
+      {required && (
+        <div>
+          <label htmlFor={`${prefix}-min`} className="label">
+            At least
+          </label>
+          <input
+            id={`${prefix}-min`}
+            name="min"
+            type="number"
+            min={1}
+            max={20}
+            defaultValue={Math.max(group?.min ?? 1, 1)}
+            className="field w-20"
+          />
+        </div>
+      )}
       <div>
         <label htmlFor={`${prefix}-max`} className="label">
-          Up to
+          At most
         </label>
         <input
           id={`${prefix}-max`}
@@ -89,11 +111,13 @@ function GroupFields({ group }: { group: Group | null }) {
 function ChoiceRow({
   choice,
   groupId,
+  usedBy,
   first,
   last,
 }: {
   choice: Choice;
   groupId: string;
+  usedBy: number;
   first: boolean;
   last: boolean;
 }) {
@@ -180,7 +204,8 @@ function ChoiceRow({
             aria-label={`Delete ${choice.nameEn}`}
             disabled={busy}
             onClick={() => {
-              if (confirm(`Delete ${choice.nameEn}?`)) run(() => deleteChoice(choice.id));
+              const also = usedBy > 0 ? ` It also leaves ${items(usedBy)}.` : "";
+              if (confirm(`Delete ${choice.nameEn}?${also}`)) run(() => deleteChoice(choice.id));
             }}
             className="btn btn-ghost btn-sm px-1.5 text-bad"
           >
@@ -188,20 +213,25 @@ function ChoiceRow({
           </button>
         </div>
       </form>
+      {choice.ownPrices > 0 && (
+        <p className="mt-1 text-[13px] text-muted">Own price on {items(choice.ownPrices)}</p>
+      )}
       <FormStatus state={state} />
       {error && <p className="text-[13px] text-bad">{error}</p>}
     </li>
   );
 }
 
-function NewChoice({ groupId }: { groupId: string }) {
+function NewChoice({ groupId, usedBy }: { groupId: string; usedBy: string[] }) {
   const [state, action, pending] = useActionState(saveChoice, idle);
   const submit = useSubmit(action);
   const [formKey, setFormKey] = useState(0);
   const [lastAt, setLastAt] = useState(0);
+  const [typing, setTyping] = useState(false);
   if (state.status === "saved" && state.at !== lastAt) {
     setLastAt(state.at);
     setFormKey((k) => k + 1);
+    setTyping(false);
   }
   return (
     <form
@@ -216,6 +246,7 @@ function NewChoice({ groupId }: { groupId: string }) {
         maxLength={80}
         placeholder="New choice"
         aria-label="New choice"
+        onChange={(e) => setTyping(e.target.value.trim() !== "")}
         className="field"
       />
       <input
@@ -241,6 +272,14 @@ function NewChoice({ groupId }: { groupId: string }) {
         <Icon name="plus" className="size-4" />
         {pending ? "Adding…" : "Add"}
       </button>
+      {typing && usedBy.length > 0 && (
+        <p role="note" className="col-span-2 text-[13px] text-muted sm:col-span-4">
+          <span className="font-semibold text-ink">
+            This will be added to {items(usedBy.length)}:
+          </span>{" "}
+          {usedBy.join(", ")}
+        </p>
+      )}
       <div className="col-span-2 sm:col-span-4">
         <FormStatus state={state} />
       </div>
@@ -261,21 +300,20 @@ export function GroupCard({ group }: { group: Group }) {
           <h2 className="text-base font-bold">{group.nameEn}</h2>
           <p className="text-[13px] text-muted">
             {ruleLabel(group)} ·{" "}
-            {group.usedBy.length === 0
-              ? "not on any item yet"
-              : `on ${group.usedBy.length} item${group.usedBy.length === 1 ? "" : "s"}`}
+            {group.usedBy.length === 0 ? "not on any item yet" : `on ${items(group.usedBy.length)}`}
           </p>
         </div>
         <button
           type="button"
           disabled={busy}
           onClick={() => {
-            if (confirm(`Delete ${group.nameEn} and all its choices?`))
+            const also = group.usedBy.length > 0 ? " Items using it keep it as their own." : "";
+            if (confirm(`Delete the ${group.nameEn} template?${also}`))
               startBusy(async () => setError((await deleteGroup(group.id)).error));
           }}
           className="btn btn-ghost btn-sm text-bad"
         >
-          Delete group
+          Delete template
         </button>
       </div>
       {group.usedBy.length > 0 && (
@@ -309,12 +347,13 @@ export function GroupCard({ group }: { group: Group }) {
             key={`${choice.id}:${choice.nameEn}:${choice.price}:${choice.available}`}
             choice={choice}
             groupId={group.id}
+            usedBy={group.usedBy.length}
             first={i === 0}
             last={i === group.choices.length - 1}
           />
         ))}
       </ul>
-      <NewChoice groupId={group.id} />
+      <NewChoice groupId={group.id} usedBy={group.usedBy} />
     </section>
   );
 }
@@ -327,22 +366,22 @@ export function NewGroup() {
     return (
       <button type="button" onClick={() => setOpen(true)} className="btn btn-primary">
         <Icon name="plus" className="size-4" />
-        Add a group of choices
+        Add a template
       </button>
     );
   return (
     <form onSubmit={submit} className="card p-5">
       <h2 className="mb-4 text-base font-bold">
-        New group of choices
+        New template
         <Help>
-          “Required, up to 1” is a must-pick (a sauce); “up to 5” lets people add several
+          Required, at most 1 is a must-pick (a sauce); optional, at most 5 lets people add several
           (toppings).
         </Help>
       </h2>
       <GroupFields group={null} />
       <div className="mt-4 flex items-center gap-3">
         <button className="btn btn-primary" disabled={pending}>
-          {pending ? "Adding…" : "Add group"}
+          {pending ? "Adding…" : "Add template"}
         </button>
         <button type="button" onClick={() => setOpen(false)} className="btn btn-ghost">
           Cancel

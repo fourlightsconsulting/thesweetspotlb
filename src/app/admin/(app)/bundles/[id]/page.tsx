@@ -75,7 +75,6 @@ export default async function BundlePage({
         active: b.is_active,
         online: b.orderable_online,
         available: b.is_available,
-        groups: [],
       }
     : {
         id: null,
@@ -91,7 +90,6 @@ export default async function BundlePage({
         active: true,
         online: true,
         available: true,
-        groups: [],
       };
 
   const slots: Slot[] = (links?.data ?? []).map((link) => {

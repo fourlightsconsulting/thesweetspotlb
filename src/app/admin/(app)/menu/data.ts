@@ -1,5 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Template } from "@/lib/item-groups";
 import type { Database } from "@/lib/supabase/database.types";
 import { menuPhoto } from "@/server/catalog";
 
@@ -54,6 +55,36 @@ export async function loadCategories(db: SupabaseClient<Database>): Promise<Admi
     imagePath: c.image_path,
     imageSrc: photoSrc(c.image_path),
     active: c.is_active,
+  }));
+}
+
+/** The choice templates, sold-out choices included. */
+export async function loadTemplates(db: SupabaseClient<Database>): Promise<Template[]> {
+  const { data, error } = await db
+    .from("option_groups")
+    .select(
+      "id, key, name_en, name_ar, min_select, max_select, options(id, key, name_en, name_ar, price_cents, is_available, sort_order)",
+    )
+    .eq("kind", "options")
+    .order("name_en");
+  if (error) throw new Error(`Loading the choices failed: ${error.message}`);
+  return data.map((g) => ({
+    id: g.id,
+    key: g.key,
+    nameEn: g.name_en,
+    nameAr: g.name_ar,
+    min: g.min_select,
+    max: g.max_select,
+    choices: [...g.options]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((o) => ({
+        id: o.id,
+        key: o.key,
+        nameEn: o.name_en,
+        nameAr: o.name_ar,
+        price: o.price_cents,
+        available: o.is_available,
+      })),
   }));
 }
 

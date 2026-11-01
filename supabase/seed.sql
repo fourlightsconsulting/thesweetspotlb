@@ -181,8 +181,8 @@ join (values
 ) as p (category, slug, name_en, name_ar, description_en, description_ar, price_cents, image_path, sort_order, orderable_online)
   on p.category = c.slug;
 
-insert into public.product_option_groups (product_id, group_id, sort_order)
-select p.id, g.id, l.sort_order
+insert into public.product_option_groups (product_id, group_id, key, sort_order)
+select p.id, g.id, g.key, l.sort_order
 from (values
   ('brownie-crepe-sandwich', 'extra-chocolate', 1),
   ('brownie-crepe-sandwich', 'fruit', 2),

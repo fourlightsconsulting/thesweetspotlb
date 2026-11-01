@@ -1178,19 +1178,37 @@ export type Database = {
       product_option_groups: {
         Row: {
           default_options: string[];
-          group_id: string;
+          group_id: string | null;
+          id: string;
+          key: string;
+          max_select: number | null;
+          min_select: number | null;
+          name_ar: string | null;
+          name_en: string | null;
           product_id: string;
           sort_order: number;
         };
         Insert: {
           default_options?: string[];
-          group_id: string;
+          group_id?: string | null;
+          id?: string;
+          key: string;
+          max_select?: number | null;
+          min_select?: number | null;
+          name_ar?: string | null;
+          name_en?: string | null;
           product_id: string;
           sort_order?: number;
         };
         Update: {
           default_options?: string[];
-          group_id?: string;
+          group_id?: string | null;
+          id?: string;
+          key?: string;
+          max_select?: number | null;
+          min_select?: number | null;
+          name_ar?: string | null;
+          name_en?: string | null;
           product_id?: string;
           sort_order?: number;
         };
@@ -1207,6 +1225,66 @@ export type Database = {
             columns: ["product_id"];
             isOneToOne: false;
             referencedRelation: "products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      product_options: {
+        Row: {
+          created_at: string;
+          id: string;
+          is_available: boolean;
+          is_removed: boolean;
+          key: string;
+          link_id: string;
+          name_ar: string | null;
+          name_en: string | null;
+          option_id: string | null;
+          price_cents: number | null;
+          sort_order: number | null;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          is_available?: boolean;
+          is_removed?: boolean;
+          key: string;
+          link_id: string;
+          name_ar?: string | null;
+          name_en?: string | null;
+          option_id?: string | null;
+          price_cents?: number | null;
+          sort_order?: number | null;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          is_available?: boolean;
+          is_removed?: boolean;
+          key?: string;
+          link_id?: string;
+          name_ar?: string | null;
+          name_en?: string | null;
+          option_id?: string | null;
+          price_cents?: number | null;
+          sort_order?: number | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "product_options_link_id_fkey";
+            columns: ["link_id"];
+            isOneToOne: false;
+            referencedRelation: "product_option_groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "product_options_option_id_fkey";
+            columns: ["option_id"];
+            isOneToOne: false;
+            referencedRelation: "options";
             referencedColumns: ["id"];
           },
         ];
@@ -1535,6 +1613,10 @@ export type Database = {
         Returns: Json;
       };
       run_job: { Args: { p_body?: Json; p_job: string }; Returns: number };
+      save_item_groups: {
+        Args: { p_groups: Json; p_product: string };
+        Returns: undefined;
+      };
       save_store_settings: { Args: { payload: Json }; Returns: undefined };
       staff_directory: {
         Args: never;

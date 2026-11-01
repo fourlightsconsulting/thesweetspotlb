@@ -76,7 +76,8 @@ export type MenuOption = { id: string; name: Localized; price: number };
 
 /**
  * A set of choices. `min`/`max` set the rule: min 1 + max 1 is a required
- * single choice; min 0 is optional, up to `max`.
+ * single choice; min 0 is optional, up to `max`. `id` is its key in a
+ * customer's selections, unique within an item.
  */
 export type OptionGroup = {
   id: string;
@@ -111,9 +112,9 @@ export type MenuItem = {
    * Bundled photos are static imports; uploaded ones are storage URLs.
    */
   image?: StaticImageData;
-  /** Option groups, in the order the customiser shows them. */
+  /** Keys into `Menu.groups`, in the order the customiser shows them. */
   groups: string[];
-  /** Preselected options. Required choices without one start empty. */
+  /** Preselected options, by group id. Required choices without one start empty. */
   defaults?: Record<string, string | string[]>;
   /** False while sold out: still listed, but it can't be ordered. */
   available?: boolean;
@@ -124,6 +125,7 @@ export type MenuItem = {
 export type Menu = {
   categories: Category[];
   items: MenuItem[];
+  /** Every item's groups; items whose groups are identical share one entry. */
   groups: Record<string, OptionGroup>;
 };
 

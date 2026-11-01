@@ -5,10 +5,11 @@ import { History, type HistoryEntry } from "@/components/admin/history";
 import { Icon } from "@/components/admin/icons";
 import { PageHeader } from "@/components/admin/page-header";
 import { site } from "@/data/site";
+import { groupDraft } from "@/lib/item-groups";
 import { adminClient } from "@/lib/supabase/server";
 import { requireStaff } from "@/server/admin/session";
-import { categoryLabel, loadCategories, photoSrc } from "../../data";
-import { type ChoiceGroup, ItemForm, type ItemValues } from "./item-form";
+import { categoryLabel, loadCategories, loadTemplates, photoSrc } from "../../data";
+import { ItemForm, type ItemValues } from "./item-form";
 
 export const metadata: Metadata = { title: "Menu item" };
 
@@ -26,19 +27,15 @@ export default async function ItemPage({
   if (!isNew && !/^[0-9a-f-]{36}$/.test(id)) notFound();
 
   const db = await adminClient();
-  const [categories, groups, product, links, history] = await Promise.all([
+  const [categories, templates, product, links, history] = await Promise.all([
     loadCategories(db),
-    db
-      .from("option_groups")
-      .select("id, name_en, min_select, max_select, options(key, name_en, price_cents, sort_order)")
-      .eq("kind", "options")
-      .order("name_en"),
+    loadTemplates(db),
     isNew ? null : db.from("products").select("*").eq("id", id).eq("kind", "item").maybeSingle(),
     isNew
       ? null
       : db
           .from("product_option_groups")
-          .select("group_id, default_options")
+          .select("*, product_options(*)")
           .eq("product_id", id)
           .order("sort_order"),
     isNew ? null : db.rpc("audit_trail", { p_table: "products", p_row_id: id, p_limit: 30 }),
@@ -46,15 +43,13 @@ export default async function ItemPage({
   if (!isNew && !product?.data) notFound();
   const p = product?.data;
 
-  const choiceGroups: ChoiceGroup[] = (groups.data ?? []).map((g) => ({
-    id: g.id,
-    nameEn: g.name_en,
-    min: g.min_select,
-    max: g.max_select,
-    options: [...g.options]
-      .sort((a, b) => a.sort_order - b.sort_order)
-      .map((o) => ({ key: o.key, nameEn: o.name_en, price: o.price_cents })),
-  }));
+  const groups = (links?.data ?? []).map((link) =>
+    groupDraft(
+      link,
+      templates.find((t) => t.id === link.group_id),
+      link.product_options,
+    ),
+  );
   const categoryChoices = categories
     .filter((c) => !c.parentId)
     .flatMap((top) => [top, ...categories.filter((c) => c.parentId === top.id)])
@@ -79,10 +74,6 @@ export default async function ItemPage({
         active: p.is_active,
         online: p.orderable_online,
         available: p.is_available,
-        groups: (links?.data ?? []).map((l) => ({
-          groupId: l.group_id,
-          defaults: l.default_options,
-        })),
       }
     : {
         id: null,
@@ -98,7 +89,6 @@ export default async function ItemPage({
         active: true,
         online: true,
         available: true,
-        groups: [],
       };
 
   return (
@@ -127,7 +117,7 @@ export default async function ItemPage({
           </>
         }
       />
-      <ItemForm item={values} categories={categoryChoices} groups={choiceGroups} />
+      <ItemForm item={values} categories={categoryChoices} groups={groups} templates={templates} />
       {p && (
         <section className="card mt-6 p-5">
           <h2 className="mb-2 text-base font-bold">History</h2>

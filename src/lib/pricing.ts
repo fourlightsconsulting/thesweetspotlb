@@ -4,7 +4,7 @@
 // Bundles: each slot holds one pick, selections[slot] = [itemId], and the
 // picked item's own choices sit under "slot/group" keys, at their usual
 // prices. A bundle costs its price, plus each pick's surcharge, plus those
-// choices (and any choices of the bundle itself).
+// choices.
 import type { Localized, Menu, MenuItem, OptionGroup } from "@/data/menu";
 import type { Locale } from "@/i18n/config";
 
@@ -28,9 +28,10 @@ const findItem = (menu: MenuLookup, id: string | undefined) =>
 function itemDefaults(item: MenuItem, groups: Groups, prefix?: string): Selections {
   const out: Selections = {};
   for (const id of item.groups) {
-    if (!groups[id]) continue;
-    const preset = item.defaults?.[id];
-    out[prefix ? slotKey(prefix, id) : id] =
+    const group = groups[id];
+    if (!group) continue;
+    const preset = item.defaults?.[group.id];
+    out[prefix ? slotKey(prefix, group.id) : group.id] =
       preset === undefined ? [] : Array.isArray(preset) ? [...preset] : [preset];
   }
   return out;
@@ -75,13 +76,13 @@ function checkGroups(
   const missing: string[] = [];
   let invalid = false;
   for (const id of item.groups) {
-    const key = prefix ? slotKey(prefix, id) : id;
-    used.add(key);
     const group = groups[id];
     if (!group) {
       invalid = true;
       continue;
     }
+    const key = prefix ? slotKey(prefix, group.id) : group.id;
+    used.add(key);
     const chosen = selections[key] ?? [];
     if (new Set(chosen).size !== chosen.length) invalid = true;
     if (chosen.some((optionId) => !group.options.some((o) => o.id === optionId))) invalid = true;
@@ -149,7 +150,7 @@ function chosenFor(item: MenuItem, groups: Groups, selections: Selections, prefi
   return item.groups.flatMap((id) => {
     const group = groups[id];
     if (!group) return [];
-    const key = prefix ? slotKey(prefix, id) : id;
+    const key = prefix ? slotKey(prefix, group.id) : group.id;
     return (selections[key] ?? []).flatMap((optionId): ChosenOption[] => {
       const option = group.options.find((o) => o.id === optionId);
       if (!option) return [];
@@ -161,7 +162,7 @@ function chosenFor(item: MenuItem, groups: Groups, selections: Selections, prefi
           name: option.name,
           price: option.price,
           ...(prefix ? { slot: prefix } : {}),
-          ...(isSingleChoice(group) && defaults[id]?.[0] === optionId ? { isDefault: true } : {}),
+          ...(isSingleChoice(group) && defaults[group.id]?.[0] === optionId ? { isDefault: true } : {}),
         },
       ];
     });

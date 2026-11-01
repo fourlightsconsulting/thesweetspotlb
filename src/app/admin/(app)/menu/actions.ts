@@ -4,6 +4,7 @@ import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { FormState } from "@/components/admin/form";
+import { groupsToSave } from "@/lib/item-groups";
 import { slugify } from "@/lib/slug";
 import { adminClient } from "@/lib/supabase/server";
 import { catalogTags } from "@/server/catalog";
@@ -20,6 +21,7 @@ import {
   text,
 } from "@/server/admin/menu";
 import { requireStaff } from "@/server/admin/session";
+import { loadTemplates } from "./data";
 
 // The menu: items, categories and their choices. Managers edit everything;
 // staff only mark items and choices sold out (the database allows them
@@ -57,17 +59,50 @@ export async function setChoiceAvailable(id: string, available: boolean): Promis
 
 // ─── Items ────────────────────────────────────────────────────────────────
 
-const attachedGroups = z
-  .array(z.object({ groupId: z.uuid(), defaults: z.array(z.string().max(60)).max(20) }))
+const itemGroups = z
+  .array(
+    z
+      .object({
+        key: z.string().max(80).nullable(),
+        templateId: z.uuid().nullable(),
+        nameEn: name,
+        nameAr: name,
+        min: z.int().min(0).max(20),
+        max: z.int().min(1).max(20),
+        defaults: z.array(z.string().max(80)).max(60),
+        choices: z
+          .array(
+            z.object({
+              key: z.string().max(80).nullable(),
+              optionId: z.uuid().nullable(),
+              nameEn: name,
+              nameAr: name,
+              price: z.int().min(0).max(1_000_000),
+              available: z.boolean(),
+              removed: z.boolean(),
+            }),
+          )
+          .max(60),
+      })
+      .refine((g) => g.min <= g.max),
+  )
   .max(20);
+
+const parseGroups = (raw: string) => {
+  try {
+    return itemGroups.safeParse(JSON.parse(raw));
+  } catch {
+    return itemGroups.safeParse(null);
+  }
+};
 
 /** Creates an item (then opens it) or saves one, with its photo and choices. */
 export async function saveItem(_prev: FormState, form: FormData): Promise<FormState> {
   await requireStaff("manager");
   const basics = parseItemBasics(form);
   if (!basics) return failed("Fill in both names, a category and a price.");
-  const groups = attachedGroups.safeParse(JSON.parse(String(form.get("groups") ?? "[]")));
-  if (!groups.success) return failed();
+  const groups = parseGroups(String(form.get("groups") ?? "[]"));
+  if (!groups.success) return failed("Give every group and choice a name in both languages.");
   const { fields, ...v } = basics;
 
   const db = await adminClient();
@@ -99,24 +134,13 @@ export async function saveItem(_prev: FormState, form: FormData): Promise<FormSt
     id = data.id;
   }
 
-  // Choices: exactly the listed groups, in this order.
-  const keep = groups.data.map((g) => g.groupId);
-  const removed = db.from("product_option_groups").delete().eq("product_id", id);
-  const { error: removeError } = await (keep.length > 0
-    ? removed.not("group_id", "in", `(${keep.join(",")})`)
-    : removed);
-  const { error: upsertError } =
-    keep.length > 0
-      ? await db.from("product_option_groups").upsert(
-          groups.data.map((g, i) => ({
-            product_id: id,
-            group_id: g.groupId,
-            sort_order: (i + 1) * 10,
-            default_options: g.defaults,
-          })),
-        )
-      : { error: null };
-  if (removeError || upsertError) return failed("The item saved, but its choices didn’t.");
+  // Its groups, stored as what differs from each template.
+  const templates = await loadTemplates(db);
+  const { error: groupsError } = await db.rpc("save_item_groups", {
+    p_product: id!,
+    p_groups: groupsToSave(groups.data, new Map(templates.map((t) => [t.id, t]))),
+  });
+  if (groupsError) return failed("The item saved, but its choices didn’t.");
 
   updateTag(catalogTags.menu);
   if (!v.id) redirect(`/admin/menu/items/${id}?created=1`);
@@ -270,7 +294,7 @@ export async function moveCategory(id: string, direction: "up" | "down"): Promis
 
 // ─── Choices (option groups and their options) ────────────────────────────
 
-/** A group of choices: its names and rule (required or optional, up to how many). */
+/** A template: its names and rule (required or optional, at least and at most how many). */
 export async function saveGroup(_prev: FormState, form: FormData): Promise<FormState> {
   await requireStaff("manager");
   const parsed = z
@@ -278,17 +302,20 @@ export async function saveGroup(_prev: FormState, form: FormData): Promise<FormS
       id: z.uuid().optional(),
       nameEn: name,
       nameAr: name,
+      min: z.coerce.number().int().min(1).max(20),
       max: z.coerce.number().int().min(1).max(20),
     })
     .safeParse({
       id: form.get("id") || undefined,
       nameEn: form.get("nameEn"),
       nameAr: form.get("nameAr"),
+      min: form.get("min") ?? 1,
       max: form.get("max"),
     });
-  if (!parsed.success) return failed("Give the group a name in both languages and a limit.");
+  if (!parsed.success) return failed("Give the template a name in both languages and a limit.");
   const v = parsed.data;
-  const min = checkbox(form, "required") ? 1 : 0;
+  const min = checkbox(form, "required") ? v.min : 0;
+  if (min > v.max) return failed("“At least” can’t be more than “at most”.");
   const fields = { name_en: v.nameEn, name_ar: v.nameAr, min_select: min, max_select: v.max };
 
   const db = await adminClient();
@@ -317,13 +344,7 @@ export async function deleteGroup(id: string): Promise<Result> {
   await requireStaff("manager");
   const db = await adminClient();
   const { error } = await db.from("option_groups").delete().eq("id", z.uuid().parse(id));
-  if (error)
-    return oops(
-      error.code === "23503"
-        ? "Items still use these choices. Take them off those items first."
-        : undefined,
-    );
-  return ok();
+  return error ? oops() : ok();
 }
 
 /** Adds a choice to a group, or changes one (with `id`). */

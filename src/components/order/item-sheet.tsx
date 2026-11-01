@@ -68,8 +68,9 @@ export function ItemSheet({ menu, lang, t, etaLabel, onSaved }: Props) {
   const presets: Selections = {};
   if (item && !line) {
     for (const groupId of item.groups) {
-      const value = params.get(groupId);
-      if (value) presets[groupId] = [value];
+      const key = menu.groups[groupId]?.id;
+      const value = key && params.get(key);
+      if (value) presets[key] = [value];
     }
   }
 
@@ -256,7 +257,7 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
             />
             {picked?.groups.map((groupId) => {
               const group = menu.groups[groupId];
-              const key = slotKey(slot.id, groupId);
+              const key = group && slotKey(slot.id, group.id);
               return (
                 group && (
                   <OptionFieldset
@@ -353,8 +354,15 @@ function OptionFieldset({
   const required = group.min > 0;
   const unlimited = group.max >= group.options.length;
   const full = !single && chosen.length >= group.max;
+  const pick = single
+    ? t.pickOne
+    : group.min === group.max
+      ? fill(t.pickExactly, { count: group.min })
+      : group.min > 1
+        ? fill(t.pickBetween, { min: group.min, max: group.max })
+        : fill(t.upTo, { count: group.max });
   const rule = required
-    ? `${t.required} · ${single ? t.pickOne : fill(t.upTo, { count: group.max })}`
+    ? `${t.required} · ${pick}`
     : unlimited
       ? t.optional
       : `${t.optional} · ${fill(t.upTo, { count: group.max })}`;
@@ -387,7 +395,7 @@ function OptionFieldset({
           >
             !
           </span>
-          {t.chooseOne}
+          {group.min > 1 ? fill(t.chooseAtLeast, { count: group.min }) : t.chooseOne}
         </p>
       )}
       <div className="clear-both flex flex-col gap-2">

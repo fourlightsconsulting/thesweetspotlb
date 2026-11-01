@@ -8,6 +8,7 @@ import {
   type OptionGroup,
   menu as builtInMenu,
 } from "@/data/menu";
+import { type Template, resolveGroup } from "@/lib/item-groups";
 import { storageUrl } from "@/lib/supabase/env";
 import { publicClient } from "@/lib/supabase/service";
 
@@ -50,14 +51,15 @@ export async function loadMenu(): Promise<Menu> {
   const db = publicClient()!;
 
   // Row level security returns only live categories and products.
-  const [categories, products, groups, options, links] = await Promise.all([
+  const [categories, products, groups, options, links, itemChoices] = await Promise.all([
     db.from("categories").select("*").order("sort_order"),
     db.from("products").select("*").eq("orderable_online", true).order("sort_order"),
     db.from("option_groups").select("*"),
     db.from("options").select("*").eq("is_available", true).order("sort_order"),
     db.from("product_option_groups").select("*").order("sort_order"),
+    db.from("product_options").select("*"),
   ]);
-  for (const result of [categories, products, groups, options, links]) {
+  for (const result of [categories, products, groups, options, links, itemChoices]) {
     if (result.error) throw new Error(`Loading the menu failed: ${result.error.message}`);
   }
 
@@ -65,18 +67,44 @@ export async function loadMenu(): Promise<Menu> {
   const optionRows = options.data!;
   const linkRows = links.data!;
 
-  const groupById = new Map<string, OptionGroup>();
-  for (const g of groups.data!.filter((g) => g.kind === "options")) {
-    groupById.set(g.id, {
-      id: g.key,
-      name: localized(g, "name"),
-      min: g.min_select,
-      max: g.max_select,
-      options: optionRows
-        .filter((o) => o.group_id === g.id)
-        .map((o) => ({ id: o.key, name: localized(o, "name"), price: o.price_cents })),
-    });
-  }
+  const templates = new Map<string, Template>(
+    groups
+      .data!.filter((g) => g.kind === "options")
+      .map((g) => [
+        g.id,
+        {
+          id: g.id,
+          key: g.key,
+          nameEn: g.name_en,
+          nameAr: g.name_ar,
+          min: g.min_select,
+          max: g.max_select,
+          choices: optionRows
+            .filter((o) => o.group_id === g.id)
+            .map((o) => ({
+              id: o.id,
+              key: o.key,
+              nameEn: o.name_en,
+              nameAr: o.name_ar,
+              price: o.price_cents,
+              available: o.is_available,
+            })),
+        },
+      ]),
+  );
+
+  // Items whose groups come out identical share one entry, to keep the page small.
+  const menuGroups: Record<string, OptionGroup> = {};
+  const sharedIds = new Map<string, string>();
+  const menuGroupId = (group: OptionGroup, itemSlug: string) => {
+    const signature = JSON.stringify(group);
+    const shared = sharedIds.get(signature);
+    if (shared) return shared;
+    const id = menuGroups[group.id] ? `${itemSlug}:${group.id}` : group.id;
+    menuGroups[id] = group;
+    sharedIds.set(signature, id);
+    return id;
+  };
 
   const categoryById = new Map(categoryRows.map((c) => [c.id, c]));
   const items: MenuItem[] = [];
@@ -88,13 +116,29 @@ export async function loadMenu(): Promise<Menu> {
     if (own.parent_id && !parent) continue;
     const top = parent ?? own;
 
-    const productLinks = linkRows.filter((l) => l.product_id === p.id && groupById.has(l.group_id));
+    // Bundles have no groups of their own: only their slots, below.
+    const productGroups =
+      p.kind === "bundle"
+        ? []
+        : linkRows
+            .filter((l) => l.product_id === p.id && (!l.group_id || templates.has(l.group_id)))
+            .map((link) => ({
+              link,
+              group: resolveGroup(
+                link,
+                link.group_id ? templates.get(link.group_id) : undefined,
+                itemChoices.data!.filter((r) => r.link_id === link.id),
+              ),
+            }));
     const defaults: Record<string, string[]> = {};
-    for (const l of productLinks) {
-      const group = groupById.get(l.group_id)!;
-      const available = l.default_options.filter((id) => group.options.some((o) => o.id === id));
+    for (const { link, group } of productGroups) {
+      const available = link.default_options
+        .filter((id) => group.options.some((o) => o.id === id))
+        .slice(0, group.max);
       if (available.length > 0) defaults[group.id] = available;
     }
+    // A required group without enough choices left can't be ordered.
+    const pickable = productGroups.every(({ group }) => group.options.length >= group.min);
 
     const item: MenuItem = {
       id: p.slug,
@@ -105,9 +149,9 @@ export async function loadMenu(): Promise<Menu> {
       name: localized(p, "name"),
       description: localized(p, "description"),
       image: menuPhoto(p.image_path),
-      groups: productLinks.map((l) => groupById.get(l.group_id)!.id),
+      groups: productGroups.map(({ group }) => menuGroupId(group, p.slug)),
       ...(Object.keys(defaults).length > 0 ? { defaults } : {}),
-      ...(p.is_available ? {} : { available: false }),
+      ...(p.is_available && pickable ? {} : { available: false }),
     };
     items.push(item);
     if (p.kind === "bundle") bundles.push({ item, productId: p.id });
@@ -168,7 +212,7 @@ export async function loadMenu(): Promise<Menu> {
   return {
     categories: menuCategories,
     items,
-    groups: Object.fromEntries([...groupById.values()].map((g) => [g.id, g])),
+    groups: menuGroups,
   };
 }
 

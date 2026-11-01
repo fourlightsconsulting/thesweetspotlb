@@ -13,7 +13,7 @@ export default async function ChoicesPage() {
   const { data, error } = await db
     .from("option_groups")
     .select(
-      "id, name_en, name_ar, min_select, max_select, options(id, name_en, name_ar, price_cents, is_available, sort_order), product_option_groups(products(name_en))",
+      "id, name_en, name_ar, min_select, max_select, options(id, name_en, name_ar, price_cents, is_available, sort_order, product_options(price_cents)), product_option_groups(products(name_en))",
     )
     .eq("kind", "options")
     .order("name_en");
@@ -34,6 +34,7 @@ export default async function ChoicesPage() {
         nameAr: o.name_ar,
         price: o.price_cents,
         available: o.is_available,
+        ownPrices: o.product_options.filter((r) => r.price_cents !== null).length,
       })),
   }));
 
@@ -41,7 +42,7 @@ export default async function ChoicesPage() {
     <>
       <PageHeader
         title="Menu"
-        help="Groups of choices (sauces, sticks, toppings) and their prices. Add a group to an item from that item’s page."
+        help="Templates for groups of choices (sauces, toppings). Add one to an item from that item’s page. Items follow their template until you change something on the item."
       />
       <MenuTabs />
       <div className="mb-4">
