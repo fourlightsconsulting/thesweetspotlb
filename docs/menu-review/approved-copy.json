@@ -1,0 +1,748 @@
+{
+  "products": [
+    {
+      "slug": "lotus-crepe",
+      "name_en": "Lotus Crêpe",
+      "description_en": "Crêpe filled with Lotus spread and topped with a mix of chocolate.",
+      "name_ar": "كريب لوتس",
+      "description_ar": "كريب محشي بكريمة لوتس ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "nutella-crepe",
+      "name_en": "Nutella Crêpe",
+      "description_en": "Crêpe filled with Nutella and topped with a mix of chocolate.",
+      "name_ar": "كريب نوتيلا",
+      "description_ar": "كريب محشي نوتيلا ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "white-chocolate-crepe",
+      "name_en": "White Chocolate Crêpe",
+      "description_en": "Crêpe filled with white chocolate and topped with a mix of chocolate.",
+      "name_ar": "كريب بالشوكولاتة البيضاء",
+      "description_ar": "كريب محشي شوكولا بيضا ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "belgian-chocolate-crepe",
+      "name_en": "Belgian Chocolate Crêpe",
+      "description_en": "Crêpe filled with Belgian chocolate and topped with Belgian milk, white and dark chocolate.",
+      "name_ar": "كريب بالشوكولاتة البلجيكية",
+      "description_ar": "كريب محشي شوكولا بلجيكية ومغطّى بشوكولا بلجيكية بالحليب، بيضا وداكنة."
+    },
+    {
+      "slug": "dark-chocolate-crepe",
+      "name_en": "Dark Chocolate Crêpe",
+      "description_en": "Crêpe filled with dark chocolate and topped with a mix of chocolate.",
+      "name_ar": "كريب بالشوكولاتة الداكنة",
+      "description_ar": "كريب محشي شوكولا داكنة ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "fettuccine-crepe",
+      "name_en": "Fettuccine Crêpe",
+      "description_en": "Crêpe ribbons topped with your favorite chocolate and served with a scoop of ice cream of your choice.",
+      "name_ar": "كريب فيتوتشيني",
+      "description_ar": "كريب مقطّع شرايط ومغطّى بالشوكولا اللي بتختارها، مع سكوب آيس كريم من اختيارك."
+    },
+    {
+      "slug": "fruity-crepe",
+      "name_en": "Fruit Crêpe",
+      "description_en": "Crêpe topped with banana, kiwi and strawberries, served with your choice of chocolate.",
+      "name_ar": "كريب بالفواكه",
+      "description_ar": "كريب مغطّى بالموز، الكيوي والفريز، مع الشوكولا اللي بتختارها."
+    },
+    {
+      "slug": "brownie-crepe-sandwich",
+      "name_en": "Brownie Crêpe Sandwich",
+      "description_en": "Crêpe filled with brownies, strawberries, banana and crème pâtissière, topped with your favorite chocolate toppings.",
+      "name_ar": "ساندويش كريب براوني",
+      "description_ar": "كريب محشي براوني، فريز، موز وكريما باتيسيير، مع الشوكولا اللي بتختارها."
+    },
+    {
+      "slug": "sushi-crepe",
+      "name_en": "Sushi Crêpe",
+      "description_en": "Eight sushi-style crêpe rolls filled with brownies, topped with fruit and served with a Belgian chocolate dip.",
+      "name_ar": "كريب سوشي",
+      "description_ar": "8 رولز كريب على شكل سوشي، محشية براوني ومغطّاة بالفواكه، مع شوكولا بلجيكية للتغميس."
+    },
+    {
+      "slug": "dubai-crepe",
+      "name_en": "Dubai Crêpe",
+      "description_en": "Crêpe filled with pistachio cream and basma osmalliye, topped with Belgian chocolate and pistachios, and served with a scoop of ice cream of your choice.",
+      "name_ar": "كريب دبي",
+      "description_ar": "كريب محشي كريمة فستق حلبي وبصمة عثملية، ومغطّى بالشوكولا البلجيكية وحبات الفستق الحلبي، مع سكوب آيس كريم من اختيارك."
+    },
+    {
+      "slug": "waffle-stick",
+      "name_en": "Waffle Stick",
+      "description_en": "One waffle stick covered with your choice of spread.",
+      "name_ar": "وافل ستيك",
+      "description_ar": "وافل ستيك مع الشوكولا اللي بتختارها."
+    },
+    {
+      "slug": "premium-waffle-stick",
+      "name_en": "Premium Waffle Stick",
+      "description_en": "One waffle stick covered with your choice of Belgian milk or Belgian dark chocolate.",
+      "name_ar": "وافل ستيك بريميوم",
+      "description_ar": "وافل ستيك مع اختيارك من الشوكولا البلجيكية بالحليب أو الشوكولا البلجيكية الداكنة."
+    },
+    {
+      "slug": "lotus-waffle",
+      "name_en": "Lotus Waffle",
+      "description_en": "Waffle topped with Lotus spread and Lotus biscuits.",
+      "name_ar": "وافل لوتس",
+      "description_ar": "وافل مع كريمة لوتس وبسكويت لوتس."
+    },
+    {
+      "slug": "nutella-waffle",
+      "name_en": "Nutella Waffle",
+      "description_en": "Waffle topped with Nutella spread.",
+      "name_ar": "وافل نوتيلا",
+      "description_ar": "وافل مع نوتيلا."
+    },
+    {
+      "slug": "white-chocolate-waffle",
+      "name_en": "White Chocolate Waffle",
+      "description_en": "Waffle topped with white chocolate.",
+      "name_ar": "وافل بالشوكولاتة البيضاء",
+      "description_ar": "وافل مع شوكولا بيضا."
+    },
+    {
+      "slug": "belgian-chocolate-waffle",
+      "name_en": "Belgian Chocolate Waffle",
+      "description_en": "Waffle topped with Belgian chocolate.",
+      "name_ar": "وافل بالشوكولاتة البلجيكية",
+      "description_ar": "وافل مع شوكولا بلجيكية."
+    },
+    {
+      "slug": "dark-chocolate-waffle",
+      "name_en": "Dark Chocolate Waffle",
+      "description_en": "Waffle topped with dark chocolate.",
+      "name_ar": "وافل بالشوكولاتة الداكنة",
+      "description_ar": "وافل مع شوكولا داكنة."
+    },
+    {
+      "slug": "waffle-sandwich",
+      "name_en": "Waffle Sandwich",
+      "description_en": "Two waffles filled with four ice cream rolls of your choice and strawberries. Dine-in only.",
+      "name_ar": "ساندويش وافل",
+      "description_ar": "2 وافل، بيناتهم 4 آيس كريم رولز من اختيارك وفريز. بس للأكل بالمحل."
+    },
+    {
+      "slug": "lotus-pancakes",
+      "name_en": "Lotus Pancakes",
+      "description_en": "Pancakes filled with Lotus spread and topped with a mix of chocolates.",
+      "name_ar": "بان كيك لوتس",
+      "description_ar": "بان كيك محشي كريمة لوتس ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "nutella-pancakes",
+      "name_en": "Nutella Pancakes",
+      "description_en": "Pancakes filled with Nutella and topped with a mix of chocolates.",
+      "name_ar": "بان كيك نوتيلا",
+      "description_ar": "بان كيك محشي نوتيلا ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "white-chocolate-pancakes",
+      "name_en": "White Chocolate Pancakes",
+      "description_en": "Pancakes filled with white chocolate and topped with a mix of chocolates.",
+      "name_ar": "بان كيك بالشوكولاتة البيضاء",
+      "description_ar": "بان كيك محشي شوكولا بيضا ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "belgian-chocolate-pancakes",
+      "name_en": "Belgian Chocolate Pancakes",
+      "description_en": "Pancakes filled with Belgian chocolate and topped with a mix of Belgian chocolates.",
+      "name_ar": "بان كيك بالشوكولاتة البلجيكية",
+      "description_ar": "بان كيك محشي شوكولا بلجيكية ومغطّى بميكس من الشوكولا البلجيكية."
+    },
+    {
+      "slug": "dark-chocolate-pancakes",
+      "name_en": "Dark Chocolate Pancakes",
+      "description_en": "Pancakes filled with dark chocolate and topped with a mix of chocolates.",
+      "name_ar": "بان كيك بالشوكولاتة الداكنة",
+      "description_ar": "بان كيك محشي شوكولا داكنة ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "slug": "creamy-profiteroles",
+      "name_en": "Profiteroles",
+      "description_en": "Five profiteroles filled with your choice of crème pâtissière or ice cream, topped with your choice of topping.",
+      "name_ar": "بروفيترول",
+      "description_ar": "5 حبات بروفيترول، محشية كريما باتيسيير أو آيس كريم حسب اختيارك، مع الشوكولا اللي بتحبها."
+    },
+    {
+      "slug": "fruity-ice-cream-rolls",
+      "name_en": "Ice Cream Rolls (One Flavor)",
+      "description_en": "Freshly prepared ice cream rolls with one flavor of your choice.",
+      "name_ar": "آيس كريم رولز بنكهة واحدة",
+      "description_ar": "آيس كريم رولز بنكهة من اختيارك."
+    },
+    {
+      "slug": "lotus-ice-cream-rolls",
+      "name_en": "Ice Cream Rolls (Two Flavors)",
+      "description_en": "Freshly prepared ice cream rolls with two flavors of your choice.",
+      "name_ar": "آيس كريم رولز بنكهتين",
+      "description_ar": "آيس كريم رولز بنكهتين من اختيارك."
+    },
+    {
+      "slug": "nutella-ice-cream-rolls",
+      "name_en": "Ice Cream Rolls (Three Flavors)",
+      "description_en": "Freshly prepared ice cream rolls with three flavors of your choice.",
+      "name_ar": "آيس كريم رولز بثلاث نكهات",
+      "description_ar": "آيس كريم رولز بثلاث نكهات من اختيارك."
+    },
+    {
+      "slug": "pistachio-ice-cream-rolls",
+      "name_en": "Pistachio Ice Cream Rolls",
+      "description_en": "Freshly prepared ice cream rolls with pistachio.",
+      "name_ar": "آيس كريم رولز بالفستق الحلبي",
+      "description_ar": "آيس كريم رولز بالفستق الحلبي."
+    },
+    {
+      "slug": "bueno-bowl",
+      "name_en": "Bueno Bowl",
+      "description_en": "TBD",
+      "name_ar": "بول بوينو",
+      "description_ar": "TBD"
+    },
+    {
+      "slug": "crunchy-bowl",
+      "name_en": "Crunchy Bowl",
+      "description_en": "TBD",
+      "name_ar": "بول كرانشي",
+      "description_ar": "TBD"
+    },
+    {
+      "slug": "dubai-bowl",
+      "name_en": "Dubai Bowl",
+      "description_en": "TBD",
+      "name_ar": "بول دبي",
+      "description_ar": "TBD"
+    },
+    {
+      "slug": "fruity-bowl",
+      "name_en": "Fruit Bowl",
+      "description_en": "TBD",
+      "name_ar": "بول فواكه",
+      "description_ar": "TBD"
+    },
+    {
+      "slug": "marshmallow-bowl",
+      "name_en": "Marshmallow Bowl",
+      "description_en": "TBD",
+      "name_ar": "بول مارشميلو",
+      "description_ar": "TBD"
+    },
+    {
+      "slug": "strawberry-bowl",
+      "name_en": "Strawberry Bowl",
+      "description_en": "TBD",
+      "name_ar": "بول فريز",
+      "description_ar": "TBD"
+    },
+    {
+      "slug": "san-sebastian-cheesecake",
+      "name_en": "San Sebastián Cheesecake",
+      "description_en": "Creamy Basque cheesecake with a caramelized top.",
+      "name_ar": "تشيز كيك سان سيباستيان",
+      "description_ar": "تشيز كيك طري من جوّا ومحمّر من فوق."
+    },
+    {
+      "slug": "strawberry-box",
+      "name_en": "Strawberry Box",
+      "description_en": "Fresh strawberries covered in chocolate.",
+      "name_ar": "علبة فريز",
+      "description_ar": "فريز طازة مغطّى بالشوكولا."
+    },
+    {
+      "slug": "tri-box",
+      "name_en": "Tri-Box",
+      "description_en": "Pistachio, fettuccine and Lotus crêpes in one box.",
+      "name_ar": "تراي بوكس",
+      "description_ar": "كريب فستق، كريب فيتوتشيني وكريب لوتس بعلبة وحدة."
+    },
+    {
+      "slug": "sweet-spot-box",
+      "name_en": "Sweet Spot Box",
+      "description_en": "Waffle bites, crêpe rolls, fettuccine crêpe, brownies, pancakes, strawberries and profiteroles, served with four cups of chocolate for dipping.",
+      "name_ar": "علبة سويت سبوت",
+      "description_ar": "قطع وافل، كريب رولز، كريب فيتوتشيني، براوني، بان كيك، فريز وبروفيترول، مع 4 كوب شوكولا للتغميس."
+    },
+    {
+      "slug": "caramel-milkshake",
+      "name_en": "Caramel Milkshake",
+      "description_en": "A smooth, cold caramel milkshake.",
+      "name_ar": "ميلك شيك كراميل",
+      "description_ar": "ميلك شيك كراميل بارد وناعم."
+    },
+    {
+      "slug": "chocolate-milkshake",
+      "name_en": "Chocolate Milkshake",
+      "description_en": "A thick, creamy chocolate milkshake.",
+      "name_ar": "ميلك شيك شوكولا",
+      "description_ar": "ميلك شيك شوكولا كثيف وكريمي."
+    },
+    {
+      "slug": "lotus-milkshake",
+      "name_en": "Lotus Milkshake",
+      "description_en": "A thick, creamy milkshake made with Lotus Biscoff.",
+      "name_ar": "ميلك شيك لوتس",
+      "description_ar": "ميلك شيك كثيف وكريمي، معمول بلوتس بيسكوف."
+    },
+    {
+      "slug": "oreo-milkshake",
+      "name_en": "Oreo Milkshake",
+      "description_en": "A creamy milkshake with Oreo cookies.",
+      "name_ar": "ميلك شيك أوريو",
+      "description_ar": "ميلك شيك كريمي مع بسكويت أوريو."
+    },
+    {
+      "slug": "strawberry-milkshake",
+      "name_en": "Strawberry Milkshake",
+      "description_en": "A thick, cold strawberry milkshake.",
+      "name_ar": "ميلك شيك فريز",
+      "description_ar": "ميلك شيك فريز بارد وكثيف."
+    },
+    {
+      "slug": "berry-smoothie",
+      "name_en": "Berry Smoothie",
+      "description_en": "A cold smoothie with mixed berries.",
+      "name_ar": "سموذي توت",
+      "description_ar": "سموذي بارد مع توت مشكّل."
+    },
+    {
+      "slug": "coconut-mango-smoothie",
+      "name_en": "Mango & Coconut Smoothie",
+      "description_en": "A cold smoothie with mango and coconut.",
+      "name_ar": "سموذي مانغو وجوز الهند",
+      "description_ar": "سموذي بارد بالمانغو وجوز الهند."
+    },
+    {
+      "slug": "mango-smoothie",
+      "name_en": "Mango Smoothie",
+      "description_en": "Ripe mango blended into a smooth, cold drink.",
+      "name_ar": "سموذي مانغو",
+      "description_ar": "سموذي بارد وناعم من المانغو الناضجة."
+    },
+    {
+      "slug": "strawberry-smoothie",
+      "name_en": "Strawberry Smoothie",
+      "description_en": "Fresh strawberries blended into a cold smoothie.",
+      "name_ar": "سموذي فريز",
+      "description_ar": "سموذي بارد من الفريز الطازة."
+    },
+    {
+      "slug": "blue-hawaii",
+      "name_en": "Blue Hawaii",
+      "description_en": "A cold tropical-style mixed drink.",
+      "name_ar": "بلو هاواي",
+      "description_ar": "بارد ومنعش."
+    },
+    {
+      "slug": "blue-ocean",
+      "name_en": "Blue Ocean",
+      "description_en": "A refreshing blue mixed drink, served cold.",
+      "name_ar": "بلو أوشن",
+      "description_ar": "بارد ومنعش."
+    },
+    {
+      "slug": "hyper-kiwi",
+      "name_en": "Hyper Kiwi",
+      "description_en": "A cold kiwi-flavored mixed drink.",
+      "name_ar": "هايبر كيوي",
+      "description_ar": "بارد ومنعش."
+    },
+    {
+      "slug": "mangotic",
+      "name_en": "Mangotic",
+      "description_en": "A cold mango-flavored mixed drink.",
+      "name_ar": "مانغوتيك",
+      "description_ar": "بارد ومنعش."
+    },
+    {
+      "slug": "passion-mojito",
+      "name_en": "Passion Fruit Mojito",
+      "description_en": "A cold mojito-style drink with passion fruit flavor.",
+      "name_ar": "موهيتو باشن فروت",
+      "description_ar": "بارد ومنعش."
+    },
+    {
+      "slug": "strawberry-mojito",
+      "name_en": "Strawberry Mojito",
+      "description_en": "A cold mojito-style drink with strawberry flavor.",
+      "name_ar": "موهيتو فريز",
+      "description_ar": "بارد ومنعش."
+    },
+    {
+      "slug": "orange-juice",
+      "name_en": "Fresh Orange Juice",
+      "description_en": "Freshly squeezed orange juice.",
+      "name_ar": "عصير برتقال طازة",
+      "description_ar": "عصير برتقال معصور طازة."
+    },
+    {
+      "slug": "water",
+      "name_en": "Water",
+      "description_en": "Bottled water.",
+      "name_ar": "مياه",
+      "description_ar": "قنينة مياه."
+    }
+  ],
+  "categories": [
+    {
+      "name_en": "Crêpes",
+      "name_ar": "كريب",
+      "slug": "crepes",
+      "description_en": "Thin crêpes with chocolate, spreads or fruit.",
+      "description_ar": "كريب رقيق مع شوكولا، لوتس أو فواكه."
+    },
+    {
+      "name_en": "Waffles",
+      "name_ar": "وافل",
+      "slug": "waffles",
+      "description_en": "Crisp on the outside, soft on the inside.",
+      "description_ar": "وافل مقرمش من برّا وطري من جوّا."
+    },
+    {
+      "name_en": "Pancakes",
+      "name_ar": "بان كيك",
+      "slug": "pancakes",
+      "description_en": "Fluffy pancakes filled with chocolate or Lotus spread, with a mix of chocolates on top.",
+      "description_ar": "بان كيك محشي شوكولا أو كريمة لوتس ومغطّى بميكس من الشوكولا."
+    },
+    {
+      "name_en": "Profiteroles",
+      "name_ar": "بروفيترول",
+      "slug": "profiteroles",
+      "description_en": "Pastry puffs filled with cream or ice cream, with your choice of sauce.",
+      "description_ar": "بروفيترول محشي كريما أو آيس كريم، مع الشوكولا اللي بتختارها."
+    },
+    {
+      "name_en": "Dessert bowls & cheesecake",
+      "name_ar": "بولز وتشيز كيك",
+      "slug": "bowls",
+      "description_en": "Dessert bowls with a variety of toppings, plus San Sebastián cheesecake.",
+      "description_ar": "بولز بإضافات مختلفة، وتشيز كيك سان سيباستيان."
+    },
+    {
+      "name_en": "Ice cream rolls",
+      "name_ar": "آيس كريم رولز",
+      "slug": "rolls",
+      "description_en": "Freshly prepared ice cream rolls in a variety of flavors.",
+      "description_ar": "آيس كريم رولز بنكهات مختلفة."
+    },
+    {
+      "name_en": "Dessert boxes",
+      "name_ar": "علب الحلو",
+      "slug": "boxes",
+      "description_en": "A selection of dessert boxes to share.",
+      "description_ar": "علب حلو للمشاركة."
+    },
+    {
+      "name_en": "Cold drinks",
+      "name_ar": "مشروبات باردة",
+      "slug": "drinks",
+      "description_en": "Milkshakes, smoothies, mixed drinks, fresh juice and water.",
+      "description_ar": "ميلك شيك، سموذي، ميكسات، عصير طازة ومياه."
+    },
+    {
+      "name_en": "Milkshakes",
+      "name_ar": "ميلك شيك",
+      "slug": "milkshakes",
+      "description_en": "",
+      "description_ar": ""
+    },
+    {
+      "name_en": "Smoothies",
+      "name_ar": "سموذي",
+      "slug": "smoothies",
+      "description_en": "",
+      "description_ar": ""
+    },
+    {
+      "name_en": "Mixed drinks",
+      "name_ar": "ميكسات",
+      "slug": "mixes",
+      "description_en": "",
+      "description_ar": ""
+    },
+    {
+      "name_en": "Fresh juice",
+      "name_ar": "عصير طازة",
+      "slug": "juice",
+      "description_en": "",
+      "description_ar": ""
+    },
+    {
+      "name_en": "Water",
+      "name_ar": "مياه",
+      "slug": "water",
+      "description_en": "",
+      "description_ar": ""
+    }
+  ],
+  "option_groups": [
+    {
+      "name_en": "Sauce",
+      "name_ar": "اختيارك من الشوكولا",
+      "key": "chocolate"
+    },
+    {
+      "name_en": "Coating",
+      "name_ar": "اختيارك من الشوكولا",
+      "key": "stick"
+    },
+    {
+      "name_en": "Coating",
+      "name_ar": "اختيارك من الشوكولا",
+      "key": "stick-premium"
+    },
+    {
+      "name_en": "Extra sauce",
+      "name_ar": "شوكولا زيادة",
+      "key": "extra-chocolate"
+    },
+    {
+      "name_en": "Fresh fruit",
+      "name_ar": "فواكه طازة",
+      "key": "fruit"
+    },
+    {
+      "name_en": "Toppings",
+      "name_ar": "الإضافات",
+      "key": "toppings"
+    },
+    {
+      "name_en": "Chocolate, cookies & brownies",
+      "name_ar": "شوكولا، بسكويت وبراوني",
+      "key": "bars"
+    },
+    {
+      "name_en": "Nuts",
+      "name_ar": "مكسرات",
+      "key": "nuts"
+    }
+  ],
+  "options": [
+    {
+      "name_en": "Belgian chocolate",
+      "name_ar": "شوكولا بلجيكية",
+      "group_key": "chocolate",
+      "key": "belgian"
+    },
+    {
+      "name_en": "Dark chocolate",
+      "name_ar": "شوكولا داكنة",
+      "group_key": "chocolate",
+      "key": "dark"
+    },
+    {
+      "name_en": "Lotus spread",
+      "name_ar": "كريمة لوتس",
+      "group_key": "chocolate",
+      "key": "lotus"
+    },
+    {
+      "name_en": "Nutella",
+      "name_ar": "نوتيلا",
+      "group_key": "chocolate",
+      "key": "nutella"
+    },
+    {
+      "name_en": "White chocolate",
+      "name_ar": "شوكولا بيضا",
+      "group_key": "chocolate",
+      "key": "white"
+    },
+    {
+      "name_en": "Lotus spread",
+      "name_ar": "كريمة لوتس",
+      "group_key": "stick",
+      "key": "lotus"
+    },
+    {
+      "name_en": "Nutella",
+      "name_ar": "نوتيلا",
+      "group_key": "stick",
+      "key": "nutella"
+    },
+    {
+      "name_en": "White chocolate",
+      "name_ar": "شوكولا بيضا",
+      "group_key": "stick",
+      "key": "white"
+    },
+    {
+      "name_en": "Belgian milk chocolate",
+      "name_ar": "شوكولا بلجيكية بالحليب",
+      "group_key": "stick-premium",
+      "key": "belgian"
+    },
+    {
+      "name_en": "Belgian dark chocolate",
+      "name_ar": "شوكولا بلجيكية داكنة",
+      "group_key": "stick-premium",
+      "key": "dark"
+    },
+    {
+      "name_en": "Belgian chocolate",
+      "name_ar": "شوكولا بلجيكية",
+      "group_key": "extra-chocolate",
+      "key": "belgian"
+    },
+    {
+      "name_en": "Dark chocolate",
+      "name_ar": "شوكولا داكنة",
+      "group_key": "extra-chocolate",
+      "key": "dark"
+    },
+    {
+      "name_en": "Lotus spread",
+      "name_ar": "كريمة لوتس",
+      "group_key": "extra-chocolate",
+      "key": "lotus"
+    },
+    {
+      "name_en": "Nutella",
+      "name_ar": "نوتيلا",
+      "group_key": "extra-chocolate",
+      "key": "nutella"
+    },
+    {
+      "name_en": "White chocolate",
+      "name_ar": "شوكولا بيضا",
+      "group_key": "extra-chocolate",
+      "key": "white"
+    },
+    {
+      "name_en": "Banana",
+      "name_ar": "موز",
+      "group_key": "fruit",
+      "key": "banana"
+    },
+    {
+      "name_en": "Kiwi",
+      "name_ar": "كيوي",
+      "group_key": "fruit",
+      "key": "kiwi"
+    },
+    {
+      "name_en": "Pineapple",
+      "name_ar": "أناناس",
+      "group_key": "fruit",
+      "key": "pineapple"
+    },
+    {
+      "name_en": "Mixed fruit",
+      "name_ar": "فواكه مشكّلة",
+      "group_key": "fruit",
+      "key": "mixed"
+    },
+    {
+      "name_en": "Strawberries",
+      "name_ar": "فريز",
+      "group_key": "fruit",
+      "key": "strawberry"
+    },
+    {
+      "name_en": "Chocolate rice crispies",
+      "name_ar": "رز مقرمش بالشوكولا",
+      "group_key": "toppings",
+      "key": "rice-chocolate"
+    },
+    {
+      "name_en": "Chocolate vermicelli",
+      "name_ar": "سبرينكلز شوكولا",
+      "group_key": "toppings",
+      "key": "vermicelli"
+    },
+    {
+      "name_en": "Crispy balls",
+      "name_ar": "كرات مقرمشة",
+      "group_key": "toppings",
+      "key": "crispy-balls"
+    },
+    {
+      "name_en": "Crispy flakes",
+      "name_ar": "رقائق مقرمشة",
+      "group_key": "toppings",
+      "key": "crispy-flakes"
+    },
+    {
+      "name_en": "Marshmallows",
+      "name_ar": "مارشميلو",
+      "group_key": "toppings",
+      "key": "marshmallow"
+    },
+    {
+      "name_en": "Smarties",
+      "name_ar": "سمارتيز",
+      "group_key": "toppings",
+      "key": "smarties"
+    },
+    {
+      "name_en": "Sprinkles",
+      "name_ar": "سبرينكلز",
+      "group_key": "toppings",
+      "key": "sprinkles"
+    },
+    {
+      "name_en": "Vanilla rice crispies",
+      "name_ar": "رز مقرمش بالفانيلا",
+      "group_key": "toppings",
+      "key": "rice-vanilla"
+    },
+    {
+      "name_en": "Brownie",
+      "name_ar": "براوني",
+      "group_key": "bars",
+      "key": "brownie"
+    },
+    {
+      "name_en": "Kinder",
+      "name_ar": "كيندر",
+      "group_key": "bars",
+      "key": "kinder"
+    },
+    {
+      "name_en": "Kinder Bueno",
+      "name_ar": "كيندر بوينو",
+      "group_key": "bars",
+      "key": "kinder-bueno"
+    },
+    {
+      "name_en": "Kinder Bueno White",
+      "name_ar": "كيندر بوينو وايت",
+      "group_key": "bars",
+      "key": "kinder-bueno-white"
+    },
+    {
+      "name_en": "Oreo",
+      "name_ar": "أوريو",
+      "group_key": "bars",
+      "key": "oreo"
+    },
+    {
+      "name_en": "Almonds",
+      "name_ar": "لوز",
+      "group_key": "nuts",
+      "key": "almond"
+    },
+    {
+      "name_en": "Hazelnuts",
+      "name_ar": "بندق",
+      "group_key": "nuts",
+      "key": "hazelnut"
+    },
+    {
+      "name_en": "Peanuts",
+      "name_ar": "فول سوداني",
+      "group_key": "nuts",
+      "key": "peanut"
+    },
+    {
+      "name_en": "Pistachios",
+      "name_ar": "فستق حلبي",
+      "group_key": "nuts",
+      "key": "pistachio"
+    }
+  ]
+}

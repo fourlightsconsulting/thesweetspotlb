@@ -67,9 +67,7 @@ describe("prices", () => {
     expect(describeSelections(profiteroles, menu, choice, "en")).toBe(
       "Nutella · Strawberries · Sprinkles",
     );
-    expect(describeSelections(profiteroles, menu, choice, "ar")).toBe(
-      "نوتيلا · فراولة · حبيبات سكر للتزيين",
-    );
+    expect(describeSelections(profiteroles, menu, choice, "ar")).toBe("نوتيلا · فريز · سبرينكلز");
   });
 
   it("prices lines and sets aside the ones it can't price", () => {
