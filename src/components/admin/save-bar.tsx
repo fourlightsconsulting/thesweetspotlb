@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { FormState } from "./form";
 
 // How every edit page saves: changes stay on the page until the bar's Save,
@@ -89,7 +89,9 @@ export function useDirtyForm(savedAt: number) {
     setLastSaved(savedAt);
     setDirty(false);
   }
-  useEffect(() => {
+  // A layout effect: the save's new fields must count as saved before the
+  // observer above gets to compare them.
+  useLayoutEffect(() => {
     if (!savedAt) return;
     settling.current = true;
     baseline.current = read();
