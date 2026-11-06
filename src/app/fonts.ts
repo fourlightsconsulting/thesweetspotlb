@@ -1,4 +1,3 @@
-import { Pacifico } from "next/font/google";
 import localFont from "next/font/local";
 
 // Self-hosted Fraunces with its "soft" axis fixed at 100: rounder terminals that
@@ -22,9 +21,9 @@ export const googleSans = localFont({
   variable: "--font-google-sans",
 });
 
-export const pacifico = Pacifico({
+export const pacifico = localFont({
+  src: "../fonts/pacifico-latin.woff2",
   weight: "400",
-  subsets: ["latin"],
   variable: "--font-pacifico",
 });
 

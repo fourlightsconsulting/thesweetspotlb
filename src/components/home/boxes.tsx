@@ -1,7 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
-import boxCutout from "@/assets/images/box-blue-cutout.png";
+import strawberryBox from "@/assets/images/box-showcase/strawberry-box.webp";
+import sweetSpotBox from "@/assets/images/box-showcase/sweet-spot-box.webp";
+import triBox from "@/assets/images/box-showcase/tri-box.webp";
 import { Heart } from "@/components/doodles";
+import { BoxShowcase } from "@/components/home/box-showcase";
 import { Reveal } from "@/components/reveal";
 import type { MenuItem } from "@/data/menu";
 import { forwardArrow, type Locale } from "@/i18n/config";
@@ -11,6 +13,12 @@ import { formatPriceShort } from "@/lib/money";
 
 /** `items`: the menu's items; the boxes among them are listed. */
 type Props = { lang: Locale; t: Dictionary["boxes"]; items: MenuItem[] };
+
+const showcaseImages = [
+  { id: "tri-box", image: triBox },
+  { id: "sweet-spot-box", image: sweetSpotBox },
+  { id: "strawberry-box", image: strawberryBox },
+];
 
 export function Boxes({ lang, t, items }: Props) {
   const r = routes(lang);
@@ -25,6 +33,10 @@ export function Boxes({ lang, t, items }: Props) {
       price: item.price,
       href: r.item(item.id),
     }));
+  const slides = showcaseImages.flatMap(({ id, image }) => {
+    const row = rows.find((row) => row.id === id);
+    return row ? [{ id, image, name: row.name }] : [];
+  });
 
   return (
     <section
@@ -32,15 +44,7 @@ export function Boxes({ lang, t, items }: Props) {
       className="wave-top bg-strawberry-cream [--wave:var(--color-strawberry-cream)]"
     >
       <div className="relative mx-auto grid max-w-[1440px] items-center gap-[clamp(28px,5cqw,80px)] pt-section-sm pb-section desk:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] desk:px-[clamp(20px,5cqw,72px)]">
-        {/* The cut-out box, slightly tilted, with a soft shadow. */}
-        <div className="relative mx-auto aspect-square w-[min(84%,440px)] desk:w-[min(100%,580px)]">
-          <Image
-            src={boxCutout}
-            alt={t.photoAlt}
-            sizes="(min-width: 820px) 480px, 70vw"
-            className="absolute inset-[4%] size-[92%] -rotate-4 object-contain drop-shadow-[0_28px_26px_rgba(26,86,167,.28)] transition-transform duration-500 ease-soft hover:scale-[1.02] hover:-rotate-1"
-          />
-        </div>
+        {slides.length > 0 && <BoxShowcase slides={slides} t={t} />}
 
         <Reveal
           className="flex flex-col items-start gap-[18px] px-5 desk:px-0"

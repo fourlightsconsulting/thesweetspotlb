@@ -9,7 +9,7 @@ import { Reviews } from "@/components/home/reviews";
 import { Ticker } from "@/components/home/ticker";
 import { WeeklySpecial } from "@/components/home/weekly-special";
 import { WEEKLY_SPECIAL_ID } from "@/data/menu";
-import { googleRating, instagramPosts, sampleReviews } from "@/data/social";
+import { featuredReviews, instagramPosts } from "@/data/social";
 import { hasLocale } from "@/i18n/config";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getBranches, getMenu, getSiteSettings, ORDERING_BRANCH } from "@/server/catalog";
@@ -37,11 +37,11 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <Hero lang={lang} t={t.hero} orderNow={t.common.orderNow} />
       {ticker.enabled && tickerWords.length > 0 && <Ticker words={tickerWords} />}
       <Categories lang={lang} t={t.categories} from={t.common.from} menu={menu} />
-      {special && <WeeklySpecial lang={lang} t={t.special} item={special} />}
+      {special && <WeeklySpecial lang={lang} t={t.special} from={t.common.from} item={special} />}
       <Boxes lang={lang} t={t.boxes} items={menu.items} />
       <DessertMoment lang={lang} t={t.dessert} />
-      <Reviews lang={lang} reviews={sampleReviews} rating={googleRating} t={t.reviews} />
-      <Instagram lang={lang} posts={instagramPosts} t={t.instagram} />
+      <Reviews lang={lang} reviews={featuredReviews} t={t.reviews} />
+      <Instagram posts={instagramPosts} t={t.instagram} />
       <Locations
         lang={lang}
         t={t.locations}

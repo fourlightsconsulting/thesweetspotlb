@@ -36,12 +36,12 @@ const en = {
     allSub: "Order for pickup or delivery.",
   },
   special: {
-    tag: "Weekly special",
+    tag: "Made to make you happy",
     title: "Roll into happiness.",
-    description: "Fresh fruit, rolled into ice cream right in front of you. Here all week.",
+    description:
+      "Your favorite fruits, chocolates, and toppings transformed into delicious ice cream. Every bite is a little happiness.",
     cta: "Grab yours",
-    limited: "Limited time",
-    note: "Rolled fresh in front of you.",
+    note: "Freshly rolled. Made to love.",
     cupAlt: "Ice cream rolls in a Sweet Spot cup",
   },
   boxes: {
@@ -49,7 +49,6 @@ const en = {
     title: "Made for sharing. Or not.",
     description:
       "Mini crêpes, waffle bites, profiteroles and fresh strawberries, packed to travel.",
-    photoAlt: "An open Sweet Spot dessert box with three dessert slices",
   },
   dessert: {
     lead: "There’s always room for",
@@ -67,19 +66,16 @@ const en = {
   },
   reviews: {
     title: "Word on the street",
-    google: "Google reviews",
     ratingOf: "{rating} out of 5",
-    count: { one: "{count} review", other: "{count} reviews" } as PluralForms,
-    leaveReview: "Leave us a review",
-    readMore: "Read more",
-    readLess: "Show less",
+    readOnGoogle: "Read on Google Maps",
+    readReviewBy: "Read the review by {author} on Google Maps",
+    readAll: "Read all Google reviews",
     previous: "Previous reviews",
     next: "More reviews",
   },
   instagram: {
     title: "Our community",
     followShort: "Follow",
-    // Draft bio; the live feed will supply the real one.
     bio: [
       "Crêpes · Waffles · Ice cream rolls",
       "Tripoli · Pickup & delivery",

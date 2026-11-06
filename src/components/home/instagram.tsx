@@ -1,12 +1,11 @@
 import { InstagramFeed } from "@/components/home/instagram-feed";
 import { site } from "@/data/site";
 import type { InstagramPost } from "@/data/social";
-import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 
-type Props = { lang: Locale; posts: InstagramPost[]; t: Dictionary["instagram"] };
+type Props = { posts: InstagramPost[]; t: Dictionary["instagram"] };
 
-/** Profile card with a row of posts; tapping one opens it in a pop-up. */
+/** Profile card for the selected Instagram posts. */
 export function Instagram({ posts, t }: Props) {
   return (
     <section
@@ -21,9 +20,6 @@ export function Instagram({ posts, t }: Props) {
           handle={site.instagramHandle}
           profileUrl={site.instagramUrl}
         />
-        <p className="mt-3 [text-align:left] font-mono text-[11px] leading-normal text-ink-soft [direction:ltr]">
-          Stand-in posts · live feed to connect
-        </p>
       </div>
     </section>
   );

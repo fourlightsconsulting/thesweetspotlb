@@ -1,83 +1,82 @@
-// Stand-in content until the Instagram feed and curated Google reviews are
-// connected. Every entry is marked as a placeholder on the page.
-import type { StaticImageData } from "next/image";
-import photoBoxLarge from "@/assets/images/photo-box-large.png";
-import photoBox from "@/assets/images/photo-box.png";
-import photoDrinks from "@/assets/images/photo-drinks.png";
-import photoIcecream from "@/assets/images/photo-icecream.png";
-import photoProfiteroles from "@/assets/images/photo-profiteroles.png";
-import photoShop from "@/assets/images/photo-shop.png";
-import photoWaffle from "@/assets/images/photo-waffle.png";
-
-/**
- * Shaped like what the Instagram API returns, so the live feed can replace
- * this list: a thumbnail, the post link, and the video file for reels.
- */
 export type InstagramPost = {
-  id: string;
-  image: StaticImageData;
-  /** object-position for the crop */
-  focus: string;
+  permalink: string;
   isReel?: boolean;
-  /** MP4 for reels; plays in the pop-up. */
-  videoUrl?: string;
-  permalink?: string;
+  media: {
+    image: string;
+    video?: string;
+  };
 };
 
+export const instagramMediaPath = "/api/instagram-media/";
+
+// Featured posts in their homepage display order.
 export const instagramPosts: InstagramPost[] = [
-  { id: "stand-in-1", image: photoIcecream, focus: "55% 50%", isReel: true },
-  { id: "stand-in-2", image: photoWaffle, focus: "70% 30%" },
-  { id: "stand-in-3", image: photoBoxLarge, focus: "45% 55%", isReel: true },
-  { id: "stand-in-4", image: photoDrinks, focus: "62% 40%" },
-  { id: "stand-in-5", image: photoProfiteroles, focus: "40% 60%", isReel: true },
-  { id: "stand-in-6", image: photoShop, focus: "78% 50%" },
-  { id: "stand-in-7", image: photoBox, focus: "30% 50%" },
+  {
+    permalink: "https://www.instagram.com/p/C3sDXnACoWP/",
+    media: { image: `${instagramMediaPath}waffle-stick.webp` },
+  },
+  {
+    permalink: "https://www.instagram.com/reel/De4QS-oiVy1/",
+    isReel: true,
+    media: {
+      image: `${instagramMediaPath}cookie-crumble-cover.webp`,
+      video: `${instagramMediaPath}cookie-crumble.mp4`,
+    },
+  },
+  {
+    permalink: "https://www.instagram.com/p/DCMyQQ6NCQu/",
+    media: { image: `${instagramMediaPath}sushi-crepe.webp` },
+  },
+  {
+    permalink: "https://www.instagram.com/p/DO6RM8bCRtl/",
+    media: { image: `${instagramMediaPath}tri-box.webp` },
+  },
+  {
+    permalink: "https://www.instagram.com/p/DYPPugjoTe4/",
+    media: { image: `${instagramMediaPath}delight-cup.webp` },
+  },
 ];
 
-/** Shaped like a Google review, so the curated real ones can replace these. */
 export type Review = {
-  quote: string;
   author: string;
-  rating: number;
-  /** When it was posted (YYYY-MM-DD); cards show it as "2 weeks ago". */
-  date: string;
+  excerpt: string;
+  permalink: string;
 };
 
-/** The shop's Google rating. Null until it's connected: the summary then shows no score. */
-export const googleRating: { rating: number; count: number } | null = null;
+export const googleReviewsUrl =
+  "https://www.google.com/maps/place/The+Sweet+Spot/@34.4261201,35.8290372,17z/data=!4m8!3m7!1s0x1521f7d959d7391b:0x1a240991edfece49!8m2!3d34.4261201!4d35.8290372!9m1!1b1!16s%2Fg%2F11ghx8mlkw";
 
-/** Sample copy for layout only. Replace with real Google reviews before launch. */
-export const sampleReviews: Review[] = [
+// Check the Tripoli listing's newest reviews when refreshing this selection.
+// Featured reviews have five stars and at least 75 characters of text.
+export const featuredReviews: Review[] = [
   {
-    quote:
-      "The Dubai crêpe is ridiculous. Crispy kunafa, pistachio everywhere. Already planning the next visit.",
-    author: "Sample review 1",
-    rating: 5,
-    date: "2026-10-12",
+    author: "Nouha Moutraji",
+    excerpt:
+      "Sweet Spot is such a lovely place! The desserts are delicious, the presentation is beautiful, and the atmosphere is really nice. …",
+    permalink: "https://maps.app.goo.gl/i5ZkgpW4n1CU8RVc6",
   },
   {
-    quote:
-      "Ordered the Party Box for a birthday and it was gone in ten minutes. Packed beautifully, still warm.",
-    author: "Sample review 2",
-    rating: 5,
-    date: "2026-09-27",
+    author: "youssef fouad",
+    excerpt:
+      "amazing place i love the vibe the cookie cup 10/10 the service was the best i recommend",
+    permalink: "https://maps.app.goo.gl/3E6kHsrzxF4sfYEH9",
   },
   {
-    quote: "Watching them roll the ice cream is half the fun. The Oreo rolls are the move.",
-    author: "Sample review 3",
-    rating: 5,
-    date: "2026-09-03",
+    author: "Nour Majzoub",
+    excerpt:
+      "The crepe was so yummy! It was fresh, delicious, and honestly so satisfying. Definitely recommend! 🤍",
+    permalink: "https://maps.app.goo.gl/Q3rEtFd3ZJMBeDMr8",
   },
   {
-    quote: "Late-night waffle run, ready before we finished parking. Friendly team, spotless shop.",
-    author: "Sample review 4",
-    rating: 5,
-    date: "2026-08-16",
+    author: "Roukaya Maassarani",
+    excerpt:
+      "Sweet spot has the best sweets in Lebanon! Its my go to spot when I need something sweet & delicious …",
+    permalink: "https://maps.app.goo.gl/J3bojDvzXDWDFM5AA",
   },
   {
-    quote: "Profiteroles drowning in warm chocolate. That’s it, that’s the review.",
-    author: "Sample review 5",
-    rating: 5,
-    date: "2026-07-21",
+    author: "Sami Elkerdi",
+    excerpt:
+      "It was a wonderful experience, full of sophistication, good treatment and sweet taste ❤️.",
+    permalink: "https://maps.app.goo.gl/uUBzW7pn9HExzeHF9",
   },
 ];

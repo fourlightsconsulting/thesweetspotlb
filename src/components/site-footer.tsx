@@ -18,7 +18,6 @@ export function SiteFooter({ lang, dict, hours, social }: Props) {
   const { nav, locations: loc, footer } = dict;
   const links = [
     { href: r.order, label: nav.menu },
-    { href: r.about, label: nav.story },
     { href: r.contact, label: nav.contact },
   ];
 

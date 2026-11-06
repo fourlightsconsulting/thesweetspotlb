@@ -1,48 +1,18 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { HomeSticker } from "@/components/home/sticker";
-import { site } from "@/data/site";
-import type { Review } from "@/data/social";
+import { googleReviewsUrl, type Review } from "@/data/social";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
-import { fill, plural } from "@/i18n/format";
+import { fill } from "@/i18n/format";
 
 type Props = {
   lang: Locale;
   reviews: Review[];
-  /** The shop's Google rating, once connected. */
-  rating: { rating: number; count: number } | null;
   t: Dictionary["reviews"];
 };
 
-const DAY = 86_400_000;
-
-// Today, read in the browser: the page is prerendered, so a "2 weeks ago"
-// worked out at build time would go stale. The server renders the month.
-const noSubscribe = () => () => {};
-const today = () => Math.floor(Date.now() / DAY);
-const onServer = () => null;
-
-/** "2 weeks ago" from today, or "Oct 2026" when today isn't known yet. */
-function postedOn(date: string, day: number | null, lang: Locale) {
-  const posted = Date.parse(date);
-  if (day === null) {
-    return new Intl.DateTimeFormat(lang, {
-      month: "short",
-      year: "numeric",
-      timeZone: "UTC",
-    }).format(posted);
-  }
-  const days = Math.max(0, day - Math.floor(posted / DAY));
-  const ago = new Intl.RelativeTimeFormat(lang, { numeric: "auto" });
-  if (days < 7) return ago.format(-days, "day");
-  if (days < 30) return ago.format(-Math.floor(days / 7), "week");
-  if (days < 365) return ago.format(-Math.floor(days / 30), "month");
-  return ago.format(-Math.floor(days / 365), "year");
-}
-
-// Google's avatars come in colours; these are the brand's.
 const avatars = [
   "bg-blueberry text-paper",
   "bg-raspberry text-ink",
@@ -50,16 +20,8 @@ const avatars = [
   "bg-strawberry-cream text-blueberry",
 ];
 
-/** Long reviews fold to four lines behind "Read more". */
-const LONG = 150;
-
-/**
- * Reviews as Google shows them: a summary (score once connected) and a looping
- * row of cards, centred on phones and navigable with arrows on desktop.
- */
-export function Reviews({ lang, reviews, rating, t }: Props) {
-  const day = useSyncExternalStore(noSubscribe, today, onServer);
-  const [open, setOpen] = useState<Record<number, boolean>>({});
+/** A looping row of links to featured Google reviews. */
+export function Reviews({ lang, reviews, t }: Props) {
   const listRef = useRef<HTMLUListElement>(null);
   const currentRef = useRef(0);
 
@@ -160,21 +122,6 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
               className="absolute end-0 top-0 w-[80px] rotate-10 sm:-end-28 sm:-top-12 sm:w-[96px] desk:-end-36 desk:-top-16 desk:w-[120px] lg:-top-14 xl:-top-8"
             />
           </h2>
-
-          {rating && (
-            <div
-              aria-label={t.google}
-              className="flex flex-wrap items-center gap-x-2 gap-y-1 font-ui text-sm leading-5"
-            >
-              <GoogleG className="size-5 flex-none" />
-              <b className="text-base">{rating.rating.toFixed(1)}</b>
-              <Stars
-                value={rating.rating}
-                label={fill(t.ratingOf, { rating: rating.rating.toFixed(1) })}
-              />
-              <span className="text-ink-soft">{plural(lang, t.count, rating.count)}</span>
-            </div>
-          )}
         </div>
 
         <ul
@@ -184,11 +131,9 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
           {[...reviews, ...reviews, ...reviews].map((review, index) => {
             const i = index % reviews.length;
             const copy = index < reviews.length || index >= reviews.length * 2;
-            const long = review.quote.length > LONG;
-            const expanded = open[i] ?? false;
             return (
               <li
-                key={`${index}-${review.author}`}
+                key={`${index}-${review.permalink}`}
                 aria-hidden={copy || undefined}
                 className="min-w-0 snap-center"
               >
@@ -201,40 +146,29 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
                       {review.author.charAt(0)}
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col font-ui">
-                      <span className="truncate text-[15px] leading-5 font-semibold">
+                      <bdi className="truncate text-[15px] leading-5 font-semibold">
                         {review.author}
-                      </span>
-                      <span className="text-[13px] leading-[18px] text-ink-soft">
-                        {postedOn(review.date, day, lang)}
-                      </span>
+                      </bdi>
                     </span>
                     <GoogleG className="size-5 flex-none" />
                   </header>
-                  <Stars
-                    value={review.rating}
-                    label={fill(t.ratingOf, { rating: review.rating })}
-                  />
-                  {/* Reviews come in either language: each sets its own direction. */}
+                  <Stars value={5} label={fill(t.ratingOf, { rating: 5 })} />
                   <blockquote
                     dir="auto"
-                    className={`m-0 font-ui text-[15px] leading-[1.55] text-pretty ${long && !expanded ? "line-clamp-4" : ""}`}
+                    className="m-0 flex-1 font-ui text-[15px] leading-[1.55] text-pretty"
                   >
-                    {review.quote}
+                    {review.excerpt}
                   </blockquote>
-                  {long && (
-                    <button
-                      type="button"
-                      onClick={() => setOpen((o) => ({ ...o, [i]: !expanded }))}
-                      aria-expanded={expanded}
-                      tabIndex={copy ? -1 : undefined}
-                      onPointerDown={(event) => {
-                        if (copy) event.preventDefault();
-                      }}
-                      className="self-start font-ui text-sm font-semibold text-blueberry"
-                    >
-                      {expanded ? t.readLess : t.readMore}
-                    </button>
-                  )}
+                  <a
+                    href={review.permalink}
+                    target="_blank"
+                    rel="noreferrer"
+                    tabIndex={copy ? -1 : undefined}
+                    aria-label={fill(t.readReviewBy, { author: review.author })}
+                    className="self-start font-ui text-sm font-semibold text-blueberry underline underline-offset-4"
+                  >
+                    {t.readOnGoogle}
+                  </a>
                 </article>
               </li>
             );
@@ -251,14 +185,13 @@ export function Reviews({ lang, reviews, rating, t }: Props) {
             <span aria-hidden="true">{lang === "ar" ? "→" : "←"}</span>
           </button>
           <a
-            href={site.tripoliDirectionsUrl}
+            href={googleReviewsUrl}
             target="_blank"
             rel="noreferrer"
-            aria-label={`${t.leaveReview} · ${t.google}`}
             className="btn btn-secondary gap-2.5 px-4 text-sm"
           >
             <GoogleG className="size-5 flex-none" />
-            {t.leaveReview}
+            {t.readAll}
           </a>
           <button
             type="button"

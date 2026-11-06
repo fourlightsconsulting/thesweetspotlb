@@ -57,7 +57,6 @@ export function SiteHeader({ lang, nav, menu }: Props) {
   const switchHref = pathname.replace(/^\/(en|ar)(?=\/|$)/, `/${otherLang}`);
   const links = [
     { href: r.order, label: nav.menu },
-    { href: r.about, label: nav.story },
     { href: r.contact, label: nav.contact },
   ];
   const openDrawer = () => drawerRef.current?.showModal();
@@ -115,6 +114,12 @@ export function SiteHeader({ lang, nav, menu }: Props) {
 
         <Link
           href={`${r.order}#your-order`}
+          onNavigate={(event) => {
+            if (pathname !== r.order || matchMedia("(width >= 51.25rem)").matches) return;
+            // On the menu, the mobile cart listens for a native hashchange.
+            event.preventDefault();
+            window.location.hash = "your-order";
+          }}
           aria-label={`${nav.cart} (${cartCount})`}
           className="btn btn-primary btn-sm gap-2"
         >

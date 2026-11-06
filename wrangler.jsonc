@@ -25,6 +25,10 @@
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "thesweetspotlb-cache",
     },
+    {
+      "binding": "INSTAGRAM_MEDIA",
+      "bucket_name": "thesweetspotlb-media",
+    },
   ],
   "d1_databases": [
     {

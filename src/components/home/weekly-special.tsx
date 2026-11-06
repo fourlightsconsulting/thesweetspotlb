@@ -9,7 +9,7 @@ import type { Dictionary } from "@/i18n/dictionaries/en";
 import { routes } from "@/i18n/routes";
 import { formatPrice } from "@/lib/money";
 
-type Props = { lang: Locale; t: Dictionary["special"]; item: MenuItem };
+type Props = { lang: Locale; t: Dictionary["special"]; from: string; item: MenuItem };
 
 /**
  * Cotton Candy band with a cut-out cup that breaks above the band into the pink
@@ -17,8 +17,8 @@ type Props = { lang: Locale; t: Dictionary["special"]; item: MenuItem };
  * section's bottom padding leaves room. On phones the cup box is sized in cqw
  * and capped, so the layout holds from 320px phones to 819px tablets.
  */
-export function WeeklySpecial({ lang, t, item }: Props) {
-  const href = routes(lang).item(item.id);
+export function WeeklySpecial({ lang, t, from, item }: Props) {
+  const href = routes(lang).category(item.category);
   const price = formatPrice(item.price, lang);
 
   return (
@@ -37,7 +37,7 @@ export function WeeklySpecial({ lang, t, item }: Props) {
           </p>
           <Link
             href={href}
-            className="btn btn-primary btn-lg mt-1.5 w-full max-w-[460px] desk:w-auto desk:max-w-none"
+            className="btn btn-primary btn-lg mt-1.5 w-full max-w-[460px] uppercase desk:w-auto desk:max-w-none"
           >
             {t.cta} <span aria-hidden="true">{forwardArrow(lang)}</span>
           </Link>
@@ -45,22 +45,25 @@ export function WeeklySpecial({ lang, t, item }: Props) {
 
         <div className="relative order-first h-[min(57cqw,247px)] desk:order-none desk:h-auto desk:min-h-[380px] desk:self-stretch">
           <div className="absolute -end-[min(9cqw,32px)] -top-[min(26cqw,112px)] z-2 aspect-[459/515] w-[min(74cqw,320px)] desk:end-[2%] desk:top-[calc(-1*(var(--spacing-section)+clamp(96px,8.5cqw,128px)))] desk:w-[min(100%,36cqw)]">
-            <div className="float size-full">
+            <Link
+              href={href}
+              className="float block size-full focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-blueberry"
+            >
               <Image
                 src={cup}
                 alt={t.cupAlt}
                 sizes="(min-width: 820px) 36vw, 320px"
                 className="size-full rotate-6 object-contain drop-shadow-[0_28px_22px_rgba(26,86,167,.4)] desk:rotate-5 desk:drop-shadow-[0_40px_34px_rgba(26,86,167,.4)]"
               />
-            </div>
+            </Link>
 
             <Link
               href={href}
-              aria-label={`${t.limited} ${price}`}
+              aria-label={`${from} ${price}`}
               className="absolute -start-[14%] bottom-[4%] flex size-[92px] -rotate-12 flex-col items-center justify-center gap-px rounded-full border-[2.5px] border-blueberry bg-raspberry text-ink shadow-[3px_3px_0_var(--color-blueberry)] transition-transform duration-300 ease-soft hover:scale-105 hover:rotate-4 desk:-start-[7%] desk:bottom-[6%] desk:size-[clamp(104px,9cqw,132px)] desk:gap-0.5 desk:shadow-[3px_4px_0_var(--color-blueberry)]"
             >
               <span className="font-ui text-[10px] leading-3 font-bold tracking-[0.05em] uppercase desk:text-[11px] desk:leading-[14px] desk:tracking-[0.06em]">
-                {t.limited}
+                {from}
               </span>
               <span className="font-display text-[26px] leading-none font-black desk:text-[clamp(28px,2.4cqw,36px)]">
                 {price}
