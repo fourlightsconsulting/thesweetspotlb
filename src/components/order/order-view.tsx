@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Suspense, useEffect, useRef, useState, type CSSProperties } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import type { Category, Menu, MenuItem } from "@/data/menu";
 import type { Fulfilment, OrderingInfo } from "@/data/ordering";
 import { forwardArrow, type Locale } from "@/i18n/config";
@@ -18,7 +18,6 @@ import { orderTotals } from "@/lib/pricing";
 import { CartLines, CartTotals, trackItems, usePricedCart } from "./cart-summary";
 import { CategoryTabs } from "./category-tabs";
 import { ItemImage } from "./item-image";
-import { menuAppearances, MenuAppearancePicker, type MenuAppearance } from "./menu-appearance";
 import { openItem } from "./item-route";
 import { ClockIcon, ItemSheet } from "./item-sheet";
 import { useOrderingStatus } from "./use-store-status";
@@ -74,8 +73,6 @@ export function OrderView({ lang, t, menu, branch }: Props) {
   const closed = status?.open === false;
   const cartSheetRef = useRef<HTMLDialogElement>(null);
   const [toast, setToast] = useState<{ id: number; text: string } | null>(null);
-  const [appearance, setAppearance] = useState<MenuAppearance>("white");
-  const colours = menuAppearances[appearance];
 
   // No delivery fee yet: it's the area's, picked at checkout.
   const totals = orderTotals(subtotal, 0);
@@ -135,11 +132,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
   );
 
   return (
-    <div
-      data-menu-appearance={appearance}
-      className="bg-[var(--menu-bg)] pb-28 desk:pb-0"
-      style={{ "--menu-bg": colours.background, "--menu-card": colours.card } as CSSProperties}
-    >
+    <div className="bg-paper pb-28 desk:pb-0">
       <div className="shell flex flex-col gap-4 pt-[clamp(28px,3.4cqw,52px)] pb-[clamp(16px,2cqw,24px)]">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div className="flex flex-col gap-2">
@@ -152,20 +145,14 @@ export function OrderView({ lang, t, menu, branch }: Props) {
           <ModeToggle mode={cart.mode} t={t} />
         </div>
 
-        {closed && status ? (
+        {closed && status && (
           <div className="flex items-start gap-3 rounded-[18px] border-[1.5px] border-blueberry/12 bg-whipped px-4 py-3.5">
             <span className="mt-0.5">
               <ClockIcon />
             </span>
             <ClosedNote status={status} lang={lang} t={t} />
           </div>
-        ) : (
-          <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-[18px] bg-strawberry-milk px-4 py-3 font-ui text-sm leading-5 font-medium">
-            <span className="tag tag-deal">{t.dealTag}</span>
-            {t.dealLine}
-          </p>
         )}
-        <MenuAppearancePicker value={appearance} onChange={setAppearance} t={t.appearance} />
       </div>
 
       <CategoryTabs categories={menu.categories} lang={lang} label={t.categoriesLabel} />
@@ -217,7 +204,7 @@ export function OrderView({ lang, t, menu, branch }: Props) {
 
       {/* Phones: a floating bar opens the order as a bottom sheet. */}
       {count > 0 && (
-        <div className="fixed inset-x-0 bottom-0 z-30 bg-linear-to-t from-[var(--menu-bg)] via-[color-mix(in_srgb,var(--menu-bg)_90%,transparent)] to-transparent px-4 pt-6 pb-[max(14px,env(safe-area-inset-bottom))] desk:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-30 bg-linear-to-t from-paper via-paper/90 to-transparent px-4 pt-6 pb-[max(14px,env(safe-area-inset-bottom))] desk:hidden">
           <button
             type="button"
             onClick={openCartSheet}
@@ -439,7 +426,7 @@ function ItemCard({ item, count, lang, t, eager }: CardProps) {
       aria-haspopup="dialog"
       aria-disabled={soldOut || undefined}
       aria-describedby={count > 0 ? `${item.id}-count` : undefined}
-      className="group flex h-[148px] w-full items-stretch gap-3.5 rounded-[22px] border-[1.5px] border-blueberry/12 bg-[var(--menu-card)] p-3 text-start focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-raspberry sm:h-[172px] sm:gap-5 sm:p-4 desk:h-full desk:flex-col desk:gap-0 desk:overflow-hidden desk:border-blueberry/10 desk:p-0 desk:transition-[transform,box-shadow,border-color] desk:duration-300 desk:ease-soft desk:hover:-translate-y-1 desk:hover:border-blueberry desk:hover:shadow-[5px_6px_0_var(--color-blueberry)]"
+      className="group flex h-[148px] w-full items-stretch gap-3.5 rounded-[22px] border-[1.5px] border-blueberry/12 bg-whipped p-3 text-start focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-raspberry sm:h-[172px] sm:gap-5 sm:p-4 desk:h-full desk:flex-col desk:gap-0 desk:overflow-hidden desk:border-blueberry/10 desk:p-0 desk:transition-[transform,box-shadow,border-color] desk:duration-300 desk:ease-soft desk:hover:-translate-y-1 desk:hover:border-blueberry desk:hover:shadow-[5px_6px_0_var(--color-blueberry)]"
     >
       <span className="order-2 flex min-w-0 flex-1 flex-col items-start gap-0.5 desk:gap-1.5 desk:px-[18px] desk:pt-4 desk:pb-[18px]">
         <span className="line-clamp-2 font-display text-lg leading-[1.2] font-bold text-blueberry desk:text-[19px]">

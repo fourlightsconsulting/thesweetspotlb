@@ -279,8 +279,7 @@ html[lang="ar"] {
     font-size: 12px;
     text-transform: none;
   }
-  .tag-new,
-  .tag-deal {
+  .tag-new {
     --tag-bg: var(--color-raspberry);
     --tag-ink: var(--color-ink);
     --tag-line: var(--color-paper);
