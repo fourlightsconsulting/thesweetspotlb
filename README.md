@@ -75,7 +75,7 @@ Deploys happen only through Cloudflare's GitHub integration: every push to `main
 - Ad tracking (each tag stays off until its id is set, and in staff browsers): `NEXT_PUBLIC_META_PIXEL_ID`, `NEXT_PUBLIC_GA4_ID`, `NEXT_PUBLIC_GOOGLE_ADS_ID` (`AW-…`) and `NEXT_PUBLIC_GOOGLE_ADS_PURCHASE_LABEL`. They're public, so they're committed in `.env.production`, which the build reads. Runtime secret for Meta's Conversions API: `META_CAPI_TOKEN`; `META_CAPI_TEST_EVENT_CODE` only while checking in Events Manager → Test events. In GA4, turn off Enhanced Measurement's "page changes based on browser history" (the site sends page views itself).
 - Custom domains: `thesweetspotlb.com`, `www.thesweetspotlb.com` (redirects to the bare domain) and `admin.thesweetspotlb.com`
 
-Pages are cached in the R2 bucket `thesweetspotlb-cache`, with revalidation tags in the D1 database `thesweetspotlb-tags` (see `open-next.config.ts`); admin saves revalidate the `menu`, `store` and `settings` tags.
+The build clears Next.js's saved data cache before prerendering so the new pages use current Supabase data. Pages are cached in the R2 bucket `thesweetspotlb-cache`, with revalidation tags in the D1 database `thesweetspotlb-tags` (see `open-next.config.ts`); admin saves revalidate the `menu`, `store` and `settings` tags.
 
 ## Design references
 
