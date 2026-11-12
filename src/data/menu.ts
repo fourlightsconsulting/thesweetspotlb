@@ -112,7 +112,7 @@ export type MenuItem = {
    * Bundled photos are static imports; uploaded ones are storage URLs.
    */
   image?: StaticImageData;
-  /** Keys into `Menu.groups`, in the order the customiser shows them. */
+  /** Keys into `Menu.groups`, in their configured order. */
   groups: string[];
   /** Preselected options, by group id. Required choices without one start empty. */
   defaults?: Record<string, string | string[]>;
@@ -134,8 +134,8 @@ export const categories: Category[] = [
     id: "crepes",
     name: { en: "Crêpes", ar: "كريب" },
     description: {
-      en: "Thin crêpes with chocolate, spreads or fruit.",
-      ar: "كريب رقيق مع شوكولا، لوتس أو فواكه.",
+      en: "Thin crêpes with chocolate, our signature Lotus mix or fruit.",
+      ar: "كريب رقيق مع شوكولا، خلطة اللوتس الخاصة فينا أو فواكه.",
     },
     image: nutellaCrepe,
   },
@@ -152,8 +152,8 @@ export const categories: Category[] = [
     id: "pancakes",
     name: { en: "Pancakes", ar: "بان كيك" },
     description: {
-      en: "Fluffy pancakes filled with chocolate or Lotus spread, with a mix of chocolates on top.",
-      ar: "بان كيك محشي شوكولا أو كريمة لوتس ومغطّى بميكس من الشوكولا.",
+      en: "Fluffy pancakes filled with chocolate or our signature Lotus mix, with a mix of chocolates on top.",
+      ar: "بان كيك محشي شوكولا أو خلطة اللوتس الخاصة فينا ومغطّى بميكس من الشوكولا.",
     },
     image: nutellaPancakes,
   },
@@ -331,8 +331,8 @@ export const items: MenuItem[] = [
     price: 500,
     name: { en: "Lotus Crêpe", ar: "كريب لوتس" },
     description: {
-      en: "Crêpe filled with Lotus spread and topped with a mix of chocolate.",
-      ar: "كريب محشي بكريمة لوتس ومغطّى بميكس من الشوكولا.",
+      en: "Crêpe filled and topped with our signature Lotus mix and finished with Lotus biscuits.",
+      ar: "كريب محشي بخلطة اللوتس الخاصة فينا ومغطّى بنفس الخلطة وبسكويت لوتس.",
     },
     image: lotusCrepe,
     groups: [...addOns],
@@ -475,8 +475,8 @@ export const items: MenuItem[] = [
     price: 700,
     name: { en: "Lotus Waffle", ar: "وافل لوتس" },
     description: {
-      en: "Waffle topped with Lotus spread and Lotus biscuits.",
-      ar: "وافل مع كريمة لوتس وبسكويت لوتس.",
+      en: "Waffle topped with our signature Lotus mix and Lotus biscuits.",
+      ar: "وافل مع خلطة اللوتس الخاصة فينا وبسكويت لوتس.",
     },
     image: lotusWaffle,
     groups: [...addOns],
@@ -523,8 +523,8 @@ export const items: MenuItem[] = [
     price: 700,
     name: { en: "Lotus Pancakes", ar: "بان كيك لوتس" },
     description: {
-      en: "Pancakes filled with Lotus spread and topped with a mix of chocolates.",
-      ar: "بان كيك محشي كريمة لوتس ومغطّى بميكس من الشوكولا.",
+      en: "Pancakes filled with our signature Lotus mix and topped with a mix of chocolates.",
+      ar: "بان كيك محشي بخلطة اللوتس الخاصة فينا ومغطّى بميكس من الشوكولا.",
     },
     image: lotusPancakes,
     groups: [...addOns],
@@ -775,8 +775,8 @@ export const items: MenuItem[] = [
     price: 500,
     name: { en: "Lotus Milkshake", ar: "ميلك شيك لوتس" },
     description: {
-      en: "A thick, creamy milkshake made with Lotus Biscoff.",
-      ar: "ميلك شيك كثيف وكريمي، معمول بلوتس بيسكوف.",
+      en: "A thick, creamy milkshake made with our signature Lotus Biscoff mix.",
+      ar: "ميلك شيك كثيف وكريمي، معمول بخلطة لوتس بيسكوف الخاصة فينا.",
     },
     image: lotusMilkshake,
     groups: [],

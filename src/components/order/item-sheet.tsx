@@ -119,8 +119,22 @@ type FormProps = {
   onSaved: (message: string) => void;
 };
 
+function optionFields(item: MenuItem, menu: Menu, slot?: BundleSlot) {
+  return item.groups.flatMap((id) => {
+    const group = menu.groups[id];
+    if (!group) return [];
+    return [
+      {
+        key: slot ? slotKey(slot.id, group.id) : group.id,
+        required: group.min > 0,
+        group,
+        slot,
+      },
+    ];
+  });
+}
+
 function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSaved }: FormProps) {
-  const groups = item.groups.map((id) => menu.groups[id]).filter(Boolean);
   const [selections, setSelections] = useState<Selections>(() =>
     line ? structuredClone(line.selections) : { ...defaultSelections(item, menu), ...presets },
   );
@@ -129,6 +143,13 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
   const [triedSubmit, setTriedSubmit] = useState(false);
 
   const check = checkSelections(item, menu, selections);
+  const fields = [
+    ...bundlePicks(item, menu, selections).flatMap(({ slot, item: picked }) => [
+      { key: slot.id, required: true, slot, chosen: picked?.id },
+      ...(picked ? optionFields(picked, menu, slot) : []),
+    ]),
+    ...optionFields(item, menu),
+  ].sort((a, b) => Number(b.required) - Number(a.required));
   const total = unitPrice(item, menu, selections) * qty;
   const soldOut = item.available === false;
 
@@ -175,9 +196,12 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
     if (soldOut) return;
     if (!check.ok) {
       setTriedSubmit(true);
-      const first = document.getElementById(`group-${check.missing[0]}`);
-      first?.scrollIntoView({ behavior: "smooth", block: "center" });
-      first?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true });
+      const firstMissing = fields.find(({ key }) => check.missing.includes(key));
+      if (firstMissing) {
+        const field = document.getElementById(`group-${firstMissing.key}`);
+        field?.scrollIntoView({ behavior: "smooth", block: "center" });
+        field?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true });
+      }
       return;
     }
     const saved = { itemId: item.id, qty, selections, note: note.trim() };
@@ -244,51 +268,38 @@ function ItemForm({ item, line, presets, menu, lang, t, etaLabel, onClose, onSav
           </p>
         </div>
 
-        {bundlePicks(item, menu, selections).map(({ slot, item: picked }) => (
-          <div key={slot.id}>
+        {fields.map((field) => {
+          const { key, slot } = field;
+          const missing = triedSubmit && check.missing.includes(key);
+          if ("group" in field) {
+            const { group } = field;
+            return (
+              <OptionFieldset
+                key={key}
+                fieldKey={key}
+                title={slot ? `${slot.name[lang]} · ${group.name[lang]}` : undefined}
+                group={group}
+                chosen={selections[key] ?? []}
+                missing={missing}
+                onToggle={(optionId) => toggle(key, group, optionId)}
+                lang={lang}
+                t={t}
+              />
+            );
+          }
+          return (
             <SlotFieldset
-              slot={slot}
+              key={key}
+              slot={field.slot}
               menu={menu}
-              chosen={picked?.id}
-              missing={triedSubmit && check.missing.includes(slot.id)}
-              onPick={(itemId) => pick(slot, itemId)}
+              chosen={field.chosen}
+              missing={missing}
+              onPick={(itemId) => pick(field.slot, itemId)}
               lang={lang}
               t={t}
             />
-            {picked?.groups.map((groupId) => {
-              const group = menu.groups[groupId];
-              const key = group && slotKey(slot.id, group.id);
-              return (
-                group && (
-                  <OptionFieldset
-                    key={key}
-                    fieldKey={key}
-                    title={`${picked.name[lang]} · ${group.name[lang]}`}
-                    group={group}
-                    chosen={selections[key] ?? []}
-                    missing={triedSubmit && check.missing.includes(key)}
-                    onToggle={(optionId) => toggle(key, group, optionId)}
-                    lang={lang}
-                    t={t}
-                  />
-                )
-              );
-            })}
-          </div>
-        ))}
-
-        {groups.map((group) => (
-          <OptionFieldset
-            key={group.id}
-            fieldKey={group.id}
-            group={group}
-            chosen={selections[group.id] ?? []}
-            missing={triedSubmit && check.missing.includes(group.id)}
-            onToggle={(optionId) => toggle(group.id, group, optionId)}
-            lang={lang}
-            t={t}
-          />
-        ))}
+          );
+        })}
 
         <label className="flex flex-col gap-2 border-t border-dashed border-blueberry/20 px-6 pt-5 pb-6">
           <span className="font-display text-lg leading-tight font-bold">{t.notes}</span>

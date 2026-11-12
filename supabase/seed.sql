@@ -43,9 +43,9 @@ where b.slug = 'tripoli';
 
 insert into public.categories (slug, name_en, name_ar, description_en, description_ar, image_path, sort_order)
 values
-  ('crepes', 'Crêpes', 'كريب', 'Thin crêpes with chocolate, spreads or fruit.', 'كريب رقيق مع شوكولا، لوتس أو فواكه.', 'nutella-crepe.webp', 1),
+  ('crepes', 'Crêpes', 'كريب', 'Thin crêpes with chocolate, our signature Lotus mix or fruit.', 'كريب رقيق مع شوكولا، خلطة اللوتس الخاصة فينا أو فواكه.', 'nutella-crepe.webp', 1),
   ('waffles', 'Waffles', 'وافل', 'Crisp on the outside, soft on the inside.', 'وافل مقرمش من برّا وطري من جوّا.', 'lotus-waffle.webp', 2),
-  ('pancakes', 'Pancakes', 'بان كيك', 'Fluffy pancakes filled with chocolate or Lotus spread, with a mix of chocolates on top.', 'بان كيك محشي شوكولا أو كريمة لوتس ومغطّى بميكس من الشوكولا.', 'nutella-pancakes.webp', 3),
+  ('pancakes', 'Pancakes', 'بان كيك', 'Fluffy pancakes filled with chocolate or our signature Lotus mix, with a mix of chocolates on top.', 'بان كيك محشي شوكولا أو خلطة اللوتس الخاصة فينا ومغطّى بميكس من الشوكولا.', 'nutella-pancakes.webp', 3),
   ('profiteroles', 'Profiteroles', 'بروفيترول', 'Pastry puffs filled with cream or ice cream, with your choice of sauce.', 'بروفيترول محشي كريما أو آيس كريم، مع الشوكولا اللي بتختارها.', 'creamy-profiteroles.webp', 4),
   ('rolls', 'Ice cream rolls', 'آيس كريم رولز', 'Freshly prepared ice cream rolls in a variety of flavors.', 'آيس كريم رولز بنكهات مختلفة.', 'pistachio-ice-cream-rolls.webp', 5),
   ('bowls', 'Dessert bowls & cheesecake', 'بولز وتشيز كيك', 'Dessert bowls with a variety of toppings, plus San Sebastián cheesecake.', 'بولز بإضافات مختلفة، وتشيز كيك سان سيباستيان.', 'strawberry-bowl.webp', 6),
@@ -122,7 +122,7 @@ insert into public.products
 select c.id, p.slug, p.name_en, p.name_ar, p.description_en, p.description_ar, p.price_cents, p.image_path, p.sort_order, p.orderable_online
 from public.categories c
 join (values
-  ('crepes', 'lotus-crepe', 'Lotus Crêpe', 'كريب لوتس', 'Crêpe filled with Lotus spread and topped with a mix of chocolate.', 'كريب محشي بكريمة لوتس ومغطّى بميكس من الشوكولا.', 500, 'lotus-crepe.webp', 1, true),
+  ('crepes', 'lotus-crepe', 'Lotus Crêpe', 'كريب لوتس', 'Crêpe filled and topped with our signature Lotus mix and finished with Lotus biscuits.', 'كريب محشي بخلطة اللوتس الخاصة فينا ومغطّى بنفس الخلطة وبسكويت لوتس.', 500, 'lotus-crepe.webp', 1, true),
   ('crepes', 'nutella-crepe', 'Nutella Crêpe', 'كريب نوتيلا', 'Crêpe filled with Nutella and topped with a mix of chocolate.', 'كريب محشي نوتيلا ومغطّى بميكس من الشوكولا.', 500, 'nutella-crepe.webp', 2, true),
   ('crepes', 'white-chocolate-crepe', 'White Chocolate Crêpe', 'كريب بالشوكولاتة البيضاء', 'Crêpe filled with white chocolate and topped with a mix of chocolate.', 'كريب محشي شوكولا بيضا ومغطّى بميكس من الشوكولا.', 500, 'white-chocolate-crepe.webp', 3, true),
   ('crepes', 'belgian-chocolate-crepe', 'Belgian Chocolate Crêpe', 'كريب بالشوكولاتة البلجيكية', 'Crêpe filled with Belgian chocolate and topped with Belgian milk, white and dark chocolate.', 'كريب محشي شوكولا بلجيكية ومغطّى بشوكولا بلجيكية بالحليب، بيضا وداكنة.', 750, 'belgian-chocolate-crepe.webp', 4, true),
@@ -134,13 +134,13 @@ join (values
   ('crepes', 'dubai-crepe', 'Dubai Crêpe', 'كريب دبي', 'Crêpe filled with pistachio cream and basma osmalliye, topped with Belgian chocolate and pistachios, and served with a scoop of ice cream of your choice.', 'كريب محشي كريمة فستق حلبي وبصمة عثملية، ومغطّى بالشوكولا البلجيكية وحبات الفستق الحلبي، مع سكوب آيس كريم من اختيارك.', 1222, 'dubai-crepe.webp', 10, true),
   ('waffles', 'waffle-stick', 'Waffle Stick', 'وافل ستيك', 'One waffle stick covered with your choice of spread.', 'وافل ستيك مع الشوكولا اللي بتختارها.', 450, 'waffle-stick.webp', 11, true),
   ('waffles', 'premium-waffle-stick', 'Premium Waffle Stick', 'وافل ستيك بريميوم', 'One waffle stick covered with your choice of Belgian milk or Belgian dark chocolate.', 'وافل ستيك مع اختيارك من الشوكولا البلجيكية بالحليب أو الشوكولا البلجيكية الداكنة.', 600, 'premium-waffle-stick.webp', 12, true),
-  ('waffles', 'lotus-waffle', 'Lotus Waffle', 'وافل لوتس', 'Waffle topped with Lotus spread and Lotus biscuits.', 'وافل مع كريمة لوتس وبسكويت لوتس.', 700, 'lotus-waffle.webp', 13, true),
+  ('waffles', 'lotus-waffle', 'Lotus Waffle', 'وافل لوتس', 'Waffle topped with our signature Lotus mix and Lotus biscuits.', 'وافل مع خلطة اللوتس الخاصة فينا وبسكويت لوتس.', 700, 'lotus-waffle.webp', 13, true),
   ('waffles', 'nutella-waffle', 'Nutella Waffle', 'وافل نوتيلا', 'Waffle topped with Nutella spread.', 'وافل مع نوتيلا.', 700, 'nutella-waffle.webp', 14, true),
   ('waffles', 'white-chocolate-waffle', 'White Chocolate Waffle', 'وافل بالشوكولاتة البيضاء', 'Waffle topped with white chocolate.', 'وافل مع شوكولا بيضا.', 700, 'white-chocolate-waffle.webp', 15, true),
   ('waffles', 'belgian-chocolate-waffle', 'Belgian Chocolate Waffle', 'وافل بالشوكولاتة البلجيكية', 'Waffle topped with Belgian chocolate.', 'وافل مع شوكولا بلجيكية.', 1000, 'belgian-chocolate-waffle.webp', 16, true),
   ('waffles', 'dark-chocolate-waffle', 'Dark Chocolate Waffle', 'وافل بالشوكولاتة الداكنة', 'Waffle topped with dark chocolate.', 'وافل مع شوكولا داكنة.', 1000, 'dark-chocolate-waffle.webp', 17, true),
   ('waffles', 'waffle-sandwich', 'Waffle Sandwich', 'ساندويش وافل', 'Two waffles filled with four ice cream rolls of your choice and strawberries. Dine-in only.', '2 وافل، بيناتهم 4 آيس كريم رولز من اختيارك وفريز. بس للأكل بالمحل.', 1000, null, 18, false),
-  ('pancakes', 'lotus-pancakes', 'Lotus Pancakes', 'بان كيك لوتس', 'Pancakes filled with Lotus spread and topped with a mix of chocolates.', 'بان كيك محشي كريمة لوتس ومغطّى بميكس من الشوكولا.', 700, 'lotus-pancakes.webp', 19, true),
+  ('pancakes', 'lotus-pancakes', 'Lotus Pancakes', 'بان كيك لوتس', 'Pancakes filled with our signature Lotus mix and topped with a mix of chocolates.', 'بان كيك محشي بخلطة اللوتس الخاصة فينا ومغطّى بميكس من الشوكولا.', 700, 'lotus-pancakes.webp', 19, true),
   ('pancakes', 'nutella-pancakes', 'Nutella Pancakes', 'بان كيك نوتيلا', 'Pancakes filled with Nutella and topped with a mix of chocolates.', 'بان كيك محشي نوتيلا ومغطّى بميكس من الشوكولا.', 700, 'nutella-pancakes.webp', 20, true),
   ('pancakes', 'white-chocolate-pancakes', 'White Chocolate Pancakes', 'بان كيك بالشوكولاتة البيضاء', 'Pancakes filled with white chocolate and topped with a mix of chocolates.', 'بان كيك محشي شوكولا بيضا ومغطّى بميكس من الشوكولا.', 700, 'white-chocolate-pancakes.webp', 21, true),
   ('pancakes', 'belgian-chocolate-pancakes', 'Belgian Chocolate Pancakes', 'بان كيك بالشوكولاتة البلجيكية', 'Pancakes filled with Belgian chocolate and topped with a mix of Belgian chocolates.', 'بان كيك محشي شوكولا بلجيكية ومغطّى بميكس من الشوكولا البلجيكية.', 1000, 'belgian-chocolate-pancakes.webp', 22, true),
@@ -163,7 +163,7 @@ join (values
   ('boxes', 'sweet-spot-box', 'Sweet Spot Box', 'علبة سويت سبوت', 'Waffle bites, crêpe rolls, fettuccine crêpe, brownies, pancakes, strawberries and profiteroles, served with four cups of chocolate for dipping.', 'قطع وافل، كريب رولز، كريب فيتوتشيني، براوني، بان كيك، فريز وبروفيترول، مع 4 كوب شوكولا للتغميس.', 3300, 'sweet-spot-box.webp', 39, true),
   ('milkshakes', 'caramel-milkshake', 'Caramel Milkshake', 'ميلك شيك كراميل', 'A smooth, cold caramel milkshake.', 'ميلك شيك كراميل بارد وناعم.', 500, 'caramel-milkshake.webp', 40, true),
   ('milkshakes', 'chocolate-milkshake', 'Chocolate Milkshake', 'ميلك شيك شوكولا', 'A thick, creamy chocolate milkshake.', 'ميلك شيك شوكولا كثيف وكريمي.', 500, 'chocolate-milkshake.webp', 41, true),
-  ('milkshakes', 'lotus-milkshake', 'Lotus Milkshake', 'ميلك شيك لوتس', 'A thick, creamy milkshake made with Lotus Biscoff.', 'ميلك شيك كثيف وكريمي، معمول بلوتس بيسكوف.', 500, 'lotus-milkshake.webp', 42, true),
+  ('milkshakes', 'lotus-milkshake', 'Lotus Milkshake', 'ميلك شيك لوتس', 'A thick, creamy milkshake made with our signature Lotus Biscoff mix.', 'ميلك شيك كثيف وكريمي، معمول بخلطة لوتس بيسكوف الخاصة فينا.', 500, 'lotus-milkshake.webp', 42, true),
   ('milkshakes', 'oreo-milkshake', 'Oreo Milkshake', 'ميلك شيك أوريو', 'A creamy milkshake with Oreo cookies.', 'ميلك شيك كريمي مع بسكويت أوريو.', 500, 'oreo-milkshake.webp', 43, true),
   ('milkshakes', 'strawberry-milkshake', 'Strawberry Milkshake', 'ميلك شيك فريز', 'A thick, cold strawberry milkshake.', 'ميلك شيك فريز بارد وكثيف.', 500, 'strawberry-milkshake.webp', 44, true),
   ('smoothies', 'berry-smoothie', 'Berry Smoothie', 'سموذي توت', 'A cold smoothie with mixed berries.', 'سموذي بارد مع توت مشكّل.', 400, 'berry-smoothie.webp', 45, true),
