@@ -4,6 +4,19 @@ import type { Fulfilment } from "@/data/ordering";
 import type { Locale } from "@/i18n/config";
 import { normalisePhone } from "@/lib/phone";
 import type { PromoRule, Selections, Totals } from "@/lib/pricing";
+import type { Enums } from "@/lib/supabase/database.types";
+
+export type PaymentMethod = Enums<"payment_method">;
+
+export const paymentMethodNames: Record<PaymentMethod, Localized> = {
+  cash_on_delivery: { en: "Cash on delivery", ar: "الدفع نقداً عند التوصيل" },
+  pay_at_pickup: { en: "Pay at pickup", ar: "الدفع عند الاستلام" },
+  whish: { en: "WHISH", ar: "WHISH" },
+};
+
+export function defaultPaymentMethod(mode: Fulfilment) {
+  return mode === "delivery" ? "cash_on_delivery" : "pay_at_pickup";
+}
 
 export type CheckoutFields = {
   name: string;
@@ -21,6 +34,7 @@ export type PlaceOrderInput = {
   idempotencyKey: string;
   lang: Locale;
   mode: Fulfilment;
+  paymentMethod?: PaymentMethod;
   fields: CheckoutFields;
   promoCode: string | null;
   lines: { itemId: string; qty: number; selections: Selections; note: string }[];
@@ -43,6 +57,7 @@ export type PlacedOrder = {
   ref: string;
   number: string;
   mode: Fulfilment;
+  paymentMethod: PaymentMethod;
   name: string;
   phone: string;
   address: { area: Localized; street: string; floor: string; note: string } | null;

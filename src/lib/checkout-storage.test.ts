@@ -61,6 +61,7 @@ describe("checkout storage", () => {
       ref: crypto.randomUUID(),
       number: "TSS-1001",
       mode: "pickup" as const,
+      paymentMethod: "pay_at_pickup" as const,
       name: fields.name,
       phone: "+96171234567",
       address: null,

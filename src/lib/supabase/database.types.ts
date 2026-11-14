@@ -1686,7 +1686,7 @@ export type Database = {
       option_group_kind: "options" | "items";
       order_status:
         "received" | "preparing" | "ready" | "out_for_delivery" | "completed" | "cancelled";
-      payment_method: "cash_on_delivery" | "pay_at_pickup";
+      payment_method: "cash_on_delivery" | "pay_at_pickup" | "whish";
       payment_status: "unpaid" | "paid" | "refunded";
       product_kind: "item" | "bundle";
       product_tag: "fav" | "new" | "limited";
@@ -1825,7 +1825,7 @@ export const Constants = {
         "completed",
         "cancelled",
       ],
-      payment_method: ["cash_on_delivery", "pay_at_pickup"],
+      payment_method: ["cash_on_delivery", "pay_at_pickup", "whish"],
       payment_status: ["unpaid", "paid", "refunded"],
       product_kind: ["item", "bundle"],
       product_tag: ["fav", "new", "limited"],

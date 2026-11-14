@@ -8,6 +8,7 @@ const order: PlacedOrder = {
   ref: "4f0c2a3e-1111-4222-8333-944455556666",
   number: "TSS-1042",
   mode: "delivery",
+  paymentMethod: "cash_on_delivery",
   name: "Rana",
   phone: "+96170123456",
   address: {
@@ -45,6 +46,7 @@ describe("orderMessage", () => {
         "Phone: +961 70 123 456",
         "Delivery address: Mina, Port street, 3rd floor",
         "Note for the driver: Ring twice",
+        "Payment method: Cash on delivery",
         "",
         "2 × Nutella Crêpe",
         "- Strawberries",
@@ -64,12 +66,15 @@ describe("orderMessage", () => {
     const pickup: PlacedOrder = {
       ...order,
       mode: "pickup",
+      paymentMethod: "pay_at_pickup",
       address: null,
       promoCode: null,
       totals: { subtotal: 1800, discount: 0, deliveryFee: 0, total: 1800 },
     };
     const text = orderMessage(pickup, "en", en.whatsappOrder, en.order);
-    expect(text).toContain("Phone: +961 70 123 456\nPickup from the shop\n\n2 × Nutella Crêpe");
+    expect(text).toContain(
+      "Phone: +961 70 123 456\nPickup from the shop\nPayment method: Pay at pickup\n\n2 × Nutella Crêpe",
+    );
     expect(text.endsWith("*Total: $18.00*")).toBe(true);
     expect(text).not.toContain("Discount");
     expect(text).not.toContain("Delivery fee");
@@ -77,12 +82,17 @@ describe("orderMessage", () => {
   });
 
   it("writes Arabic orders in Arabic, the phone number left to right", () => {
-    const text = orderMessage(order, "ar", ar.whatsappOrder, ar.order);
+    const text = orderMessage(
+      { ...order, paymentMethod: "whish" },
+      "ar",
+      ar.whatsappOrder,
+      ar.order,
+    );
     expect(text.split("\n")[0]).toBe("مرحبا ذا سويت سبوت! هيدا طلبي *TSS-1042* من الموقع.");
     expect(text).toContain("الرقم: ⁦+961 70 123 456⁩");
     expect(text).toContain("عنوان التوصيل: الميناء، Port street، 3rd floor");
     expect(text).toContain("2 × كريب نوتيلا\n- فريز\n- موز");
-    expect(text).not.toContain("الدفع");
+    expect(text).toContain("طريقة الدفع: WHISH");
   });
 
   it("opens WhatsApp with the message typed in", () => {

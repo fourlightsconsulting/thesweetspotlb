@@ -1,7 +1,7 @@
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill } from "@/i18n/format";
-import type { PlacedOrder } from "./checkout";
+import { paymentMethodNames, type PlacedOrder } from "./checkout";
 import { formatPrice } from "./money";
 import { formatPhoneLocal } from "./phone";
 
@@ -33,6 +33,7 @@ export function orderMessage(
           .join(lang === "ar" ? "، " : ", ")}`
       : t.pickup,
     ...(address?.note ? [`${t.driverNote}: ${address.note}`] : []),
+    `${t.payment}: ${paymentMethodNames[order.paymentMethod][lang]}`,
   ];
 
   const items = order.lines.flatMap((line) => [

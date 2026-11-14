@@ -26,7 +26,9 @@ import { alphabetical } from "@/lib/alphabetical";
 import { cartActions } from "@/lib/cart";
 import {
   type CheckoutFields,
+  defaultPaymentMethod,
   type FieldError,
+  paymentMethodNames,
   type PlacedOrder,
   type PromoError,
   validateFields,
@@ -101,6 +103,7 @@ function CheckoutForm({
   const { cart, lines, subtotal, count } = usePricedCart(menu);
   const status = useOrderingStatus(branch.schedule);
   const [fields, setFields] = useState<CheckoutFields>(initialFields);
+  const [useWhish, setUseWhish] = useState(false);
   const [remember, setRemember] = useState(true);
   const [errors, setErrors] = useState<Partial<Record<keyof CheckoutFields, FieldError>>>({});
   const [promoInput, setPromoInput] = useState("");
@@ -114,6 +117,8 @@ function CheckoutForm({
   const bannerRef = useRef<HTMLDivElement>(null);
 
   const mode = cart.mode;
+  const defaultMethod = defaultPaymentMethod(mode);
+  const paymentMethod = useWhish ? "whish" : defaultMethod;
   const areas = alphabetical(branch.areas, (area) => area.name[lang], lang);
   const area = areas.find((area) => area.id === fields.area);
   // The selected area's zone sets the delivery fee.
@@ -173,6 +178,7 @@ function CheckoutForm({
     e.preventDefault();
     if (placing || lines.length === 0) return;
     const fieldErrors = validateFields(mode, fields);
+    if (mode === "delivery" && !area) fieldErrors.area = "area";
     setErrors(fieldErrors);
     const firstInvalid = (Object.keys(fieldErrors) as (keyof CheckoutFields)[])[0];
     if (firstInvalid) {
@@ -190,6 +196,7 @@ function CheckoutForm({
           idempotencyKey: checkoutAttemptKey(),
           lang,
           mode,
+          paymentMethod,
           fields,
           promoCode: promo?.code ?? null,
           lines: lines.map(({ line }) => ({
@@ -431,34 +438,25 @@ function CheckoutForm({
             {mode === "delivery" && (
               <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-ink/20 pt-5">
                 <h3 className="font-display text-lg leading-tight font-bold">{t.address}</h3>
-                <fieldset
-                  id="field-area"
-                  tabIndex={-1}
-                  aria-invalid={Boolean(errors.area)}
-                  aria-describedby={errors.area ? "area-error" : undefined}
-                  className="flex flex-col gap-2.5 focus:outline-none"
-                >
-                  <legend className="mb-2.5 font-ui text-sm font-semibold">{t.area}</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {areas.map((z) => (
-                      <label
-                        key={z.id}
-                        className={`relative flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] bg-paper px-4 font-ui text-[15px] font-semibold transition-colors has-checked:border-ink has-checked:bg-blueberry has-checked:text-paper has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-raspberry ${errors.area ? "border-raspberry" : "border-ink/20 hover:border-ink/50"}`}
-                      >
-                        <input
-                          type="radio"
-                          name="area"
-                          value={z.id}
-                          checked={fields.area === z.id}
-                          onChange={() => update("area", z.id)}
-                          className="sr-only"
-                        />
-                        {z.name[lang]}
-                      </label>
+                <Field id="area" label={t.area} error={errors.area && t.errors.area}>
+                  <select
+                    id="field-area"
+                    value={area?.id ?? ""}
+                    onChange={(e) => update("area", e.target.value)}
+                    aria-invalid={Boolean(errors.area)}
+                    aria-describedby={errors.area ? "area-error" : undefined}
+                    className={`${inputClass} min-w-0 cursor-pointer`}
+                  >
+                    <option value="" disabled>
+                      {t.selectArea}
+                    </option>
+                    {areas.map(({ id, name, fee }) => (
+                      <option key={id} value={id}>
+                        {`${name[lang]} · ${formatPrice(fee, lang)}`}
+                      </option>
                     ))}
-                  </div>
-                  {errors.area && <ErrorText id="area-error" text={t.errors.area} />}
-                </fieldset>
+                  </select>
+                </Field>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field id="street" label={t.street} error={errors.street && t.errors.street}>
                     <input
@@ -507,22 +505,22 @@ function CheckoutForm({
           </Step>
 
           <Step number={3} title={t.stepPayment}>
-            <div className="flex items-start gap-3 rounded-[18px] border-2 border-ink bg-cotton-candy p-4 shadow-[3px_4px_0_var(--color-ink)]">
-              <span
-                aria-hidden="true"
-                className="mt-0.5 flex size-[22px] flex-none items-center justify-center rounded-full border-2 border-ink bg-blueberry"
-              >
-                <span className="size-2 rounded-full bg-whipped" />
-              </span>
-              <span className="flex flex-col gap-0.5">
-                <span className="font-ui text-base font-bold">
-                  {mode === "delivery" ? t.cod : t.pap}
-                </span>
-                <span className="font-ui text-sm text-ink-soft">
-                  {mode === "delivery" ? t.codDesc : t.papDesc}
-                </span>
-              </span>
-            </div>
+            <fieldset disabled={placing} className="grid gap-3 sm:grid-cols-2">
+              <legend className="sr-only">{t.stepPayment}</legend>
+              <ChoiceCard
+                name="payment"
+                checked={!useWhish}
+                onChange={() => setUseWhish(false)}
+                title={paymentMethodNames[defaultMethod][lang]}
+                description={mode === "delivery" ? t.codDesc : t.papDesc}
+              />
+              <ChoiceCard
+                name="payment"
+                checked={useWhish}
+                onChange={() => setUseWhish(true)}
+                title={paymentMethodNames.whish[lang]}
+              />
+            </fieldset>
 
             <div className="mt-6 flex flex-col gap-2">
               <label htmlFor="promo" className="font-ui text-sm font-semibold">
@@ -675,7 +673,7 @@ type ChoiceProps = {
   checked: boolean;
   onChange: () => void;
   title: string;
-  description: string;
+  description?: string;
 };
 
 function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps) {
@@ -696,7 +694,9 @@ function ChoiceCard({ name, checked, onChange, title, description }: ChoiceProps
       </span>
       <span className="flex flex-col gap-0.5">
         <span className="font-ui text-base font-bold">{title}</span>
-        <span className="font-ui text-sm leading-[1.4] text-ink-soft">{description}</span>
+        {description && (
+          <span className="font-ui text-sm leading-[1.4] text-ink-soft">{description}</span>
+        )}
       </span>
     </label>
   );

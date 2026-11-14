@@ -6,6 +6,7 @@ import { ordering } from "@/data/ordering";
 import { locales } from "@/i18n/config";
 import {
   type CheckPromoResult,
+  defaultPaymentMethod,
   type PlaceOrderInput,
   type PlaceOrderResult,
   type PlacedOrder,
@@ -21,6 +22,7 @@ import {
   selectionParts,
 } from "@/lib/pricing";
 import { serviceClient } from "@/lib/supabase/service";
+import { Constants } from "@/lib/supabase/database.types";
 import { getMenu, getOrderingBranch, ORDERING_BRANCH } from "./catalog";
 import { sendOrderAlerts } from "./order-alerts";
 import { reportOrderPlaced, type RequestInfo } from "./tracking";
@@ -36,6 +38,7 @@ const inputSchema = z.object({
   idempotencyKey: z.uuid(),
   lang: z.enum(locales),
   mode: z.enum(["pickup", "delivery"]),
+  paymentMethod: z.enum(Constants.public.Enums.payment_method).optional(),
   fields: z.object({
     name: text(60),
     phone: text(24),
@@ -98,7 +101,7 @@ async function findPlacedOrder(db: OrderDb, idempotencyKey: string): Promise<Pla
   const { data, error } = await db
     .from("orders")
     .select(
-      "public_token, number, fulfilment, customer_name, customer_phone, delivery_area_name_en, delivery_area_name_ar, address_street, address_floor, delivery_note, subtotal_cents, discount_cents, delivery_fee_cents, total_cents, discount_code, order_items(position, name_en, name_ar, quantity, note, order_item_options(group_key, option_name_en, option_name_ar))",
+      "public_token, number, fulfilment, payment_method, customer_name, customer_phone, delivery_area_name_en, delivery_area_name_ar, address_street, address_floor, delivery_note, subtotal_cents, discount_cents, delivery_fee_cents, total_cents, discount_code, order_items(position, name_en, name_ar, quantity, note, order_item_options(group_key, option_name_en, option_name_ar))",
     )
     .eq("idempotency_key", idempotencyKey)
     .maybeSingle();
@@ -109,6 +112,7 @@ async function findPlacedOrder(db: OrderDb, idempotencyKey: string): Promise<Pla
     ref: data.public_token,
     number: `TSS-${data.number}`,
     mode: data.fulfilment,
+    paymentMethod: data.payment_method,
     name: data.customer_name,
     phone: data.customer_phone,
     address:
@@ -184,6 +188,12 @@ async function placeNewOrder(
   request: RequestInfo,
   db: OrderDb | null,
 ): Promise<PlaceOrderResult> {
+  const defaultMethod = defaultPaymentMethod(input.mode);
+  const paymentMethod = input.paymentMethod ?? defaultMethod;
+  if (paymentMethod !== defaultMethod && paymentMethod !== "whish") {
+    return { ok: false, code: "invalid", fields: {} };
+  }
+
   const [menu, branch] = await Promise.all([getMenu(), getOrderingBranch()]);
 
   const fieldErrors = validateFields(input.mode, input.fields);
@@ -236,6 +246,7 @@ async function placeNewOrder(
         ref: crypto.randomUUID(),
         number: `TSS-${1000 + Math.floor(Math.random() * 9000)}`,
         mode: input.mode,
+        paymentMethod,
         name,
         phone,
         address,
@@ -254,6 +265,7 @@ async function placeNewOrder(
         branch: ORDERING_BRANCH,
         locale: input.lang,
         fulfilment: input.mode,
+        payment_method: paymentMethod,
         name,
         phone,
         ...(delivery
@@ -326,6 +338,7 @@ async function placeNewOrder(
       ref: data.public_token,
       number: `TSS-${data.order_number}`,
       mode: input.mode,
+      paymentMethod,
       name,
       phone,
       address,

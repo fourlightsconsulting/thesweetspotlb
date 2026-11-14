@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { money, orderLabel, phone, timeOf, when, whatsappLink } from "@/components/admin/format";
 import { Icon } from "@/components/admin/icons";
+import { paymentMethodNames } from "@/lib/checkout";
 import { cancelOrder } from "./actions";
 import { cancelReasons, describeOptions, dueAt, type Order, statusLabel } from "./data";
 
 const paymentLabel = (order: Order) =>
-  `${order.payment_method === "cash_on_delivery" ? "Cash on delivery" : "Pay at pickup"} · ${
+  `${paymentMethodNames[order.payment_method].en} · ${
     order.payment_status === "paid"
       ? "paid"
       : order.payment_status === "refunded"

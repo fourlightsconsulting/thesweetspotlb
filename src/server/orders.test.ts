@@ -46,6 +46,7 @@ const savedOrder = () => ({
   public_token: "01fa13ea-8f90-4c8e-a9a9-d84d997110c8",
   number: 1001,
   fulfilment: "delivery" as const,
+  payment_method: "cash_on_delivery" as const,
   customer_name: "Maya Haddad",
   customer_phone: "+96171234567",
   delivery_area_name_en: "Mina",
@@ -173,6 +174,7 @@ describe("placeOrder", () => {
         ref: saved.public_token,
         number: "TSS-1001",
         mode: "delivery",
+        paymentMethod: "cash_on_delivery",
         name: "Maya Haddad",
         phone: "+96171234567",
         address: {
@@ -293,9 +295,51 @@ describe("placeOrder", () => {
       total: 2400,
     });
     expect(result.order.phone).toBe("+96171234567");
+    expect(result.order.paymentMethod).toBe("pay_at_pickup");
     expect(result.order.number).toMatch(/^TSS-\d{4}$/);
     expect(result.order.lines[0].options.en).toEqual(["Nutella", "Strawberries"]);
     expect(result.order.demo).toBe(true);
+  });
+
+  it.each(["pickup", "delivery"] as const)(
+    "saves WHISH for %s and returns it on retry",
+    async (mode) => {
+      const backend = mockBackend();
+      const input: PlaceOrderInput = {
+        ...base(),
+        mode,
+        paymentMethod: "whish",
+        fields: { ...base().fields, area: "boulevard", street: "Main Street" },
+      };
+
+      expect(await placeOrder(input)).toMatchObject({
+        ok: true,
+        order: { paymentMethod: "whish" },
+      });
+      expect(backend.rpc).toHaveBeenCalledWith(
+        "create_order",
+        expect.objectContaining({
+          payload: expect.objectContaining({ fulfilment: mode, payment_method: "whish" }),
+        }),
+      );
+
+      backend.maybeSingle.mockResolvedValue({
+        data: { ...savedOrder(), fulfilment: mode, payment_method: "whish" },
+        error: null,
+      });
+      expect(await placeOrder({ ...input, paymentMethod: undefined })).toMatchObject({
+        ok: true,
+        order: { paymentMethod: "whish" },
+      });
+      expect(backend.rpc).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it("rejects a payment method that belongs to a different fulfilment mode", async () => {
+    expect(await placeOrder({ ...base(), paymentMethod: "cash_on_delivery" })).toMatchObject({
+      ok: false,
+      code: "invalid",
+    });
   });
 
   it("takes the order even if the customer saw a different total", async () => {
