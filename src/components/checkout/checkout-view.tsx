@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   type FormEvent,
+  type KeyboardEvent,
   type ReactNode,
   useRef,
   useState,
@@ -16,7 +17,7 @@ import { ClockIcon } from "@/components/order/item-sheet";
 import { ClosedNote, etaLabel, opensLabel } from "@/components/order/order-view";
 import { useOrderingStatus } from "@/components/order/use-store-status";
 import type { Menu } from "@/data/menu";
-import { type OrderingInfo, ordering } from "@/data/ordering";
+import { type DeliveryArea, type OrderingInfo, ordering } from "@/data/ordering";
 import { forwardArrow, type Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/dictionaries/en";
 import { fill, plural, range } from "@/i18n/format";
@@ -438,25 +439,14 @@ function CheckoutForm({
             {mode === "delivery" && (
               <div className="mt-6 flex flex-col gap-4 border-t border-dashed border-ink/20 pt-5">
                 <h3 className="font-display text-lg leading-tight font-bold">{t.address}</h3>
-                <Field id="area" label={t.area} error={errors.area && t.errors.area}>
-                  <select
-                    id="field-area"
-                    value={area?.id ?? ""}
-                    onChange={(e) => update("area", e.target.value)}
-                    aria-invalid={Boolean(errors.area)}
-                    aria-describedby={errors.area ? "area-error" : undefined}
-                    className={`${inputClass} min-w-0 cursor-pointer`}
-                  >
-                    <option value="" disabled>
-                      {t.selectArea}
-                    </option>
-                    {areas.map(({ id, name, fee }) => (
-                      <option key={id} value={id}>
-                        {`${name[lang]} · ${formatPrice(fee, lang)}`}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
+                <AreaPicker
+                  areas={areas}
+                  selected={area}
+                  onSelect={(id) => update("area", id)}
+                  lang={lang}
+                  t={t}
+                  invalid={Boolean(errors.area)}
+                />
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Field id="street" label={t.street} error={errors.street && t.errors.street}>
                     <input
@@ -656,6 +646,139 @@ function Field({ id, label, hint, optional, error, children }: FieldProps) {
       )}
       {error && <ErrorText id={`${id}-error`} text={error} />}
     </div>
+  );
+}
+
+const searchText = (value: string) =>
+  value
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[\p{M}ـ]/gu, "")
+    .trim();
+
+function AreaPicker({
+  areas,
+  selected,
+  onSelect,
+  lang,
+  t,
+  invalid,
+}: {
+  areas: DeliveryArea[];
+  selected: DeliveryArea | undefined;
+  onSelect: (id: string) => void;
+  lang: Locale;
+  t: Dictionary["checkout"];
+  invalid: boolean;
+}) {
+  const [query, setQuery] = useState<string | null>(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const open = query !== null;
+  const term = searchText(query ?? "");
+  const matches = term
+    ? areas.filter(({ name }) =>
+        [name.en, name.ar].some((label) => searchText(label).includes(term)),
+      )
+    : areas;
+  const active = open ? matches[activeIndex] : undefined;
+  const optionId = (id: string) => `area-option-${id}`;
+
+  const openList = () => {
+    setQuery("");
+    setActiveIndex(-1);
+  };
+
+  const choose = (area: DeliveryArea) => {
+    onSelect(area.id);
+    setQuery(null);
+  };
+
+  const handleKeys = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.nativeEvent.isComposing) return;
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!open) openList();
+      const current = open ? activeIndex : -1;
+      const next =
+        event.key === "ArrowDown"
+          ? Math.min(current + 1, matches.length - 1)
+          : current < 0
+            ? matches.length - 1
+            : Math.max(current - 1, 0);
+      setActiveIndex(next);
+      const option = matches[next];
+      if (option)
+        requestAnimationFrame(() => {
+          document.getElementById(optionId(option.id))?.scrollIntoView({ block: "nearest" });
+        });
+    } else if (event.key === "Enter" && open) {
+      event.preventDefault();
+      const choice = active ?? (matches.length === 1 ? matches[0] : undefined);
+      if (choice) choose(choice);
+    } else if (event.key === "Escape" && open) {
+      event.preventDefault();
+      setQuery(null);
+    }
+  };
+
+  return (
+    <Field id="area" label={t.area} error={invalid && t.errors.area}>
+      <div className="relative">
+        <input
+          id="field-area"
+          role="combobox"
+          autoComplete="off"
+          spellCheck={false}
+          aria-autocomplete="list"
+          aria-expanded={open}
+          aria-controls="delivery-area-options"
+          aria-activedescendant={active ? optionId(active.id) : undefined}
+          aria-required="true"
+          aria-invalid={invalid}
+          aria-describedby={invalid ? "area-error" : undefined}
+          value={query ?? selected?.name[lang] ?? ""}
+          placeholder={selected?.name[lang] ?? t.selectArea}
+          onFocus={openList}
+          onClick={() => {
+            if (!open) openList();
+          }}
+          onBlur={() => setQuery(null)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setActiveIndex(-1);
+          }}
+          onKeyDown={handleKeys}
+          className={inputClass}
+        />
+        <div
+          hidden={!open}
+          className="absolute inset-x-0 top-full z-20 mt-2 max-h-60 overflow-auto overscroll-contain rounded-[14px] border-[1.5px] border-ink/25 bg-paper shadow-lg"
+        >
+          <ul id="delivery-area-options" role="listbox" aria-label={t.area}>
+            {open &&
+              matches.map((area) => (
+                <li
+                  key={area.id}
+                  id={optionId(area.id)}
+                  role="option"
+                  aria-selected={area.id === selected?.id}
+                  data-active={area === active ? "true" : undefined}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => choose(area)}
+                  className="flex min-h-11 cursor-pointer items-center px-4 py-2 font-ui text-base hover:bg-pink-tint aria-selected:font-bold data-[active=true]:bg-cotton-candy"
+                >
+                  {area.name[lang]}
+                </li>
+              ))}
+          </ul>
+          {open && matches.length === 0 && (
+            <p role="status" className="px-4 py-3 font-ui text-sm text-ink-soft">
+              {t.noAreas}
+            </p>
+          )}
+        </div>
+      </div>
+    </Field>
   );
 }
 
