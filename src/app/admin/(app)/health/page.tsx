@@ -9,7 +9,13 @@ import { requireStaff } from "@/server/admin/session";
 import { ConnectionsTab } from "./connections";
 import { type Bucket, bucketLabels } from "./labels";
 import { HealthOverviewTab, websiteSetup } from "./overview";
-import { type ProblemRange, problemRanges, ProblemsTab } from "./problems";
+import {
+  problemGroupKey,
+  problemRanges,
+  problemsHref,
+  ProblemsTab,
+  ProblemVisits,
+} from "./problems";
 import type { HealthOverview, HealthProblems } from "./types";
 import { VisitTab } from "./visit";
 
@@ -23,6 +29,79 @@ const tabs = [
 ] as const;
 
 const one = (value: string | string[] | undefined) => (Array.isArray(value) ? value[0] : value);
+const visitsPerPage = 25;
+type Db = Awaited<ReturnType<typeof adminClient>>;
+type SearchParams = Awaited<PageProps<"/admin/health">["searchParams"]>;
+
+async function Problems({ db, params }: { db: Db; params: SearchParams }) {
+  const range = problemRanges.find((r) => r.key === one(params.range)) ?? problemRanges[1];
+  const bucketParam = one(params.bucket);
+  const bucket =
+    bucketParam && Object.hasOwn(bucketLabels, bucketParam) ? (bucketParam as Bucket) : null;
+  const groupKey = one(params.group);
+  const now = Date.parse(minutesAgo(0));
+  const requestedEnd = Date.parse(one(params.until) ?? "");
+  const end = groupKey && requestedEnd >= 0 && requestedEnd <= now ? requestedEnd : now;
+  const periodEnd = new Date(end).toISOString();
+  const period = {
+    p_from: new Date(end - range.hours * 3_600_000).toISOString(),
+    p_to: periodEnd,
+  };
+  const { data, error } = await db.rpc("health_problems", period);
+  if (error) throw new Error(`health_problems failed: ${error.message}`);
+  const report = data as HealthProblems;
+  const group = groupKey
+    ? report.groups.find((g) => (!bucket || g.bucket === bucket) && problemGroupKey(g) === groupKey)
+    : undefined;
+
+  if (!groupKey || !group)
+    return (
+      <ProblemsTab
+        data={report}
+        range={range.key}
+        bucket={bucket}
+        periodEnd={periodEnd}
+        groupMissing={Boolean(groupKey)}
+      />
+    );
+
+  const requestedPage = Number(one(params.page));
+  const lastPage = Math.max(1, Math.ceil(group.visits / visitsPerPage));
+  const page =
+    Number.isSafeInteger(requestedPage) && requestedPage > 1
+      ? Math.min(requestedPage, lastPage)
+      : 1;
+  const offset = (page - 1) * visitsPerPage;
+  const { data: visits, error: visitsError } = await db
+    .rpc("health_problem_visits", {
+      ...period,
+      p_bucket: group.bucket,
+      p_event: group.event,
+      p_detail: group.detail,
+      p_handled: group.handled,
+    })
+    .order("last_at", { ascending: false })
+    .order("visit_id")
+    .range(offset, offset + visitsPerPage);
+  if (visitsError) throw new Error(`health_problem_visits failed: ${visitsError.message}`);
+  const pageHref = (number: number) =>
+    problemsHref(range.key, bucket, {
+      group: groupKey,
+      until: periodEnd,
+      page: number === 1 ? null : String(number),
+    });
+
+  return (
+    <ProblemVisits
+      group={group}
+      visits={visits.slice(0, visitsPerPage)}
+      rangeLabel={range.label}
+      backHref={problemsHref(range.key, bucket)}
+      previousHref={page > 1 ? pageHref(page - 1) : null}
+      nextHref={visits.length > visitsPerPage ? pageHref(page + 1) : null}
+    />
+  );
+}
 
 export default async function HealthPage({ searchParams }: PageProps<"/admin/health">) {
   await requireStaff("manager");
@@ -32,21 +111,7 @@ export default async function HealthPage({ searchParams }: PageProps<"/admin/hea
 
   let body: React.ReactNode;
   if (tab === "problems") {
-    const range = problemRanges.find((r) => r.key === one(params.range)) ?? problemRanges[1];
-    const bucketParam = one(params.bucket);
-    const bucket = bucketParam && bucketParam in bucketLabels ? (bucketParam as Bucket) : null;
-    const { data, error } = await db.rpc("health_problems", {
-      p_from: minutesAgo(range.hours * 60),
-      p_to: minutesAgo(-1),
-    });
-    if (error) throw new Error(`health_problems failed: ${error.message}`);
-    body = (
-      <ProblemsTab
-        data={data as HealthProblems}
-        range={range.key as ProblemRange}
-        bucket={bucket}
-      />
-    );
+    body = <Problems db={db} params={params} />;
   } else if (tab === "visit") {
     body = <VisitTab db={db} visit={one(params.visit)?.slice(0, 64) || null} />;
   } else if (tab === "connections") {

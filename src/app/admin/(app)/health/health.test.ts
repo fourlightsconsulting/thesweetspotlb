@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { type AttentionCounts, attentionItems } from "@/server/admin/attention";
 import { cronRows, healthCards, importRows, setupRows } from "./cards";
 import { problemTitle } from "./labels";
-import { ProblemsTab } from "./problems";
+import { problemGroupKey, ProblemsTab, ProblemVisits } from "./problems";
 import { scheduleLabel } from "./status";
 import type { HealthOverview, HealthProblems } from "./types";
 
@@ -211,7 +211,7 @@ describe("problems tab", () => {
           detail: "x is undefined",
           handled: "",
           times: 2,
-          visits: 1,
+          visits: 2,
           last_seen: "2026-10-09T09:00:00Z",
           latest_visit: "s1",
           pages: ["/en/order"],
@@ -248,11 +248,36 @@ describe("problems tab", () => {
       ],
     };
     const html = renderToStaticMarkup(
-      createElement(ProblemsTab, { data, range: "7d", bucket: null }),
+      createElement(ProblemsTab, {
+        data,
+        range: "7d",
+        bucket: null,
+        periodEnd: "2026-10-09T12:00:00.000Z",
+      }),
     );
     expect(html).toContain("Page error: x is undefined");
     expect(html).toContain("Typed: SWEET10");
     expect(html).toContain("/admin/health?tab=visit&amp;visit=s1");
     expect(html).toContain("Phone · Safari · iOS");
+    expect(html).toContain(`group=${problemGroupKey(data.groups[0])}`);
+    expect(html).toContain("until=2026-10-09T12%3A00%3A00.000Z");
+    expect(html).toContain("All visits");
+    expect(html).toContain("View visit");
+
+    const list = renderToStaticMarkup(
+      createElement(ProblemVisits, {
+        group: data.groups[0],
+        visits: [data.visits[0], { ...data.visits[0], visit_id: "s+2", problems: 1 }],
+        rangeLabel: "Last 7 days",
+        backHref: "/admin/health?tab=problems&range=7d",
+        previousHref: null,
+        nextHref: null,
+      }),
+    );
+    expect(list).toContain("2 visits · Last 7 days");
+    expect(list).toContain("tab=visit&amp;visit=s1");
+    expect(list).toContain("tab=visit&amp;visit=s%2B2");
+    expect(list).toContain("Back to problems");
+    expect(list).not.toContain("More visits");
   });
 });

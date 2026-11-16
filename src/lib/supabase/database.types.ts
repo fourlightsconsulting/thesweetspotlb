@@ -1556,6 +1556,26 @@ export type Database = {
         Returns: string;
       };
       health_overview: { Args: never; Returns: Json };
+      health_problem_visits: {
+        Args: {
+          p_bucket: string;
+          p_detail: string;
+          p_event: string;
+          p_from: string;
+          p_handled: string;
+          p_to: string;
+        };
+        Returns: {
+          attention: boolean;
+          browser: string | null;
+          device: string | null;
+          first_at: string;
+          last_at: string;
+          os: string | null;
+          problems: number;
+          visit_id: string;
+        }[];
+      };
       health_problems: { Args: { p_from: string; p_to: string }; Returns: Json };
       housekeeping: { Args: never; Returns: undefined };
       is_staff: {
