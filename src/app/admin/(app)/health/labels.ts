@@ -21,6 +21,8 @@ export const handledLabels: Record<string, string> = {
   robot: "Robot",
   staff: "Staff browsing",
   other_script: "Meta’s or Google’s script",
+  in_app_android: "Instagram or Facebook app on Android",
+  in_app_iphone: "Instagram or Facebook app on iPhone",
 };
 
 const eventLabels: Record<string, string> = {

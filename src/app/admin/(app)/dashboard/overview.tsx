@@ -1,7 +1,5 @@
 import { Bars, Kpi, KpiGrid, Panel, percent, TrendChart } from "@/components/admin/charts";
-import { AttentionList } from "@/components/admin/attention-list";
 import { money } from "@/components/admin/format";
-import type { Attention } from "@/server/admin/attention";
 import { dayLabel, type Period } from "./period";
 import type { MarketingData, OrdersData, WebData } from "./types";
 
@@ -13,21 +11,12 @@ type Props = {
   web: WebData;
   webBefore: WebData | null;
   marketing: MarketingData;
-  attention: Attention;
 };
 
 const ratio = (part: number, whole: number) => (whole > 0 ? part / whole : 0);
 
 /** The week (or any period) at a glance. */
-export function Overview({
-  period,
-  orders,
-  ordersBefore,
-  web,
-  webBefore,
-  marketing,
-  attention,
-}: Props) {
+export function Overview({ period, orders, ordersBefore, web, webBefore, marketing }: Props) {
   const t = orders.totals;
   const b = ordersBefore?.totals;
   const average = ratio(t.sales_cents, t.orders);
@@ -35,8 +24,6 @@ export function Overview({
 
   return (
     <div className="flex flex-col gap-6">
-      <AttentionList items={attention} />
-
       <KpiGrid>
         <Kpi
           label="Sales"

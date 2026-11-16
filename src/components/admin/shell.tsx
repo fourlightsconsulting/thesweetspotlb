@@ -46,14 +46,6 @@ export function AdminShell({ items, account, staff, children }: Props) {
           >
             <Icon name={item.icon} />
             {item.label}
-            {item.badge && (
-              <span
-                aria-label={`${item.badge.count} to look at`}
-                className={`ms-auto rounded-full px-2 text-xs leading-5 font-bold tabular-nums ${item.badge.tone === "bad" ? "bg-bad-soft text-bad" : "bg-wait-soft text-wait"}`}
-              >
-                {item.badge.count}
-              </span>
-            )}
           </Link>
         </Fragment>
       ))}

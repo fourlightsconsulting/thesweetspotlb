@@ -255,7 +255,6 @@ describe("dashboards render", () => {
           web: emptyWeb,
           webBefore: emptyWeb,
           marketing: emptyMarketing,
-          attention: [],
         }),
       ),
       render(createElement(OrdersReport, { data: emptyOrders, before: emptyOrders })),
@@ -274,11 +273,10 @@ describe("dashboards render", () => {
         web,
         webBefore: emptyWeb,
         marketing,
-        attention: [{ text: "1 order waiting", href: "/admin/orders", tone: "bad" }],
       }),
     );
     expect(overview).toContain("$20.00");
-    expect(overview).toContain("1 order waiting");
+    expect(overview).not.toContain("Needs attention");
     const ordersHtml = render(createElement(OrdersReport, { data: orders, before: emptyOrders }));
     expect(ordersHtml).toContain("Lotus Crêpe");
     const marketingHtml = render(

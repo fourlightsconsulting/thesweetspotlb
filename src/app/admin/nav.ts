@@ -12,8 +12,6 @@ export type NavItem = {
   group?: string;
   /** Other paths that belong to this section. */
   also?: string[];
-  /** A count beside the label (Health's problems). */
-  badge?: { count: number; tone: "bad" | "wait" };
 };
 
 export type NavIcon =

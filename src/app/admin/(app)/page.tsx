@@ -4,7 +4,6 @@ import { beirutDate } from "@/components/admin/format";
 import { PageHeader } from "@/components/admin/page-header";
 import { site } from "@/data/site";
 import { adminClient } from "@/lib/supabase/server";
-import { needsAttention } from "@/server/admin/health";
 import { atLeast, requireStaff } from "@/server/admin/session";
 import { DashboardControls, RefreshButton } from "./dashboard/controls";
 import { MarketingReport } from "./dashboard/marketing-report";
@@ -60,13 +59,12 @@ async function Dashboard({ db, tab, period, compare }: DashboardProps) {
       return <WebReport data={data} before={before} itemNames={names} />;
     }
     default: {
-      const [orders, ordersBefore, web, webBefore, marketing, needs] = await Promise.all([
+      const [orders, ordersBefore, web, webBefore, marketing] = await Promise.all([
         report<OrdersData>(db, "dashboard_orders", period),
         previous<OrdersData>("dashboard_orders"),
         report<WebData>(db, "dashboard_web", period),
         previous<WebData>("dashboard_web"),
         report<MarketingData>(db, "dashboard_marketing", period),
-        needsAttention(),
       ]);
       return (
         <Overview
@@ -76,7 +74,6 @@ async function Dashboard({ db, tab, period, compare }: DashboardProps) {
           web={web}
           webBefore={webBefore}
           marketing={marketing}
-          attention={needs}
         />
       );
     }

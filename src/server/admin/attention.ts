@@ -1,7 +1,5 @@
-// "Needs attention": the short list on the admin home and the Health page,
-// and the badge on Health's menu link. The counts come from the database's
-// health_attention(); the rest from settings this module is handed, so it
-// stays plain logic.
+// The Health page's "Needs attention" list uses counts from health_attention()
+// and the settings supplied by the caller.
 
 export type AttentionItem = { text: string; href: string; tone: "bad" | "wait" };
 export type Attention = AttentionItem[];
